@@ -136,13 +136,18 @@
           width: 100% !important;
         }
 
-        /* Force larger fonts on mobile */
+        /* Force larger fonts on mobile - exclude button containers */
         #newsletter-email p,
-        #newsletter-email td,
-        #newsletter-email a,
+        #newsletter-email a:not(.button-link),
         #newsletter-email li {
           font-size: 18px !important;
           line-height: 1.6 !important;
+        }
+
+        /* Keep button links at their specified size and line-height */
+        #newsletter-email a.button-link,
+        .button-link {
+          line-height: 44px !important;
         }
 
         #newsletter-email h2 {
@@ -222,13 +227,6 @@
         a,
         li {
           font-family: Arial, sans-serif !important;
-          font-size: 16px !important;
-        }
-        h2 {
-          font-size: 32px !important;
-        }
-        h3 {
-          font-size: 18px !important;
         }
       </style>
     <![endif]-->
@@ -307,7 +305,7 @@
                                   style="
                                     padding-top: 32px;
                                     padding-right: 50px;
-                                    padding-bottom: 30px;
+                                    padding-bottom: 15px;
                                     padding-left: 20px;
                                   "
                                   class="section-text-area section-content-cell padding-mobile-right"
@@ -365,7 +363,7 @@
                                 <tr>
                                   <td
                                     style="
-                                      padding-top: 60px;
+                                      padding-top: 35px;
                                       padding-right: 50px;
                                       padding-bottom: 10px;
                                       padding-left: 50px;
@@ -727,12 +725,7 @@ in the market.
                                     >
                                       Two years in, BNG is becoming a defining feature of land use and development in England. Those who plan early, understand local demand and invest in high-quality habitats will be best placed as the market continues to mature.
                                     </p>
-                                    <table
-                                      border="0"
-                                      cellspacing="0"
-                                      cellpadding="0"
-                                      width="100%"
-                                    >
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                       <tr>
                                         <td height="25"></td>
                                       </tr>
@@ -748,11 +741,11 @@ in the market.
                                           align="center"
                                           valign="middle"
                                           bgcolor="#000000"
-                                          width="240"
+                                          width="280"
                                           height="44"
                                           style="
                                             background-color: #000000;
-                                            width: 240px;
+                                            width: 280px;
                                             height: 44px;
                                           "
                                         >
@@ -764,12 +757,11 @@ in the market.
                                               text-decoration: none !important;
                                               border-bottom: none !important;
                                               font-family: Arial, sans-serif;
-                                              font-size: 14px;
+                                              font-size: 13px;
                                               font-weight: bold;
                                               letter-spacing: 0.1em;
-                                              text-transform: uppercase;
                                               display: block;
-                                              width: 240px;
+                                              width: 280px;
                                               height: 44px;
                                               line-height: 44px;
                                               text-align: center;
@@ -1037,12 +1029,7 @@ priorities.
                                     >
                                       The project demonstrates how early engagement and well-planned BNG delivery can remove uncertainty, unlock development and investment in both nature and the local economy.
                                     </p>
-                                    <table
-                                      border="0"
-                                      cellspacing="0"
-                                      cellpadding="0"
-                                      width="100%"
-                                    >
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                       <tr>
                                         <td height="25"></td>
                                       </tr>
@@ -1058,11 +1045,11 @@ priorities.
                                           align="center"
                                           valign="middle"
                                           bgcolor="#000000"
-                                          width="280"
+                                          width="320"
                                           height="44"
                                           style="
                                             background-color: #000000;
-                                            width: 280px;
+                                            width: 320px;
                                             height: 44px;
                                           "
                                         >
@@ -1074,12 +1061,11 @@ priorities.
                                               text-decoration: none !important;
                                               border-bottom: none !important;
                                               font-family: Arial, sans-serif;
-                                              font-size: 13px;
+                                              font-size: 12px;
                                               font-weight: bold;
                                               letter-spacing: 0.1em;
-                                              text-transform: uppercase;
                                               display: block;
-                                              width: 280px;
+                                              width: 320px;
                                               height: 44px;
                                               line-height: 44px;
                                               text-align: center;
@@ -1292,12 +1278,7 @@ priorities.
                                     >
                                       This project demonstrates how BNG can enable development rather than constrain it, aligning ecological delivery with real-world operational needs and directing investment where it delivers the greatest benefit.
                                     </p>
-                                    <table
-                                      border="0"
-                                      cellspacing="0"
-                                      cellpadding="0"
-                                      width="100%"
-                                    >
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                       <tr>
                                         <td height="25"></td>
                                       </tr>
@@ -1329,12 +1310,11 @@ priorities.
                                               text-decoration: none !important;
                                               border-bottom: none !important;
                                               font-family: Arial, sans-serif;
-                                              font-size: 13px;
+                                              font-size: 14px;
                                               font-weight: bold;
-                                              letter-spacing: 0.1em;
-                                              text-transform: uppercase;
+                                              letter-spacing: 0.15em;
                                               display: block;
-                                              width: 280px;
+                                              width: 180px;
                                               height: 44px;
                                               line-height: 44px;
                                               text-align: center;
@@ -1615,12 +1595,7 @@ priorities.
                                       ">
                                     Where risk is recognised, action is growing. With nature at the centre, we are better
                                     placed to protect both our food and our environment.</p>
-                                    <table
-                                      border="0"
-                                      cellspacing="0"
-                                      cellpadding="0"
-                                      width="100%"
-                                    >
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                       <tr>
                                         <td height="25"></td>
                                       </tr>
@@ -1652,12 +1627,11 @@ priorities.
                                               text-decoration: none !important;
                                               border-bottom: none !important;
                                               font-family: Arial, sans-serif;
-                                              font-size: 13px;
+                                              font-size: 12px;
                                               font-weight: bold;
                                               letter-spacing: 0.1em;
-                                              text-transform: uppercase;
                                               display: block;
-                                              width: 240px;
+                                              width: 280px;
                                               height: 44px;
                                               line-height: 44px;
                                               text-align: center;
@@ -1884,12 +1858,7 @@ priorities.
                                     >
                                       Together, we will continue to focus on delivering high-integrity off-site BNG that creates lasting value for nature, landowners, developers and communities.
                                     </p>
-                                    <table
-                                      border="0"
-                                      cellspacing="0"
-                                      cellpadding="0"
-                                      width="100%"
-                                    >
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                       <tr>
                                         <td height="25"></td>
                                       </tr>
@@ -1905,11 +1874,11 @@ priorities.
                                           align="center"
                                           valign="middle"
                                           bgcolor="#000000"
-                                          width="280"
+                                          width="180"
                                           height="44"
                                           style="
                                             background-color: #000000;
-                                            width: 280px;
+                                            width: 180px;
                                             height: 44px;
                                           "
                                         >
@@ -1923,10 +1892,9 @@ priorities.
                                               font-family: Arial, sans-serif;
                                               font-size: 14px;
                                               font-weight: bold;
-                                              letter-spacing: 0.1em;
-                                              text-transform: uppercase;
+                                              letter-spacing: 0.15em;
                                               display: block;
-                                              width: 280px;
+                                              width: 180px;
                                               height: 44px;
                                               line-height: 44px;
                                               text-align: center;
@@ -1941,6 +1909,7 @@ priorities.
                               </tbody>
                             </table>
                           </div>
+
 
                           <!-- FOOTER -->
                           <table
@@ -1975,7 +1944,7 @@ priorities.
                                   </table>
                                   <p
                                     style="
-                                      font-size: 14px;
+                                      font-size: 12px;
                                       line-height: 1.6 !important;
                                       margin: 0 0 12px 0;
                                       font-family: 'Inter', -apple-system,
@@ -1989,7 +1958,7 @@ priorities.
                                   </p>
                                   <p
                                     style="
-                                      font-size: 14px;
+                                      font-size: 12px;
                                       line-height: 1.5;
                                       margin: 0;
                                       font-family: 'Inter', -apple-system,
