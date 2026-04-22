@@ -1,0 +1,2327 @@
+<!doctype html>
+<html
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>Biofarm: April update from the ground</title>
+    <!--[if mso]>
+      <noscript>
+        <xml>
+          <o:OfficeDocumentSettings>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+          </o:OfficeDocumentSettings>
+        </xml>
+      </noscript>
+      <style type="text/css">
+        a,
+        a:link,
+        a:visited {
+          color: #f5f6f1 !important;
+          text-decoration: none !important;
+        }
+        .button-link,
+        .button-link:link,
+        .button-link:visited {
+          color: #f5f6f1 !important;
+          text-decoration: none !important;
+        }
+        td[bgcolor='#000000'] a {
+          color: #f5f6f1 !important;
+          text-decoration: none !important;
+        }
+      </style>
+    <![endif]-->
+    <style>
+      /* Force light color scheme - prevent dark-mode inversion */
+      :root {
+        color-scheme: light only;
+        supported-color-schemes: light only;
+      }
+
+      /* Brand fonts - with fallbacks for unsupported clients */
+      @font-face {
+        font-family: 'RATI';
+        src: url('https://static1.squarespace.com/static/6818f9d9bff1414041f33bf3/t/6824c94beed6e10aa5f3a5c5/1747241291677/BauhausRatiDisplay-ExtraLight.otf')
+          format('opentype');
+        font-weight: 300;
+        font-style: normal;
+      }
+
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap');
+
+      /* Reset styles */
+      body,
+      table,
+      td,
+      p,
+      a,
+      li {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      table,
+      td {
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+      img {
+        -ms-interpolation-mode: bicubic;
+        border: 0;
+        height: auto;
+        line-height: 100%;
+        outline: none;
+        text-decoration: none;
+      }
+
+      html,
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+      }
+
+      /* Prevent any fixed-width descendant from overflowing the viewport */
+      .body,
+      #newsletter-email,
+      #newsletter-email table,
+      #newsletter-email td,
+      #newsletter-email img {
+        max-width: 100% !important;
+      }
+
+      /* Gmail iOS: block any descendant from ever pushing beyond 100vw */
+      #newsletter-email * {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Override link styles for Outlook Web and other clients */
+      a,
+      a:link,
+      a:visited,
+      a:hover,
+      a:active {
+        text-decoration: none !important;
+        border-bottom: none !important;
+      }
+
+      /* Target button links specifically */
+      .button-link,
+      .button-link:link,
+      .button-link:visited,
+      .button-link:hover,
+      .button-link:active {
+        text-decoration: none !important;
+        color: #f5f6f1 !important;
+        border-bottom: none !important;
+      }
+
+      /* Outlook.com / Outlook Web specific overrides */
+      [class~='x_button-link'],
+      [class*='x_button'] a,
+      [class^='x_'] a,
+      .x_button-link {
+        text-decoration: none !important;
+        color: #f5f6f1 !important;
+        border-bottom: none !important;
+      }
+
+      /* Force no underline on all links in tables */
+      table a,
+      td a,
+      table a:link,
+      table a:visited,
+      td a:link,
+      td a:visited {
+        text-decoration: none !important;
+        border-bottom: none !important;
+      }
+
+      /* Keep inline story links underlined */
+      a.inline-link,
+      a.inline-link:link,
+      a.inline-link:visited,
+      a.inline-link:hover,
+      a.inline-link:active {
+        text-decoration: underline !important;
+        color: #000000 !important;
+      }
+
+      /* Additional override for Outlook Web button cells */
+      td[bgcolor='#000000'] a,
+      td[bgcolor='#4B5E36'] a,
+      td[bgcolor='#A6B897'] a {
+        text-decoration: none !important;
+        color: #f5f6f1 !important;
+        border-bottom: none !important;
+      }
+
+      body,
+      #newsletter-email,
+      #newsletter-email td,
+      #newsletter-email p,
+      #newsletter-email a,
+      #newsletter-email li {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Arial,
+          sans-serif;
+        font-weight: 300;
+      }
+
+      #newsletter-email h1,
+      #newsletter-email h2,
+      #newsletter-email h3,
+      #newsletter-email h4 {
+        font-family: 'RATI', 'Inter', Georgia, 'Times New Roman', Times, serif;
+        font-weight: 300;
+      }
+
+      /* Gmail mobile fix - Gmail ignores media queries but reads these */
+      u + .body #newsletter-email {
+        width: 100% !important;
+        max-width: 594px !important;
+      }
+
+      @media only screen and (max-width: 600px) {
+        #newsletter-email {
+          width: 100% !important;
+        }
+
+        /* Mobile font sizes */
+        #newsletter-email p,
+        #newsletter-email a:not(.button-link),
+        #newsletter-email li {
+          font-size: 18px !important;
+          line-height: 1.6 !important;
+        }
+
+        #newsletter-email a.button-link,
+        .button-link {
+          line-height: 44px !important;
+        }
+
+        #newsletter-email h2 {
+          font-size: 32px !important;
+        }
+
+        #newsletter-email h3 {
+          font-size: 24px !important;
+        }
+
+        .show-desktop-only,
+        .section-spacing-left,
+        .section-spacing-right,
+        .spacing-above,
+        .spacing-below,
+        .desktop-gap {
+          display: none !important;
+          mso-hide: all !important;
+          width: 0 !important;
+          height: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+        }
+
+        .stack-cell-wrap,
+        .stack-cell-up,
+        .stack-cell-down,
+        table.side-layout th,
+        table.side-layout td.section-image-cell,
+        table.side-layout td.section-text-area,
+        table.blog-section.side-layout th,
+        table.blog-section.side-layout td.section-text-area {
+          display: block !important;
+          width: 100% !important;
+        }
+
+        table.side-layout {
+          width: 100% !important;
+        }
+
+        table.side-layout td.section-image-cell {
+          padding: 0 20px !important;
+        }
+
+        table.side-layout td.section-text-area {
+          padding: 16px 20px 20px 20px !important;
+        }
+
+        .padding-mobile-both {
+          padding-left: 20px !important;
+          padding-right: 20px !important;
+        }
+
+        .padding-mobile-right {
+          padding-right: 20px !important;
+        }
+
+        .button-section .section-content-cell,
+        .cta-section td {
+          text-align: center !important;
+        }
+
+        img.section-scaleable-image {
+          height: auto !important;
+          width: 100% !important;
+        }
+
+        img.card-scaleable-image {
+          height: auto !important;
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+
+        /* Center stacked cards' image cell on mobile so the 240-px image sits
+           in the middle of the column instead of hugging the left edge */
+        table.side-layout td.section-image-cell {
+          text-align: center !important;
+        }
+
+        img.cta-illustration {
+          width: 180px !important;
+          max-width: 180px !important;
+          height: auto !important;
+          margin: 0 auto !important;
+        }
+
+        .brand-illustration {
+          max-width: 80px !important;
+        }
+
+        .brand-illustration-small {
+          max-width: 50px !important;
+        }
+      }
+
+    </style>
+  </head>
+  <body class="body" style="margin: 0; padding: 0; background-color: #ffffff">
+    <!--[if mso]>
+      <style type="text/css">
+        body,
+        table,
+        td,
+        p,
+        a,
+        li {
+          font-family: Arial, sans-serif !important;
+        }
+      </style>
+    <![endif]-->
+    <!-- Outer wrapper with white background -->
+    <table
+      role="presentation"
+      border="0"
+      cellpadding="0"
+      cellspacing="0"
+      width="100%"
+      style="background-color: #ffffff"
+    >
+      <tr>
+        <td align="center" style="padding: 20px 10px">
+          <!-- Email container -->
+          <table
+            style="margin: 0 auto; max-width: 594px"
+            align="center"
+            id="newsletter-email"
+            bgcolor="#F5F6F1"
+            width="594"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+          >
+            <tbody>
+              <tr>
+                <td
+                  class="book-contrast-2"
+                  id="newsletter-email-wrapper"
+                  valign="top"
+                  align="center"
+                >
+                  <!-- Preheader text (hidden) -->
+                  <div
+                    style="
+                      display: none;
+                      max-height: 0;
+                      overflow: hidden;
+                      opacity: 0;
+                      color: transparent;
+                      mso-hide: all;
+                    "
+                  >
+                    Stories from the ground this month include the latest
+                    government response and what it means for our landowner and
+                    developer partners, BNG deals, and a new habitat bank in Mid
+                    Sussex.
+                  </div>
+
+                  <!-- HEADER WITH LOGO -->
+                  <table
+                    id="newsletter-section-header"
+                    border="0"
+                    cellspacing="0"
+                    cellpadding="0"
+                    width="100%"
+                  >
+                    <tbody>
+                      <tr>
+                        <td
+                          id="newsletter-section-header-cell"
+                          valign="middle"
+                          align="center"
+                          style="position: relative"
+                        >
+                          <table
+                            style="background-color: transparent"
+                            class="section-content header-section header-section-center"
+                            bgcolor="transparent"
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                          >
+                            <tbody>
+                              <tr>
+                                <td
+                                  style="
+                                    padding-top: 40px;
+                                    padding-right: 50px;
+                                    padding-bottom: 20px;
+                                    padding-left: 50px;
+                                  "
+                                  class="section-text-area section-content-cell padding-mobile-both"
+                                  valign="middle"
+                                  align="center"
+                                >
+                                  <a
+                                    href="https://www.biofarm.co.uk/?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                    style="
+                                      display: inline-block;
+                                      text-decoration: none;
+                                    "
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/January%20Newsletter%20-%20Imagery/logo.png"
+                                      alt="Biofarm"
+                                      width="190"
+                                      height="36"
+                                      style="display: block; border: 0"
+                                    />
+                                  </a>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <!-- BODY -->
+                  <table
+                    id="newsletter-section-body"
+                    border="0"
+                    cellspacing="0"
+                    cellpadding="0"
+                    width="100%"
+                  >
+                    <tbody>
+                      <tr>
+                        <td
+                          id="newsletter-section-body-cell"
+                          width="100%"
+                          valign="top"
+                          align="center"
+                        >
+                          <!-- Intro Section -->
+                          <div id="text-intro">
+                            <table
+                              class="text-section section-content"
+                              bgcolor="transparent"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    style="
+                                      padding-top: 10px;
+                                      padding-right: 50px;
+                                      padding-bottom: 30px;
+                                      padding-left: 50px;
+                                      color: #000;
+                                      background-color: transparent;
+                                      text-align: left;
+                                    "
+                                    class="section-text-area section-content-cell padding-mobile-both"
+                                    valign="top"
+                                    align="left"
+                                  >
+                                    <p
+                                      style="
+                                        font-size: 18px;
+                                        line-height: 1.6;
+                                        margin: 0;
+                                        font-weight: 300;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Stories from the ground this month include
+                                      the latest government response and what it
+                                      means for our landowner and developer
+                                      partners, BNG deals, and a new habitat
+                                      bank in Mid Sussex.
+                                    </p>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Hero Image (full width) -->
+                          <div id="image-hero">
+                            <table
+                              class="image-section below-layout section-content"
+                              bgcolor="transparent"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      width="100%"
+                                    >
+                                      <tbody>
+                                        <tr>
+                                          <td
+                                            style="padding: 0"
+                                            class="section-image-cell section-content-cell"
+                                            valign="middle"
+                                            align="center"
+                                          >
+                                            <img
+                                              style="
+                                                display: block;
+                                                border: 0;
+                                                text-decoration: none;
+                                                line-height: 0;
+                                                background-color: transparent;
+                                                font-weight: normal;
+                                                height: auto;
+                                                width: 594px;
+                                                max-width: 100%;
+                                                mso-line-height-rule: exactly;
+                                                margin: 0 auto;
+                                              "
+                                              alt="Site team reviewing plans on a development site"
+                                              height="auto"
+                                              width="594"
+                                              src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/hero-hardhats.png"
+                                              class="section-scaleable-image"
+                                            />
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- ============================================ -->
+                          <!-- SECTION 1: Government response (full-width)  -->
+                          <!-- ============================================ -->
+
+                          <div id="header-gov-response">
+                            <table
+                              class="text-section section-content"
+                              bgcolor="transparent"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    style="
+                                      padding: 30px 50px 10px 50px;
+                                      color: #000;
+                                      background-color: transparent;
+                                      text-align: left;
+                                    "
+                                    class="section-text-area section-content-cell padding-mobile-both"
+                                    valign="top"
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 10px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 26px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Government response confirms it: BNG is
+                                      settling. Off-site is now central
+                                    </h3>
+                                    <table
+                                      role="presentation"
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                    >
+                                      <tr>
+                                        <td
+                                          height="1"
+                                          bgcolor="#A6B897"
+                                          style="
+                                            height: 1px;
+                                            line-height: 1px;
+                                            font-size: 1px;
+                                            background-color: #a6b897;
+                                          "
+                                        >
+                                          &nbsp;
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <div id="text-gov-response">
+                            <table
+                              class="text-section section-content"
+                              bgcolor="transparent"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    style="
+                                      padding: 10px 50px 10px 50px;
+                                      color: #000;
+                                      background-color: transparent;
+                                      text-align: left;
+                                    "
+                                    class="section-text-area section-content-cell padding-mobile-both"
+                                    valign="top"
+                                  >
+                                    <p
+                                      style="
+                                        font-size: 18px;
+                                        line-height: 1.6;
+                                        margin: 0 0 16px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      The latest government response to BNG
+                                      consultations does something important. It
+                                      brings clarity.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 18px;
+                                        line-height: 1.6;
+                                        margin: 0 0 16px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Not just on direction, but on how delivery
+                                      will work in practice.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 18px;
+                                        line-height: 1.6;
+                                        margin: 0 0 16px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      The 10% requirement remains. But delivery
+                                      is becoming more practical, more flexible,
+                                      and easier to plan for.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 18px;
+                                        line-height: 1.6;
+                                        margin: 0 0 16px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Key changes are being implemented through
+                                      2026. This includes updates to off-site
+                                      delivery ahead of July 2026, and BNG
+                                      applying to Nationally Significant
+                                      Infrastructure Projects (NSIPs) from
+                                      November 2026.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 18px;
+                                        line-height: 1.6;
+                                        margin: 0 0 24px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Find out what this means for you.
+                                    </p>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/stories/government-response-to-bng-consultations-off-site-now-central?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Read the full story</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Spacer -->
+                          <table
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                            role="presentation"
+                          >
+                            <tr>
+                              <td
+                                height="40"
+                                style="
+                                  font-size: 1px;
+                                  line-height: 40px;
+                                  mso-line-height-rule: exactly;
+                                "
+                              >
+                                &nbsp;
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- ============================================ -->
+                          <!-- SECTION 2: Avon Fire and Rescue (side-layout) -->
+                          <!-- ============================================ -->
+
+                          <div id="story-avon">
+                            <table
+                              role="presentation"
+                              class="section-content side-layout"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    class="section-image-cell"
+                                    width="240"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 15px 0 20px"
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/avon-fire.png"
+                                      width="240"
+                                      alt="Avon Fire and Rescue Service fire engine"
+                                      class="card-scaleable-image"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        width: 240px;
+                                        height: auto;
+                                        max-width: 240px;
+                                      "
+                                    />
+                                  </td>
+                                  <td
+                                    class="section-text-area"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 20px 0 0"
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 10px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 20px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Avon Fire and Rescue Service: when space
+                                      is tight, progress should not be
+                                    </h3>
+                                    <table
+                                      role="presentation"
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                    >
+                                      <tr>
+                                        <td
+                                          height="1"
+                                          bgcolor="#A6B897"
+                                          style="
+                                            height: 1px;
+                                            line-height: 1px;
+                                            font-size: 1px;
+                                            background-color: #a6b897;
+                                          "
+                                        >
+                                          &nbsp;
+                                        </td>
+                                      </tr>
+                                    </table>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 12px 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Public services do not have spare land.
+                                      Fire stations, hospitals and emergency
+                                      hubs are built to serve people first.
+                                      Every square metre has a purpose.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      And these sites need to keep evolving.
+                                      Expanding, reconfiguring, responding to
+                                      demand.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      BNG needs to work within
+                                      that reality. Delivering it on site can
+                                      mean setting land aside. Space that may be
+                                      needed in the future.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 18px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      It doesn&rsquo;t have to work that way.
+                                    </p>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/stories/avon-fire-and-rescue-service-bng-that-works-alongside-operational-sites?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Read the full story</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Spacer -->
+                          <table
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                            role="presentation"
+                          >
+                            <tr>
+                              <td
+                                height="40"
+                                style="
+                                  font-size: 1px;
+                                  line-height: 40px;
+                                  mso-line-height-rule: exactly;
+                                "
+                              >
+                                &nbsp;
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- ============================================ -->
+                          <!-- SECTION 3: Worth Abbey (side-layout)         -->
+                          <!-- ============================================ -->
+
+                          <div id="story-worth-abbey">
+                            <table
+                              role="presentation"
+                              class="section-content side-layout"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    class="section-image-cell"
+                                    width="240"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 15px 0 20px"
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/worth-abbey.png"
+                                      width="240"
+                                      alt="Worth Abbey estate in the High Weald"
+                                      class="card-scaleable-image"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        width: 240px;
+                                        height: auto;
+                                        max-width: 240px;
+                                      "
+                                    />
+                                  </td>
+                                  <td
+                                    class="section-text-area"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 20px 0 0"
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 10px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 20px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Worth Abbey arrives: a landmark habitat
+                                      bank for the High Weald
+                                    </h3>
+                                    <table
+                                      role="presentation"
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                    >
+                                      <tr>
+                                        <td
+                                          height="1"
+                                          bgcolor="#A6B897"
+                                          style="
+                                            height: 1px;
+                                            line-height: 1px;
+                                            font-size: 1px;
+                                            background-color: #a6b897;
+                                          "
+                                        >
+                                          &nbsp;
+                                        </td>
+                                      </tr>
+                                    </table>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 12px 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      A major new habitat bank is coming to
+                                      market in Mid Sussex. Built for developers
+                                      who need BNG that holds up in policy and
+                                      in practice.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 18px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Set across 25 hectares (just over 60
+                                      acres) in the High Weald,
+                                      <a
+                                        class="inline-link"
+                                        href="https://www.google.com/maps/d/u/0/viewer?mid=1_0Y6MlTcCB2SSTEzCayZw8mZM5aYG50&amp;ll=51.116673300000045%2C-0.115782099999997&amp;z=8"
+                                        style="
+                                          color: #000000;
+                                          text-decoration: underline !important;
+                                        "
+                                        >Worth Abbey</a
+                                      >
+                                      will deliver 131 units across lowland
+                                      meadow, other neutral grassland, mixed
+                                      scrub and individual trees.
+                                    </p>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/stories/worth-abbey-habitat-bank-arrives-biodiversity-net-gain-in-the-high-weald?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Read the full story</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Spacer -->
+                          <table
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                            role="presentation"
+                          >
+                            <tr>
+                              <td
+                                height="40"
+                                style="
+                                  font-size: 1px;
+                                  line-height: 40px;
+                                  mso-line-height-rule: exactly;
+                                "
+                              >
+                                &nbsp;
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- ============================================ -->
+                          <!-- SECTION 4: Acorn Property Group (side-layout) -->
+                          <!-- ============================================ -->
+
+                          <div id="story-acorn">
+                            <table
+                              role="presentation"
+                              class="section-content side-layout"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    class="section-image-cell"
+                                    width="240"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 15px 0 20px"
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/acorn-fairford.png"
+                                      width="240"
+                                      alt="New homes at a Cotswold-stone development"
+                                      class="card-scaleable-image"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        width: 240px;
+                                        height: auto;
+                                        max-width: 240px;
+                                      "
+                                    />
+                                  </td>
+                                  <td
+                                    class="section-text-area"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 20px 0 0"
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 10px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 20px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Acorn Property Group: the right BNG
+                                      solution, ready when it&rsquo;s needed
+                                    </h3>
+                                    <table
+                                      role="presentation"
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                    >
+                                      <tr>
+                                        <td
+                                          height="1"
+                                          bgcolor="#A6B897"
+                                          style="
+                                            height: 1px;
+                                            line-height: 1px;
+                                            font-size: 1px;
+                                            background-color: #a6b897;
+                                          "
+                                        >
+                                          &nbsp;
+                                        </td>
+                                      </tr>
+                                    </table>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 12px 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Not every BNG story needs to be complex.
+                                      Sometimes, it&rsquo;s simply about having
+                                      the right solution in the right place, at
+                                      the right time.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 18px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Our recent work with independent
+                                      developers,
+                                      <a
+                                        class="inline-link"
+                                        href="https://www.acornpropertygroup.org/"
+                                        style="
+                                          color: #000000;
+                                          text-decoration: underline !important;
+                                        "
+                                        >Acorn Property Group</a
+                                      >, is a perfect example. Supporting the
+                                      redevelopment of a former school site in
+                                      Fairford into a collection of 34
+                                      high-quality new and converted homes, they
+                                      needed a clear, compliant BNG solution
+                                      within the Upper Thames Clay Vales.
+                                    </p>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/stories/delivering-new-homes-in-fairford-with-a-simple-compliant-bng-solution-for-acorn-property-group?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Read the full story</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Spacer -->
+                          <table
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                            role="presentation"
+                          >
+                            <tr>
+                              <td
+                                height="40"
+                                style="
+                                  font-size: 1px;
+                                  line-height: 40px;
+                                  mso-line-height-rule: exactly;
+                                "
+                              >
+                                &nbsp;
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- ============================================ -->
+                          <!-- SECTION 5: Tamworth Effect (side-layout)     -->
+                          <!-- ============================================ -->
+
+                          <div id="story-tamworth">
+                            <table
+                              role="presentation"
+                              class="section-content side-layout"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    class="section-image-cell"
+                                    width="240"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 15px 0 20px"
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/tamworth-pig.png"
+                                      width="240"
+                                      alt="A Tamworth pig grazing"
+                                      class="card-scaleable-image"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        width: 240px;
+                                        height: auto;
+                                        max-width: 240px;
+                                      "
+                                    />
+                                  </td>
+                                  <td
+                                    class="section-text-area"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 20px 0 0"
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 10px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 20px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Notes from the field: the Tamworth Effect
+                                    </h3>
+                                    <table
+                                      role="presentation"
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                    >
+                                      <tr>
+                                        <td
+                                          height="1"
+                                          bgcolor="#A6B897"
+                                          style="
+                                            height: 1px;
+                                            line-height: 1px;
+                                            font-size: 1px;
+                                            background-color: #a6b897;
+                                          "
+                                        >
+                                          &nbsp;
+                                        </td>
+                                      </tr>
+                                    </table>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 12px 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      You don&rsquo;t need to overhaul your land
+                                      to restore it. Sometimes nature can do the
+                                      heavy lifting for you.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Tamworth pigs are a simple example of
+                                      that.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 18px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      They&rsquo;re being used across England to
+                                      reinstate natural processes, improve
+                                      biodiversity, and create practical,
+                                      long-term value through Biodiversity Net
+                                      Gain (BNG).
+                                    </p>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/stories/how-tamworth-pigs-can-increase-biodiversity-and-unlock-income-on-your-land?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Read the full story</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Spacer -->
+                          <table
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                            role="presentation"
+                          >
+                            <tr>
+                              <td
+                                height="40"
+                                style="
+                                  font-size: 1px;
+                                  line-height: 40px;
+                                  mso-line-height-rule: exactly;
+                                "
+                              >
+                                &nbsp;
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- ============================================ -->
+                          <!-- SECTION 6: BNG starts on the ground (side)   -->
+                          <!-- ============================================ -->
+
+                          <div id="story-rycote">
+                            <table
+                              role="presentation"
+                              class="section-content side-layout"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    class="section-image-cell"
+                                    width="240"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 15px 0 20px"
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/rycote-planning.png"
+                                      width="240"
+                                      alt="Ecologists and landowner walking the site"
+                                      class="card-scaleable-image"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        width: 240px;
+                                        height: auto;
+                                        max-width: 240px;
+                                      "
+                                    />
+                                  </td>
+                                  <td
+                                    class="section-text-area"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 20px 0 0"
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 10px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 20px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      BNG starts on the ground: setting up every
+                                      habitat bank for success
+                                    </h3>
+                                    <table
+                                      role="presentation"
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                    >
+                                      <tr>
+                                        <td
+                                          height="1"
+                                          bgcolor="#A6B897"
+                                          style="
+                                            height: 1px;
+                                            line-height: 1px;
+                                            font-size: 1px;
+                                            background-color: #a6b897;
+                                          "
+                                        >
+                                          &nbsp;
+                                        </td>
+                                      </tr>
+                                    </table>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 12px 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      At the start of every habitat bank scheme,
+                                      we bring all stakeholders together on
+                                      site. Not for a tick-box meeting. To make
+                                      BNG work in practice.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 18px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      At
+                                      <a
+                                        class="inline-link"
+                                        href="https://www.biofarm.co.uk/stories/rycote-farm-bng-that-delivers-lasting-returns-for-people-development-and-naturenbsp?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                        style="
+                                          color: #000000;
+                                          text-decoration: underline !important;
+                                        "
+                                        >Rycote Farm</a
+                                      >
+                                      (BGS-150725001) in South Oxfordshire, our
+                                      ecologists walked the land with the
+                                      landowner and local specialist partners
+                                      who know the area and work with the
+                                      landscape every day. Together, we mapped
+                                      constraints, challenged assumptions, and
+                                      agreed what good delivery actually looks
+                                      like on the ground.
+                                    </p>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/stories/how-bng-delivery-starts-on-the-ground?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Read the full story</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Spacer -->
+                          <table
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                            role="presentation"
+                          >
+                            <tr>
+                              <td
+                                height="40"
+                                style="
+                                  font-size: 1px;
+                                  line-height: 40px;
+                                  mso-line-height-rule: exactly;
+                                "
+                              >
+                                &nbsp;
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- ============================================ -->
+                          <!-- SECTION 7: Christy Wells / Fisher German      -->
+                          <!-- ============================================ -->
+
+                          <div id="story-christy">
+                            <table
+                              role="presentation"
+                              class="section-content side-layout"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    class="section-image-cell"
+                                    width="240"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 15px 0 20px"
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/christy-wells-field.png"
+                                      width="240"
+                                      alt="Crop field at sunrise"
+                                      class="card-scaleable-image"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        width: 240px;
+                                        height: auto;
+                                        max-width: 240px;
+                                      "
+                                    />
+                                  </td>
+                                  <td
+                                    class="section-text-area"
+                                    valign="top"
+                                    align="left"
+                                    style="padding: 0 20px 0 0"
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 10px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 20px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Biodiversity Net Gain: a Landowner
+                                      Perspective from Christy Wells, Natural
+                                      Capital Specialist, Fisher German
+                                    </h3>
+                                    <table
+                                      role="presentation"
+                                      width="100%"
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                    >
+                                      <tr>
+                                        <td
+                                          height="1"
+                                          bgcolor="#A6B897"
+                                          style="
+                                            height: 1px;
+                                            line-height: 1px;
+                                            font-size: 1px;
+                                            background-color: #a6b897;
+                                          "
+                                        >
+                                          &nbsp;
+                                        </td>
+                                      </tr>
+                                    </table>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 12px 0 12px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      As the BNG market continues to evolve, the
+                                      focus for many landowners is shifting from
+                                      whether to participate to how BNG fits
+                                      within the long-term structure of their
+                                      land management and rural businesses.
+                                    </p>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 18px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Historically, environmental schemes have
+                                      compensated landowners based on
+                                      &ldquo;income foregone and cost
+                                      incurred.&rdquo; BNG, by contrast,
+                                      introduces a market mechanism where
+                                      biodiversity improvements can generate
+                                      long-term commercial value in their own
+                                      right.
+                                    </p>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/stories/how-bng-is-creating-new-opportunities-for-landowners-while-recognising-value-of-environmental-stewardship?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Read the full story</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Spacer -->
+                          <table
+                            border="0"
+                            cellspacing="0"
+                            cellpadding="0"
+                            width="100%"
+                            role="presentation"
+                          >
+                            <tr>
+                              <td
+                                height="40"
+                                style="
+                                  font-size: 1px;
+                                  line-height: 40px;
+                                  mso-line-height-rule: exactly;
+                                "
+                              >
+                                &nbsp;
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- ============================================ -->
+                          <!-- GREEN CTA BLOCK                              -->
+                          <!-- ============================================ -->
+
+                          <div id="cta-green">
+                            <table
+                              role="presentation"
+                              bgcolor="#A6B897"
+                              class="side-layout"
+                              border="0"
+                              cellspacing="0"
+                              cellpadding="0"
+                              width="100%"
+                              style="background-color: #a6b897"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    class="section-image-cell"
+                                    width="240"
+                                    valign="middle"
+                                    align="center"
+                                    bgcolor="#A6B897"
+                                    style="
+                                      padding: 30px 15px 30px 20px;
+                                      background-color: #a6b897;
+                                    "
+                                  >
+                                    <img
+                                      src="https://tasknify.com/biofarms/April%20Newsletter%20-%20Imagery/breeze-block.png"
+                                      width="220"
+                                      alt="Biofarm brand illustration"
+                                      class="cta-illustration"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        width: 220px;
+                                        height: auto;
+                                        max-width: 100%;
+                                        margin: 0 auto;
+                                      "
+                                    />
+                                  </td>
+                                  <td
+                                    class="section-text-area"
+                                    valign="middle"
+                                    align="left"
+                                    bgcolor="#A6B897"
+                                    style="
+                                      padding: 30px 20px 30px 0;
+                                      background-color: #a6b897;
+                                      text-align: left;
+                                    "
+                                  >
+                                    <h3
+                                      style="
+                                        color: #000;
+                                        margin: 0 0 12px;
+                                        font-weight: 400;
+                                        line-height: 1.3;
+                                        font-size: 20px;
+                                        font-family:
+                                          'RATI',
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      Ready to fulfil your BNG obligations?
+                                    </h3>
+                                    <p
+                                      style="
+                                        font-size: 16px;
+                                        line-height: 1.6;
+                                        margin: 0 0 18px 0;
+                                        font-family:
+                                          'Inter',
+                                          -apple-system,
+                                          BlinkMacSystemFont,
+                                          'Segoe UI',
+                                          Arial,
+                                          sans-serif;
+                                        color: #000;
+                                        text-align: left !important;
+                                      "
+                                    >
+                                      We connect developers with high-quality,
+                                      fully-managed BNG habitat sites across
+                                      England. Click the button below to talk to
+                                      us about units and locations that can
+                                      support your next project.
+                                    </p>
+                                    <!-- Spacer between copy and button -->
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%" role="presentation">
+                                      <tr>
+                                        <td height="20" style="font-size: 1px; line-height: 20px; mso-line-height-rule: exactly;">&nbsp;</td>
+                                      </tr>
+                                    </table>
+                                    <table
+                                      border="0"
+                                      cellspacing="0"
+                                      cellpadding="0"
+                                      align="center"
+                                    >
+                                      <tr>
+                                        <td
+                                          align="center"
+                                          valign="middle"
+                                          bgcolor="#000000"
+                                          width="200"
+                                          height="40"
+                                          style="
+                                            background-color: #000000;
+                                            width: 200px;
+                                            height: 40px;
+                                          "
+                                        >
+                                          <a
+                                            class="button-link"
+                                            href="https://www.biofarm.co.uk/contact?utm_source=pipedrive&amp;utm_medium=email&amp;utm_campaign=april-email-2026"
+                                            style="
+                                              color: #f5f6f1;
+                                              text-decoration: none;
+                                              font-family: Arial, sans-serif;
+                                              font-size: 13px;
+                                              font-weight: bold;
+                                              letter-spacing: 0.08em;
+                                              display: block;
+                                              width: 200px;
+                                              height: 40px;
+                                              line-height: 40px;
+                                              text-align: center;
+                                              mso-line-height-rule: exactly;
+                                            "
+                                          >
+                                            <font
+                                              color="#f5f6f1"
+                                              style="
+                                                color: #f5f6f1;
+                                                text-decoration: none;
+                                              "
+                                              >Get in touch</font
+                                            >
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
