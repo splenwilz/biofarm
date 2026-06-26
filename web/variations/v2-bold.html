@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BNG on a Working Farm — Biofarm at Groundswell 2026 · Bold</title>
+  <meta name="description" content="Biofarm at Groundswell 2026 — a panel discussion on Biodiversity Net Gain on a working farm. Pasture Field, Stand D6." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700;1,300;1,700&family=Acme:ital,wght@0,400&display=swap" rel="stylesheet" />
+  <style>
+    @font-face { font-family:'RATI'; src:url('https://static1.squarespace.com/static/6818f9d9bff1414041f33bf3/t/6824c94beed6e10aa5f3a5c5/1747241291677/BauhausRatiDisplay-ExtraLight.otf') format('opentype'); font-weight:300; font-display:swap; }
+    @font-face { font-family:'RATI_v2'; src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'); font-weight:300; font-display:swap; }
+    :root{
+      --cream:#F5F6F1; --cream-2:#F7F8F3; --ink:#111111; --green:#71977A; --accent:#C8F06E; --white:#fff; --muted:#5b5f57; --hairline:rgba(17,17,17,.12);
+      --font-display:'RATI','Inter',Georgia,serif; --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+      --maxw:1200px; --gutter:clamp(20px,5vw,64px);
+    }
+    *,*::before,*::after{box-sizing:border-box;}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+    body{margin:0;font-family:var(--font-body);font-weight:300;color:var(--ink);background:var(--cream);line-height:1.65;font-size:18px;-webkit-font-smoothing:antialiased;}
+    img{max-width:100%;display:block;} a{color:inherit;}
+    h1,h2,h3,h4{font-family:var(--font-display);font-weight:300;line-height:1.12;letter-spacing:-.015em;margin:0 0 .4em;}
+    h1{font-size:clamp(2.6rem,7vw,5.4rem);} h2{font-size:clamp(2rem,4.6vw,3.2rem);} h3{font-size:clamp(1.4rem,2.6vw,2rem);} h4{font-size:clamp(1.2rem,2vw,1.5rem);}
+    p{margin:0 0 1.1em;} .lead{font-size:clamp(1.1rem,1.7vw,1.35rem);color:var(--muted);}
+    .wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding-inline:var(--gutter);}
+    .section{padding-block:clamp(56px,9vw,120px);}
+    .section--cream{background:var(--cream);} .section--cream2{background:var(--cream-2);} .section--green{background:var(--green);color:var(--white);} .section--ink{background:var(--ink);color:var(--cream);}
+    .narrow{max-width:860px;margin-inline:auto;}
+    .eyebrow{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.2em;font-size:.8rem;font-weight:700;color:var(--green);margin:0 0 1rem;}
+    .section--green .eyebrow,.section--ink .eyebrow{color:var(--accent);}
+    /* downward "V" notch — cream dips to a centre point over the next section (matches biofarm.co.uk) */
+    .section--vtop{clip-path:polygon(0 0,50% clamp(34px,4.4vw,82px),100% 0,100% 100%,0 100%);padding-top:clamp(80px,10vw,134px);}
+    .btn{display:inline-block;font-family:'RATI_v2',var(--font-display);font-size:18px;line-height:1;text-decoration:none;padding:16px 34px;border-radius:25px;background:var(--ink);color:var(--white)!important;border:1.5px solid var(--ink);transition:background-color 600ms linear,transform .15s,color .2s,border-color .2s;cursor:pointer;}
+    .btn:hover{background:#000;transform:translateY(-1px);}
+    .btn--accent{background:var(--accent);color:var(--ink)!important;border-color:var(--accent);} .btn--accent:hover{background:#b9e64f;}
+    .btn--ghost{background:transparent;color:var(--ink)!important;border-color:var(--ink);} .btn--ghost:hover{background:var(--ink);color:var(--white)!important;}
+    .btn--sm{padding:11px 22px;font-size:16px;}
+
+    /* sticky reserve bar */
+    .topbar{position:sticky;top:0;z-index:120;background:var(--ink);color:var(--cream);}
+    .topbar__row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;flex-wrap:wrap;}
+    .topbar__info{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:.9rem;letter-spacing:.01em;color:rgba(245,246,241,.78);}
+    .topbar__brand{display:inline-flex;align-items:center;gap:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-size:.82rem;}
+    .topbar__brand::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(200,240,110,.6);animation:pulse 2.4s ease-out infinite;}
+    .topbar__sep{opacity:.28;}
+    .topbar__info b{color:var(--white);font-weight:600;}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,240,110,.55);}70%{box-shadow:0 0 0 7px rgba(200,240,110,0);}100%{box-shadow:0 0 0 0 rgba(200,240,110,0);}}
+    @media(prefers-reduced-motion:reduce){.topbar__brand::before{animation:none;}}
+    .site-header{position:sticky;top:0;z-index:100;background:rgba(245,246,241,.92);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--hairline);}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-block:14px;}
+    .nav__logo img{height:30px;width:auto;}
+    .nav__links{display:flex;align-items:center;gap:26px;list-style:none;margin:0;padding:0;}
+    .nav__links a{text-decoration:none;font-size:.96rem;transition:opacity .2s;} .nav__links a:hover{opacity:.6;}
+    .nav__toggle{display:none;background:none;border:0;font-size:1.6rem;cursor:pointer;color:var(--ink);}
+
+    /* centered hero */
+    .hero{text-align:center;padding:clamp(48px,7vw,96px) 0 clamp(28px,4.5vw,56px);}
+    .hero h1{max-width:18ch;margin-inline:auto;}
+    .hero .lead{max-width:60ch;margin:0 auto 32px;}
+    .hero__cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+    .hero__meta{margin:26px 0 0;font-size:.95rem;color:var(--muted);letter-spacing:.02em;}
+    .hero__meta strong{color:var(--ink);font-weight:700;}
+
+    /* numbered timeline */
+    /* on the agenda — two-column editorial list */
+    .agenda-grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(32px,6vw,84px);align-items:start;}
+    .agenda-intro .lead{color:rgba(255,255,255,.85);max-width:32ch;margin-bottom:0;}
+    .timeline{margin:0;}
+    .tl-item{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:baseline;padding:20px 0;border-top:1px solid rgba(255,255,255,.22);}
+    .tl-item:first-child{border-top:0;padding-top:0;}
+    .tl-num{font-family:var(--font-display);font-size:1.7rem;line-height:1;color:var(--accent);min-width:2.4ch;}
+    .tl-item p{margin:0;font-size:clamp(1.05rem,1.5vw,1.22rem);}
+    @media(max-width:768px){.agenda-grid{grid-template-columns:1fr;gap:8px;}}
+
+    .host{font-size:1.2rem;max-width:62ch;margin-inline:auto;text-align:center;}
+    .people{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,3vw,32px);margin-top:48px;}
+    .person{background:var(--cream-2);border:1px solid var(--hairline);border-radius:16px;padding:28px 30px;border-left:4px solid var(--green);}
+    .person h4{margin-bottom:.1em;} .person .role{color:var(--green);font-weight:700;font-size:.95rem;margin:0 0 .7em;} .person p{font-size:1rem;opacity:.92;margin:0;}
+
+    /* who should attend — editorial ruled list */
+    ul.ticks{list-style:none;margin:40px auto 0;padding:0;max-width:720px;text-align:left;}
+    ul.ticks li{display:flex;align-items:center;gap:18px;padding:20px 6px;border-bottom:1px solid var(--hairline);font-size:clamp(1.1rem,1.6vw,1.3rem);}
+    ul.ticks li:first-child{border-top:1px solid var(--hairline);}
+    ul.ticks li::before{content:"\2713";color:var(--green);font-weight:700;font-size:1rem;line-height:1;flex:0 0 auto;}
+
+    .stand{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,5vw,64px);align-items:center;}
+    .stand-badge{display:inline-block;font-family:var(--font-display);font-size:1.15rem;background:var(--accent);color:var(--ink);padding:7px 20px;border-radius:25px;margin-bottom:18px;}
+    .stand__banner img{width:100%;border-radius:16px;}
+    .band{text-align:center;} .band .lead{max-width:56ch;margin-inline:auto;color:rgba(255,255,255,.92);}
+    /* registration form */
+    .reserve__card{max-width:600px;margin:36px auto 0;background:var(--cream);color:var(--ink);border-radius:22px;padding:clamp(26px,4vw,44px);text-align:left;box-shadow:0 34px 80px -48px rgba(0,0,0,.75);}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;}
+    .form-row{display:grid;gap:7px;margin-bottom:18px;}
+    .form-row label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink);}
+    .form-row label .opt{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);}
+    .form-row input,.form-row select{font-family:var(--font-body);font-size:1rem;font-weight:300;color:var(--ink);background:var(--white);border:1px solid var(--hairline);border-radius:12px;padding:13px 15px;width:100%;transition:border-color .2s,box-shadow .2s;}
+    .form-row select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.6'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:18px;padding-right:42px;cursor:pointer;}
+    .form-row input:focus,.form-row select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.28);}
+    .form__submit{width:100%;margin-top:4px;}
+    .form__note{font-size:.82rem;color:var(--muted);margin:14px 0 0;text-align:center;}
+    @media(max-width:560px){.form-grid{grid-template-columns:1fr;}}
+
+    .site-footer{background:var(--cream);border-top:1px solid var(--hairline);padding-block:48px;}
+    .footer__row{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+    .footer__links{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:.92rem;} .footer__links a{text-decoration:none;}
+    .footer__social{display:flex;gap:16px;} .footer__social a{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--hairline);border-radius:50%;transition:background .2s,color .2s;} .footer__social a:hover{background:var(--ink);color:var(--cream);} .footer__social svg{width:18px;height:18px;fill:currentColor;}
+    .footer__meta{width:100%;margin-top:28px;font-size:.82rem;color:var(--muted);}
+    @media(max-width:768px){
+      .nav__links{position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:flex-start;gap:18px;background:var(--cream);padding:24px var(--gutter);border-bottom:1px solid var(--hairline);display:none;}
+      .nav__links.is-open{display:flex;} .nav__toggle{display:block;}
+      .people{grid-template-columns:1fr;} ul.ticks{grid-template-columns:1fr;} .stand{grid-template-columns:1fr;}
+      .topbar .btn{display:none;}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar"><div class="wrap"><div class="topbar__row">
+    <div class="topbar__info">
+      <span class="topbar__brand">Groundswell 2026</span>
+      <span class="topbar__sep" aria-hidden="true">|</span>
+      <span>Panel discussion &middot; <b>Wed 1 &amp; Thu 2 July</b></span>
+      <span class="topbar__sep" aria-hidden="true">|</span>
+      <span><b>12.00pm</b></span>
+      <span class="topbar__sep" aria-hidden="true">|</span>
+      <span>Pasture Field, <b>Stand D6</b></span>
+    </div>
+    <a class="btn btn--accent btn--sm" href="#reserve">Reserve Your Place</a>
+  </div></div></div>
+
+  <header class="site-header"><div class="wrap"><nav class="nav" aria-label="Primary">
+    <a class="nav__logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" /></a>
+    <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="https://www.biofarm.co.uk/developers">Developers</a></li>
+      <li><a href="https://www.biofarm.co.uk/landowners">Landowners</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
+      <li><a class="btn btn--sm" href="#reserve">Reserve</a></li>
+    </ul>
+  </nav></div></header>
+
+  <main>
+    <section class="hero section--cream"><div class="wrap">
+      <p class="eyebrow">Biofarm at Groundswell 2026</p>
+      <h1>BNG on a Working Farm</h1>
+      <p class="lead">Opportunity, reality and long-term commitment. Biodiversity Net Gain is attracting growing interest from farmers and landowners — but where does it fit within a working farm business?</p>
+      <div class="hero__cta">
+        <a class="btn btn--accent" href="#reserve">Reserve Your Place</a>
+        <a class="btn btn--ghost" href="#panel">Meet the Panel</a>
+      </div>
+      <p class="hero__meta">Two sessions &middot; <strong>Wed 1</strong> &amp; <strong>Thu 2 July</strong>, 12.00&ndash;12.45pm &middot; Pasture Field, Stand D6</p>
+    </div></section>
+
+    <section class="section section--green section--vtop"><div class="wrap">
+      <div class="agenda-grid">
+        <div class="agenda-intro">
+          <p class="eyebrow">On the agenda</p>
+          <h2>What we&rsquo;ll discuss</h2>
+          <p class="lead">Six themes the panel will work through across the 45-minute session &mdash; with time for your questions live at the end.</p>
+        </div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-num">01</div><p>Where BNG fits within a working farm business</p></div>
+          <div class="tl-item"><div class="tl-num">02</div><p>The opportunities and limitations of BNG</p></div>
+          <div class="tl-item"><div class="tl-num">03</div><p>Lessons from landowners already involved in projects</p></div>
+          <div class="tl-item"><div class="tl-num">04</div><p>How BNG compares to other diversification options</p></div>
+          <div class="tl-item"><div class="tl-num">05</div><p>Long-term management, stewardship and commitment</p></div>
+          <div class="tl-item"><div class="tl-num">06</div><p>Your questions, answered live by the panel</p></div>
+        </div>
+      </div>
+    </div></section>
+
+    <section class="section section--cream" id="panel"><div class="wrap">
+      <p class="eyebrow" style="text-align:center;">The Panel</p>
+      <h2 style="text-align:center;max-width:20ch;margin-inline:auto;">Leading voices across farming, land &amp; nature recovery</h2>
+      <p class="host">Hosted by <strong>Chris Rowland-Smith</strong>, Land Manager at Biofarm. Across the two days, panel members include:</p>
+      <div class="people">
+        <div class="person"><h4>Martin Lines</h4><p class="role">CEO, Nature Friendly Farming Network</p><p>Farmer, industry leader and one of the UK&rsquo;s most influential voices on the future of sustainable farming.</p></div>
+        <div class="person"><h4>Stephen Panks</h4><p class="role">Senior Specialist, BNG, Natural England</p><p>Bringing insight into the policy, delivery and practical realities of BNG.</p></div>
+        <div class="person"><h4>Vicki Hird</h4><p class="role">Strategic Lead &ndash; Agriculture, The Wildlife Trusts</p><p>Author, campaigner and leading advocate for nature-friendly farming and land management.</p></div>
+        <div class="person"><h4>Toby Diggens</h4><p class="role">Founder &amp; Co-Director, Digg &amp; Co.</p><p>Landscape restoration specialist experienced in creating and restoring species-rich habitats.</p></div>
+        <div class="person"><h4>Edward Hurley</h4><p class="role">Landowner</p><p>Sharing first-hand experience of exploring and adopting BNG on his own land — the decisions, opportunities and challenges.</p></div>
+        <div class="person"><h4>Ed Green</h4><p class="role">Farmer and Landowner</p><p>Offering a practical farming perspective on managing land in a changing rural economy.</p></div>
+        <div class="person"><h4>Simon Nash</h4><p class="role">Head of Habitat Management, Biofarm</p><p>Habitat restoration specialist delivering and managing biodiversity projects across the UK.</p></div>
+      </div>
+    </div></section>
+
+    <section class="section section--cream2"><div class="wrap narrow" style="text-align:center;">
+      <p class="eyebrow">Come along</p>
+      <h2>Who should attend?</h2>
+      <ul class="ticks">
+        <li>Farmers</li>
+        <li>Landowners</li>
+        <li>Estate managers</li>
+        <li>Rural advisers</li>
+        <li>Anyone exploring BNG, natural capital or land diversification opportunities</li>
+      </ul>
+    </div></section>
+
+    <section class="section section--cream"><div class="wrap"><div class="stand">
+      <div>
+        <span class="stand-badge">Pasture Field &middot; Stand D6</span>
+        <h2>Visit Biofarm at Groundswell</h2>
+        <p class="lead">Find us in Pasture Field, Stand D6 throughout the event. Drop by to discuss your land, meet the team and join us for sundowners from 5pm each day with complimentary refreshments.</p>
+      </div>
+      <div class="stand__banner"><img src="../assets/groundswell-banner.png" alt="Groundswell 2026 — Biofarm" /></div>
+    </div></div></section>
+
+    <section class="section section--ink band" id="reserve"><div class="wrap">
+      <p class="eyebrow">Wednesday 1 &amp; Thursday 2 July &middot; 12.00pm</p>
+      <h2>Reserve your place</h2>
+      <p class="lead">Spaces for each session are limited. Tell us a little about you and we&rsquo;ll save you a seat for the panel discussion at Groundswell 2026.</p>
+
+      <!-- TODO: set `action` to your registration endpoint (e.g. Pipedrive web form, Formspree, Mailchimp or Calendly) and adjust field names to match -->
+      <form class="reserve__card" action="#" method="post">
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="firstName">First name</label>
+            <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
+          </div>
+          <div class="form-row">
+            <label for="lastName">Last name</label>
+            <input id="lastName" name="lastName" type="text" autocomplete="family-name" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="form-row">
+          <label for="org">Organisation <span class="opt">(optional)</span></label>
+          <input id="org" name="organisation" type="text" autocomplete="organization" />
+        </div>
+        <div class="form-row">
+          <label for="session">Which session?</label>
+          <select id="session" name="session" required>
+            <option value="" disabled selected>Select a day&hellip;</option>
+            <option value="wed-1-jul">Wednesday 1 July &middot; 12.00&ndash;12.45pm</option>
+            <option value="thu-2-jul">Thursday 2 July &middot; 12.00&ndash;12.45pm</option>
+            <option value="either">Either day</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn--accent form__submit">Reserve Your Place</button>
+        <p class="form__note">Limited spaces per session &middot; we&rsquo;ll only use your details to manage your booking.</p>
+      </form>
+    </div></section>
+  </main>
+
+  <footer class="site-footer"><div class="wrap"><div class="footer__row">
+    <a class="nav__logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" style="height:28px;" /></a>
+    <ul class="footer__links"><li><a href="https://www.biofarm.co.uk/privacy-policy">Privacy Policy</a></li><li><a href="https://www.biofarm.co.uk/contact">Contact</a></li></ul>
+    <div class="footer__social">
+      <a href="https://www.linkedin.com/company/biofarmuk/" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.5 8h4V23h-4V8zm7.5 0h3.8v2.05h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V23h-4v-6.6c0-1.57-.03-3.6-2.2-3.6-2.2 0-2.53 1.72-2.53 3.49V23h-4V8z"/></svg></a>
+      <a href="https://www.youtube.com/channel/UCzLf48y3NnvKqYvX7W-N2PA" aria-label="YouTube" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.11-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.39.58A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.11 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.39-.58a3 3 0 0 0 2.11-2.12A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/></svg></a>
+    </div>
+  </div><div class="footer__meta">&copy; Biofarm &middot; Groundswell 2026, 1st &amp; 2nd July &middot; We&rsquo;re in the business of nature.</div></div></footer>
+
+  <script>
+    var t=document.querySelector('.nav__toggle'),l=document.getElementById('navLinks');
+    t.addEventListener('click',function(){var o=l.classList.toggle('is-open');t.setAttribute('aria-expanded',o?'true':'false');});
+  </script>
+</body>
+</html>

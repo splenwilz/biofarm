@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Groundswell 2026 page — design variations · Biofarm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700;1,300;1,700&family=Acme:ital,wght@0,400&display=swap" rel="stylesheet" />
+  <style>
+    @font-face { font-family:'RATI'; src:url('https://static1.squarespace.com/static/6818f9d9bff1414041f33bf3/t/6824c94beed6e10aa5f3a5c5/1747241291677/BauhausRatiDisplay-ExtraLight.otf') format('opentype'); font-weight:300; font-display:swap; }
+    :root{ --cream:#F5F6F1; --ink:#111; --green:#71977A; --accent:#C8F06E; --muted:#5b5f57; --hairline:rgba(17,17,17,.12);
+      --font-display:'RATI','Inter',Georgia,serif; --font-body:'Inter',-apple-system,Arial,sans-serif; }
+    *,*::before,*::after{box-sizing:border-box;}
+    body{margin:0;font-family:var(--font-body);font-weight:300;color:var(--ink);background:var(--cream);line-height:1.6;font-size:18px;-webkit-font-smoothing:antialiased;}
+    a{color:inherit;}
+    h1,h2,h3{font-family:var(--font-display);font-weight:300;letter-spacing:-.01em;line-height:1.12;margin:0 0 .35em;}
+    h1{font-size:clamp(2.4rem,5vw,3.6rem);}
+    .wrap{max-width:1080px;margin:0 auto;padding:clamp(40px,6vw,80px) clamp(20px,5vw,48px);}
+    .eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:.78rem;font-weight:700;color:var(--green);margin:0 0 1rem;}
+    .intro{max-width:60ch;color:var(--muted);font-size:1.15rem;}
+    .meta-row{display:flex;flex-wrap:wrap;gap:8px 22px;margin:22px 0 8px;font-size:.95rem;color:var(--ink);}
+    .meta-row b{color:var(--green);}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:44px;}
+    .card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--hairline);border-radius:20px;overflow:hidden;transition:transform .15s,box-shadow .2s,border-color .2s;}
+    .card:hover{transform:translateY(-4px);box-shadow:0 24px 50px -28px rgba(17,17,17,.4);border-color:var(--green);}
+    .card__swatch{height:120px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.6rem;position:relative;}
+    .s-editorial{background:var(--cream);color:var(--ink);border-bottom:1px solid var(--hairline);}
+    .s-bold{background:var(--cream);color:var(--ink);} .s-bold::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 120%,rgba(200,240,110,.55),transparent 60%);}
+    .s-dark{background:var(--ink);color:var(--accent);} .s-conference{background:var(--green);color:#fff;}
+    .card__body{padding:24px 26px 26px;display:flex;flex-direction:column;gap:8px;flex:1;}
+    .tag{display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted);}
+    .card__body h3{margin:.1em 0 0;}
+    .card__desc{color:var(--muted);font-size:.98rem;margin:0;flex:1;}
+    .card__links{display:flex;gap:12px;margin-top:14px;}
+    .btn{display:inline-block;font-family:var(--font-display);font-size:16px;text-decoration:none;padding:11px 22px;border-radius:25px;background:var(--ink);color:#fff;border:1.5px solid var(--ink);transition:background .3s;}
+    .btn:hover{background:#000;}
+    .btn--ghost{background:transparent;color:var(--ink);} .btn--ghost:hover{background:var(--ink);color:#fff;}
+    .note{margin-top:40px;padding:18px 22px;background:#fff;border:1px solid var(--hairline);border-left:4px solid var(--accent);border-radius:12px;font-size:.95rem;color:var(--muted);}
+    .note b{color:var(--ink);}
+    @media(max-width:720px){.grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">Biofarm × Groundswell 2026 · Page design options</p>
+    <h1>Pick a direction</h1>
+    <p class="intro">Four full-page treatments of the same &ldquo;BNG on a Working Farm&rdquo; content &mdash; identical brand (RATI + Inter, cream / ink / green / lime palette), different layout and mood. Open each, then tell me which to take forward (or mix elements).</p>
+    <div class="meta-row">
+      <span><b>Content:</b> identical in all four</span>
+      <span><b>Brand:</b> matches biofarm.co.uk</span>
+      <span><b>Responsive:</b> yes</span>
+    </div>
+
+    <div class="grid">
+      <a class="card" href="v1-editorial.html">
+        <div class="card__swatch s-editorial">Aa</div>
+        <div class="card__body">
+          <span class="tag">Variation 1</span>
+          <h3>Editorial Light</h3>
+          <p class="card__desc">Cream-dominant and airy. Two-column hero (banner right), alternating soft bands, clean 3-column panel grid. Calm and understated.</p>
+          <div class="card__links"><span class="btn">Open</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="v2-bold.html">
+        <div class="card__swatch s-bold">Aa</div>
+        <div class="card__body">
+          <span class="tag">Variation 2</span>
+          <h3>Bold Banner Hero</h3>
+          <p class="card__desc">Marketing-led. Big centered title above a large banner, sticky &ldquo;Reserve&rdquo; bar, numbered agenda timeline, strong ink CTA. High-impact.</p>
+          <div class="card__links"><span class="btn">Open</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="v3-dark.html">
+        <div class="card__swatch s-dark">Aa</div>
+        <div class="card__body">
+          <span class="tag">Variation 3</span>
+          <h3>Immersive Dark</h3>
+          <p class="card__desc">Premium event feel. Ink background with lime accents, banner framed in a green card, hover-lift panel, highlighted sundowners block.</p>
+          <div class="card__links"><span class="btn">Open</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="v4-conference.html">
+        <div class="card__swatch s-conference">Aa</div>
+        <div class="card__body">
+          <span class="tag">Variation 4</span>
+          <h3>Conference / Agenda</h3>
+          <p class="card__desc">Schedule-first. Dark hero strip, sticky left-rail agenda + reserve button, speaker-lineup grid. Structured like a session page.</p>
+          <div class="card__links"><span class="btn">Open</span></div>
+        </div>
+      </a>
+    </div>
+
+    <div class="note">
+      <b>Also available:</b> the original first draft lives at <a href="../index.html">../index.html</a>.
+      &nbsp;Heads-up: every &ldquo;Reserve Your Place&rdquo; button uses a placeholder link &mdash; send me the real registration URL and I&rsquo;ll wire them all up.
+    </div>
+  </div>
+</body>
+</html>
