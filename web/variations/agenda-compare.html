@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What we'll discuss — Green vs Off-white</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet" />
+  <style>
+    @font-face { font-family:'RATI'; src:url('https://static1.squarespace.com/static/6818f9d9bff1414041f33bf3/t/6824c94beed6e10aa5f3a5c5/1747241291677/BauhausRatiDisplay-ExtraLight.otf') format('opentype'); font-weight:300; font-display:swap; }
+    :root{
+      --cream:#F5F6F1; --ink:#212121; --green:#71977A; --white:#fff;
+      --font-display:'RATI','Inter',Georgia,serif; --font-body:'Inter',-apple-system,Arial,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;}
+    body{margin:0;background:#1b1c1a;color:#cfd2cb;font-family:var(--font-body);font-weight:300;-webkit-font-smoothing:antialiased;padding:32px 24px 64px;}
+    h1.pagetitle{font-family:var(--font-body);font-weight:700;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:#9aa093;max-width:1120px;margin:0 auto 8px;}
+    p.pagenote{max-width:1120px;margin:0 auto 28px;font-size:.95rem;color:#9aa093;}
+    .label{max-width:1120px;margin:40px auto 12px;color:#cfd2cb;font-weight:700;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;}
+    .label span{color:#7d8377;font-weight:400;letter-spacing:0;text-transform:none;}
+
+    .panel{max-width:1120px;margin:0 auto;border-radius:20px;overflow:hidden;}
+    .agenda{padding:clamp(40px,5vw,72px);}
+    .eyebrow{font-weight:700;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;margin:0 0 1rem;}
+    .agenda h2{font-family:var(--font-display);font-weight:300;font-size:clamp(2rem,4.4vw,3rem);line-height:1.12;letter-spacing:-.015em;margin:0 0 .3em;}
+    .agenda-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:clamp(32px,6vw,84px);margin-top:clamp(28px,3.5vw,48px);align-items:start;}
+    .agenda-intro p{font-size:1.02rem;line-height:1.6;max-width:54ch;margin:0 0 1.1em;}
+    .agenda-intro p:first-of-type{font-size:clamp(1.1rem,1.6vw,1.28rem);}
+    .agenda-intro p:last-child{margin-bottom:0;}
+    .timeline{margin:0;}
+    .tl-item{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:baseline;padding:20px 0;}
+    .tl-item:first-child{padding-top:0;}
+    .tl-num{font-family:var(--font-display);font-size:1.7rem;line-height:1;min-width:2.4ch;}
+    .tl-item p{margin:0;font-size:clamp(1.05rem,1.5vw,1.22rem);line-height:1.3;}
+
+    /* Option A — Green (current) */
+    .agenda--green{background:var(--green);color:#fff;}
+    .agenda--green .eyebrow{color:#fff;}
+    .agenda--green .agenda-intro p{color:rgba(255,255,255,.88);}
+    .agenda--green .agenda-intro p:first-of-type{color:#fff;}
+    .agenda--green .tl-num{color:var(--ink);}
+    .agenda--green .tl-item{border-top:1px solid rgba(255,255,255,.22);}
+    .agenda--green .tl-item:first-child{border-top:0;}
+
+    /* Option B — Off-white (brand primary) */
+    .agenda--light{background:var(--cream);color:var(--ink);}
+    .agenda--light .eyebrow{color:var(--green);}
+    .agenda--light .agenda-intro p{color:#3a3d37;}
+    .agenda--light .agenda-intro p:first-of-type{color:var(--ink);}
+    .agenda--light .tl-num{color:var(--ink);}
+    .agenda--light .tl-item{border-top:1px solid rgba(33,33,33,.14);}
+    .agenda--light .tl-item:first-child{border-top:0;}
+
+    @media(max-width:768px){.agenda-grid{grid-template-columns:1fr;gap:8px;}}
+  </style>
+</head>
+<body>
+  <h1 class="pagetitle">"What we'll discuss" — colour comparison</h1>
+  <p class="pagenote">Same content, same layout. Only the section background / text colour differs. Dividers now run the full width (under the numbers too).</p>
+
+  <p class="label">Option A &mdash; Green <span>(current live version)</span></p>
+  <div class="panel"><section class="agenda agenda--green">
+    <p class="eyebrow">On the agenda</p>
+    <h2>What we&rsquo;ll discuss</h2>
+    <div class="agenda-grid">
+      <div class="agenda-intro">
+        <p>Biodiversity Net Gain is creating new opportunities for farmers and landowners, but it&rsquo;s also raising important questions.</p>
+        <p>Where does BNG fit within a productive farm or estate? How does it compare with other diversification opportunities? What are the long-term commitments? And how do you balance commercial returns with the practical realities of managing land for nature?</p>
+        <p>Join Biofarm for an honest, practical discussion exploring the opportunities, challenges and long-term realities of BNG on working land.</p>
+        <p>Bringing together leading voices from farming, landownership, policy, nature recovery and habitat management, the panel will share different perspectives, real-world experience and practical insights to help landowners make informed decisions about whether BNG is the right fit for their land and business.</p>
+        <p>Whether you&rsquo;re already exploring BNG or simply want to understand where it sits within the future of rural land management, you&rsquo;ll leave with a clearer understanding of the opportunities, the risks and the questions every landowner should be asking.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-num">01</div><p>Where BNG fits within a working farm business</p></div>
+        <div class="tl-item"><div class="tl-num">02</div><p>The opportunities and limitations of BNG</p></div>
+        <div class="tl-item"><div class="tl-num">03</div><p>Lessons from landowners already involved in projects</p></div>
+        <div class="tl-item"><div class="tl-num">04</div><p>How BNG compares to other diversification options</p></div>
+        <div class="tl-item"><div class="tl-num">05</div><p>Long-term management, stewardship and commitment</p></div>
+        <div class="tl-item"><div class="tl-num">06</div><p>Your questions, answered live by the panel</p></div>
+      </div>
+    </div>
+  </section></div>
+
+  <p class="label">Option B &mdash; Off-white <span>(brand primary colourway: black on off-white)</span></p>
+  <div class="panel"><section class="agenda agenda--light">
+    <p class="eyebrow">On the agenda</p>
+    <h2>What we&rsquo;ll discuss</h2>
+    <div class="agenda-grid">
+      <div class="agenda-intro">
+        <p>Biodiversity Net Gain is creating new opportunities for farmers and landowners, but it&rsquo;s also raising important questions.</p>
+        <p>Where does BNG fit within a productive farm or estate? How does it compare with other diversification opportunities? What are the long-term commitments? And how do you balance commercial returns with the practical realities of managing land for nature?</p>
+        <p>Join Biofarm for an honest, practical discussion exploring the opportunities, challenges and long-term realities of BNG on working land.</p>
+        <p>Bringing together leading voices from farming, landownership, policy, nature recovery and habitat management, the panel will share different perspectives, real-world experience and practical insights to help landowners make informed decisions about whether BNG is the right fit for their land and business.</p>
+        <p>Whether you&rsquo;re already exploring BNG or simply want to understand where it sits within the future of rural land management, you&rsquo;ll leave with a clearer understanding of the opportunities, the risks and the questions every landowner should be asking.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-num">01</div><p>Where BNG fits within a working farm business</p></div>
+        <div class="tl-item"><div class="tl-num">02</div><p>The opportunities and limitations of BNG</p></div>
+        <div class="tl-item"><div class="tl-num">03</div><p>Lessons from landowners already involved in projects</p></div>
+        <div class="tl-item"><div class="tl-num">04</div><p>How BNG compares to other diversification options</p></div>
+        <div class="tl-item"><div class="tl-num">05</div><p>Long-term management, stewardship and commitment</p></div>
+        <div class="tl-item"><div class="tl-num">06</div><p>Your questions, answered live by the panel</p></div>
+      </div>
+    </div>
+  </section></div>
+</body>
+</html>

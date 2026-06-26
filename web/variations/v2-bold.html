@@ -12,7 +12,7 @@
     @font-face { font-family:'RATI'; src:url('https://static1.squarespace.com/static/6818f9d9bff1414041f33bf3/t/6824c94beed6e10aa5f3a5c5/1747241291677/BauhausRatiDisplay-ExtraLight.otf') format('opentype'); font-weight:300; font-display:swap; }
     @font-face { font-family:'RATI_v2'; src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'); font-weight:300; font-display:swap; }
     :root{
-      --cream:#F5F6F1; --cream-2:#F7F8F3; --ink:#111111; --green:#71977A; --accent:#C8F06E; --white:#fff; --muted:#5b5f57; --hairline:rgba(17,17,17,.12);
+      --cream:#F5F6F1; --cream-2:#F7F8F3; --ink:#212121; --green:#71977A; --accent:#71977A; --white:#fff; --muted:#5b5f57; --hairline:rgba(33,33,33,.12);
       --font-display:'RATI','Inter',Georgia,serif; --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
       --maxw:1200px; --gutter:clamp(20px,5vw,64px);
     }
@@ -28,24 +28,25 @@
     .section--cream{background:var(--cream);} .section--cream2{background:var(--cream-2);} .section--green{background:var(--green);color:var(--white);} .section--ink{background:var(--ink);color:var(--cream);}
     .narrow{max-width:860px;margin-inline:auto;}
     .eyebrow{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.2em;font-size:.8rem;font-weight:700;color:var(--green);margin:0 0 1rem;}
-    .section--green .eyebrow,.section--ink .eyebrow{color:var(--accent);}
+    .section--green .eyebrow,.section--ink .eyebrow{color:var(--cream);}
     /* downward "V" notch — cream dips to a centre point over the next section (matches biofarm.co.uk) */
     .section--vtop{clip-path:polygon(0 0,50% clamp(34px,4.4vw,82px),100% 0,100% 100%,0 100%);padding-top:clamp(80px,10vw,134px);}
     .btn{display:inline-block;font-family:'RATI_v2',var(--font-display);font-size:18px;line-height:1;text-decoration:none;padding:16px 34px;border-radius:25px;background:var(--ink);color:var(--white)!important;border:1.5px solid var(--ink);transition:background-color 600ms linear,transform .15s,color .2s,border-color .2s;cursor:pointer;}
     .btn:hover{background:#000;transform:translateY(-1px);}
-    .btn--accent{background:var(--accent);color:var(--ink)!important;border-color:var(--accent);} .btn--accent:hover{background:#b9e64f;}
+    .btn--accent{background:var(--ink);color:var(--white)!important;border-color:var(--ink);} .btn--accent:hover{background:#000;}
     .btn--ghost{background:transparent;color:var(--ink)!important;border-color:var(--ink);} .btn--ghost:hover{background:var(--ink);color:var(--white)!important;}
+    .btn--invert{background:var(--cream);color:var(--ink)!important;border-color:var(--cream);} .btn--invert:hover{background:var(--white);}
     .btn--sm{padding:11px 22px;font-size:16px;}
 
     /* sticky reserve bar */
     .topbar{position:sticky;top:0;z-index:120;background:var(--ink);color:var(--cream);}
     .topbar__row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;flex-wrap:wrap;}
     .topbar__info{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:.9rem;letter-spacing:.01em;color:rgba(245,246,241,.78);}
-    .topbar__brand{display:inline-flex;align-items:center;gap:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-size:.82rem;}
-    .topbar__brand::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(200,240,110,.6);animation:pulse 2.4s ease-out infinite;}
+    .topbar__brand{display:inline-flex;align-items:center;gap:9px;font-weight:700;color:var(--cream);text-transform:uppercase;letter-spacing:.08em;font-size:.82rem;}
+    .topbar__brand::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(113,151,122,.6);animation:pulse 2.4s ease-out infinite;}
     .topbar__sep{opacity:.28;}
     .topbar__info b{color:var(--white);font-weight:600;}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,240,110,.55);}70%{box-shadow:0 0 0 7px rgba(200,240,110,0);}100%{box-shadow:0 0 0 0 rgba(200,240,110,0);}}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(113,151,122,.55);}70%{box-shadow:0 0 0 8px rgba(113,151,122,0);}100%{box-shadow:0 0 0 0 rgba(113,151,122,0);}}
     @media(prefers-reduced-motion:reduce){.topbar__brand::before{animation:none;}}
     .site-header{position:sticky;top:0;z-index:100;background:rgba(245,246,241,.92);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--hairline);}
     .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-block:14px;}
@@ -64,12 +65,14 @@
 
     /* numbered timeline */
     /* on the agenda — two-column editorial list */
-    .agenda-grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(32px,6vw,84px);align-items:start;}
-    .agenda-intro .lead{color:rgba(255,255,255,.85);max-width:32ch;margin-bottom:0;}
+    .agenda-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:clamp(32px,6vw,84px);align-items:start;margin-top:clamp(28px,3.5vw,48px);}
+    .agenda-intro p{color:rgba(255,255,255,.88);font-size:1.02rem;max-width:54ch;}
+    .agenda-intro p:first-of-type{font-size:clamp(1.1rem,1.6vw,1.28rem);color:#fff;}
+    .agenda-intro p:last-child{margin-bottom:0;}
     .timeline{margin:0;}
     .tl-item{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:baseline;padding:20px 0;border-top:1px solid rgba(255,255,255,.22);}
     .tl-item:first-child{border-top:0;padding-top:0;}
-    .tl-num{font-family:var(--font-display);font-size:1.7rem;line-height:1;color:var(--accent);min-width:2.4ch;}
+    .tl-num{font-family:var(--font-display);font-size:1.7rem;line-height:1;color:var(--ink);min-width:2.4ch;}
     .tl-item p{margin:0;font-size:clamp(1.05rem,1.5vw,1.22rem);}
     @media(max-width:768px){.agenda-grid{grid-template-columns:1fr;gap:8px;}}
 
@@ -85,21 +88,33 @@
     ul.ticks li::before{content:"\2713";color:var(--green);font-weight:700;font-size:1rem;line-height:1;flex:0 0 auto;}
 
     .stand{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,5vw,64px);align-items:center;}
-    .stand-badge{display:inline-block;font-family:var(--font-display);font-size:1.15rem;background:var(--accent);color:var(--ink);padding:7px 20px;border-radius:25px;margin-bottom:18px;}
+    .stand-badge{display:inline-block;font-family:var(--font-display);font-size:1.15rem;background:var(--ink);color:var(--cream);padding:7px 20px;border-radius:25px;margin-bottom:18px;}
     .stand__banner img{width:100%;border-radius:16px;}
     .band{text-align:center;} .band .lead{max-width:56ch;margin-inline:auto;color:rgba(255,255,255,.92);}
-    /* registration form */
-    .reserve__card{max-width:600px;margin:36px auto 0;background:var(--cream);color:var(--ink);border-radius:22px;padding:clamp(26px,4vw,44px);text-align:left;box-shadow:0 34px 80px -48px rgba(0,0,0,.75);}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;}
-    .form-row{display:grid;gap:7px;margin-bottom:18px;}
-    .form-row label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink);}
-    .form-row label .opt{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);}
-    .form-row input,.form-row select{font-family:var(--font-body);font-size:1rem;font-weight:300;color:var(--ink);background:var(--white);border:1px solid var(--hairline);border-radius:12px;padding:13px 15px;width:100%;transition:border-color .2s,box-shadow .2s;}
-    .form-row select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.6'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:18px;padding-right:42px;cursor:pointer;}
-    .form-row input:focus,.form-row select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.28);}
-    .form__submit{width:100%;margin-top:4px;}
-    .form__note{font-size:.82rem;color:var(--muted);margin:14px 0 0;text-align:center;}
+    /* registration form — underline fields directly on the dark section (matches the live Squarespace form) */
+    .reserve__form{max-width:760px;margin:44px auto 0;text-align:left;}
+    .form-group-label{display:block;font-size:1.05rem;color:var(--cream);margin:0 0 16px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;}
+    .form-row{display:flex;flex-direction:column;gap:10px;margin-bottom:30px;}
+    .form-row label{font-size:1rem;color:var(--cream);}
+    .form-row label .opt{color:rgba(245,246,241,.5);}
+    .form-row input,.form-row select{font-family:var(--font-body);font-size:1.05rem;font-weight:300;color:var(--cream);background:transparent;border:0;border-bottom:1px solid rgba(245,246,241,.4);border-radius:0;padding:10px 2px;width:100%;transition:border-color .2s;}
+    .form-row input:focus,.form-row select:focus{outline:none;border-bottom-color:var(--cream);}
+    .form-row select{appearance:none;cursor:pointer;color:rgba(245,246,241,.55);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F5F6F1' stroke-width='1.4'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 2px center;background-size:22px;padding-right:34px;}
+    .form-row select.filled{color:var(--cream);}
+    .form-row select option{color:#212121;}
+    .form__submit{display:inline-block;margin-top:8px;background:var(--cream);color:var(--ink)!important;border:0;border-radius:50px;font-family:var(--font-display);font-weight:300;font-size:1.3rem;padding:22px 52px;cursor:pointer;transition:background .2s,transform .15s;}
+    .form__submit:hover{background:var(--white);transform:translateY(-1px);}
     @media(max-width:560px){.form-grid{grid-template-columns:1fr;}}
+    /* post-submit confirmation */
+    .reserve__success{max-width:600px;margin:36px auto 0;background:var(--cream);color:var(--ink);border-radius:22px;padding:clamp(34px,4.5vw,58px);text-align:center;box-shadow:0 34px 80px -48px rgba(0,0,0,.75);}
+    .reserve__success .eyebrow{color:var(--green);}
+    .reserve__success h2{color:var(--ink);margin:.1em 0 .5em;}
+    .reserve__success p{color:#3a3d37;margin:0 auto 1em;max-width:46ch;font-size:1.02rem;}
+    .reserve__success p:last-of-type{margin-bottom:0;}
+    .reserve__success .tick{width:64px;height:64px;border-radius:50%;background:var(--green);display:grid;place-items:center;margin:0 auto 22px;}
+    .reserve__success .tick svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+    .reserve__success .stand-badge{margin:24px 0 0;}
 
     .site-footer{background:var(--cream);border-top:1px solid var(--hairline);padding-block:48px;}
     .footer__row{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
@@ -125,7 +140,7 @@
       <span class="topbar__sep" aria-hidden="true">|</span>
       <span>Pasture Field, <b>Stand D6</b></span>
     </div>
-    <a class="btn btn--accent btn--sm" href="#reserve">Reserve Your Place</a>
+    <a class="btn btn--invert btn--sm" href="#reserve">Reserve Your Place</a>
   </div></div></div>
 
   <header class="site-header"><div class="wrap"><nav class="nav" aria-label="Primary">
@@ -144,7 +159,7 @@
     <section class="hero section--cream"><div class="wrap">
       <p class="eyebrow">Biofarm at Groundswell 2026</p>
       <h1>BNG on a Working Farm</h1>
-      <p class="lead">Opportunity, reality and long-term commitment. Biodiversity Net Gain is attracting growing interest from farmers and landowners — but where does it fit within a working farm business?</p>
+      <p class="lead">Biodiversity Net Gain is attracting growing interest from farmers and landowners. But where does it fit within a working farm business?</p>
       <div class="hero__cta">
         <a class="btn btn--accent" href="#reserve">Reserve Your Place</a>
         <a class="btn btn--ghost" href="#panel">Meet the Panel</a>
@@ -153,11 +168,15 @@
     </div></section>
 
     <section class="section section--green section--vtop"><div class="wrap">
+      <p class="eyebrow">On the agenda</p>
+      <h2>What we&rsquo;ll discuss</h2>
       <div class="agenda-grid">
         <div class="agenda-intro">
-          <p class="eyebrow">On the agenda</p>
-          <h2>What we&rsquo;ll discuss</h2>
-          <p class="lead">Six themes the panel will work through across the 45-minute session &mdash; with time for your questions live at the end.</p>
+          <p>Biodiversity Net Gain is creating new opportunities for farmers and landowners, but it&rsquo;s also raising important questions.</p>
+          <p>Where does BNG fit within a productive farm or estate? How does it compare with other diversification opportunities? What are the long-term commitments? And how do you balance commercial returns with the practical realities of managing land for nature?</p>
+          <p>Join Biofarm for an honest, practical discussion exploring the opportunities, challenges and long-term realities of BNG on working land.</p>
+          <p>Bringing together leading voices from farming, landownership, policy, nature recovery and habitat management, the panel will share different perspectives, real-world experience and practical insights to help landowners make informed decisions about whether BNG is the right fit for their land and business.</p>
+          <p>Whether you&rsquo;re already exploring BNG or simply want to understand where it sits within the future of rural land management, you&rsquo;ll leave with a clearer understanding of the opportunities, the risks and the questions every landowner should be asking.</p>
         </div>
         <div class="timeline">
           <div class="tl-item"><div class="tl-num">01</div><p>Where BNG fits within a working farm business</p></div>
@@ -179,7 +198,7 @@
         <div class="person"><h4>Stephen Panks</h4><p class="role">Senior Specialist, BNG, Natural England</p><p>Bringing insight into the policy, delivery and practical realities of BNG.</p></div>
         <div class="person"><h4>Vicki Hird</h4><p class="role">Strategic Lead &ndash; Agriculture, The Wildlife Trusts</p><p>Author, campaigner and leading advocate for nature-friendly farming and land management.</p></div>
         <div class="person"><h4>Toby Diggens</h4><p class="role">Founder &amp; Co-Director, Digg &amp; Co.</p><p>Landscape restoration specialist experienced in creating and restoring species-rich habitats.</p></div>
-        <div class="person"><h4>Edward Hurley</h4><p class="role">Landowner</p><p>Sharing first-hand experience of exploring and adopting BNG on his own land — the decisions, opportunities and challenges.</p></div>
+        <div class="person"><h4>Edward Hutley</h4><p class="role">Landowner</p><p>Sharing first-hand experience of exploring and adopting BNG on his own land — the decisions, opportunities and challenges.</p></div>
         <div class="person"><h4>Ed Green</h4><p class="role">Farmer and Landowner</p><p>Offering a practical farming perspective on managing land in a changing rural economy.</p></div>
         <div class="person"><h4>Simon Nash</h4><p class="role">Head of Habitat Management, Biofarm</p><p>Habitat restoration specialist delivering and managing biodiversity projects across the UK.</p></div>
       </div>
@@ -207,42 +226,50 @@
     </div></div></section>
 
     <section class="section section--ink band" id="reserve"><div class="wrap">
+      <div id="reserveForm">
       <p class="eyebrow">Wednesday 1 &amp; Thursday 2 July &middot; 12.00pm</p>
       <h2>Reserve your place</h2>
       <p class="lead">Spaces for each session are limited. Tell us a little about you and we&rsquo;ll save you a seat for the panel discussion at Groundswell 2026.</p>
 
       <!-- TODO: set `action` to your registration endpoint (e.g. Pipedrive web form, Formspree, Mailchimp or Calendly) and adjust field names to match -->
-      <form class="reserve__card" action="#" method="post">
+      <form class="reserve__form" action="#" method="post" id="reserveFormEl">
+        <span class="form-group-label">Name</span>
         <div class="form-grid">
           <div class="form-row">
-            <label for="firstName">First name</label>
+            <label for="firstName">First Name <span class="opt">(required)</span></label>
             <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
           </div>
           <div class="form-row">
-            <label for="lastName">Last name</label>
+            <label for="lastName">Last Name <span class="opt">(required)</span></label>
             <input id="lastName" name="lastName" type="text" autocomplete="family-name" required />
           </div>
         </div>
         <div class="form-row">
-          <label for="email">Email</label>
+          <label for="email">Email <span class="opt">(required)</span></label>
           <input id="email" name="email" type="email" autocomplete="email" required />
         </div>
         <div class="form-row">
-          <label for="org">Organisation <span class="opt">(optional)</span></label>
-          <input id="org" name="organisation" type="text" autocomplete="organization" />
-        </div>
-        <div class="form-row">
-          <label for="session">Which session?</label>
+          <label for="session">Which Session?</label>
           <select id="session" name="session" required>
-            <option value="" disabled selected>Select a day&hellip;</option>
+            <option value="" disabled selected>Select an option</option>
             <option value="wed-1-jul">Wednesday 1 July &middot; 12.00&ndash;12.45pm</option>
             <option value="thu-2-jul">Thursday 2 July &middot; 12.00&ndash;12.45pm</option>
             <option value="either">Either day</option>
           </select>
         </div>
-        <button type="submit" class="btn btn--accent form__submit">Reserve Your Place</button>
-        <p class="form__note">Limited spaces per session &middot; we&rsquo;ll only use your details to manage your booking.</p>
+        <button type="submit" class="form__submit">Reserve your place</button>
       </form>
+      </div>
+
+      <div id="reserveSuccess" class="reserve__success" hidden>
+        <div class="tick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+        <p class="eyebrow">Registration confirmed</p>
+        <h2>You&rsquo;re in.</h2>
+        <p>Thanks for registering your interest.</p>
+        <p>We&rsquo;re looking forward to seeing you at Groundswell and welcoming you to <strong>BNG on a Working Farm: Opportunity, Reality &amp; Long-Term Commitment</strong>.</p>
+        <p>If you&rsquo;re passing Pasture Field, Stand D6, we&rsquo;d love to see you.</p>
+        <span class="stand-badge">Pasture Field &middot; Stand D6</span>
+      </div>
     </div></section>
   </main>
 
@@ -258,6 +285,20 @@
   <script>
     var t=document.querySelector('.nav__toggle'),l=document.getElementById('navLinks');
     t.addEventListener('click',function(){var o=l.classList.toggle('is-open');t.setAttribute('aria-expanded',o?'true':'false');});
+
+    // Brighten the session select once a real option is chosen (placeholder stays muted)
+    var sel=document.getElementById('session');
+    if(sel){var setFilled=function(){sel.classList.toggle('filled',!!sel.value);};setFilled();sel.addEventListener('change',setFilled);}
+
+    // Registration form -> "You're in." confirmation (client-side demo; wire `action` to a real endpoint for live use)
+    var rf=document.getElementById('reserveFormEl');
+    if(rf){rf.addEventListener('submit',function(e){
+      e.preventDefault();
+      document.getElementById('reserveForm').hidden=true;
+      var s=document.getElementById('reserveSuccess');
+      s.hidden=false;
+      s.scrollIntoView({behavior:'smooth',block:'center'});
+    });}
   </script>
 </body>
 </html>
