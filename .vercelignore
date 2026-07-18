@@ -1,0 +1,11 @@
+# Internal source assets — keep these out of the public deploy
+BIOFARM_BRAND_GUIDELINES/
+**/*.docx
+**/*.pdf
+**/*.mp4
+**/*.mov
+**/wetransfer_*/
+**/*.DS_Store
+.claude/
+.vscode/
+README.md
