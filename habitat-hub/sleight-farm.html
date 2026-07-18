@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sleight Farm Habitat Bank, South West England | Biofarm BNG units</title>
+  <meta name="description" content="Sleight Farm is a 70-hectare registered Biofarm habitat bank delivering Biodiversity Net Gain units through lowland meadow and species-rich grassland recovery, with 30-year stewardship." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="hub.css" />
+  <style>
+    .inline-link{color:var(--green-d);text-decoration:underline;}
+    #location .map-panel{position:relative;top:auto;}
+    /* on-page nav */
+    .page-nav{position:sticky;top:60px;z-index:80;background:rgba(245,246,241,.96);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--hairline);}
+    .page-nav__row{display:flex;gap:6px;overflow-x:auto;padding:10px 0;}
+    .page-nav a{white-space:nowrap;text-decoration:none;font-size:.86rem;color:var(--muted);padding:8px 14px;border-radius:20px;transition:background .2s,color .2s;}
+    .page-nav a:hover{color:var(--ink);}
+    .page-nav a.is-active{background:var(--ink);color:var(--cream);}
+    /* recovery timeline */
+    .tl{margin-top:34px;max-width:760px;}
+    .tl__item{position:relative;padding:0 0 28px 34px;border-left:2px solid var(--hairline);}
+    .tl__item:last-child{border-left-color:transparent;padding-bottom:0;}
+    .tl__item::before{content:"";position:absolute;left:-8px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--green);border:3px solid var(--cream-2);}
+    .tl__phase{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--green);}
+    .tl__item h3{font-size:1.25rem;margin:.2em 0 .3em;}
+    .tl__item p{color:var(--muted);margin:0;font-size:1rem;}
+    /* species grid */
+    .species{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px;}
+    .sp{background:var(--white);border:1px solid var(--hairline);border-radius:14px;padding:18px 20px;}
+    .sp .tag{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--green);}
+    .sp h3{font-size:1.15rem;margin:.15em 0 .25em;}
+    .sp p{font-size:.92rem;color:var(--muted);margin:0;}
+    /* resources */
+    .resources{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px;}
+    .res{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--white);border:1px solid var(--hairline);border-radius:14px;padding:18px 22px;text-decoration:none;transition:border-color .2s,transform .15s;}
+    .res:hover{border-color:var(--green);transform:translateY(-2px);}
+    .res .rt{font-family:var(--font-display);font-size:1.15rem;}
+    .res .rm{font-size:.8rem;color:var(--muted);}
+    .res .dl{font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--green-d);white-space:nowrap;}
+    /* enquiry form */
+    .enq-card{max-width:760px;background:var(--white);border:1px solid var(--hairline);border-radius:20px;padding:clamp(24px,3vw,40px);box-shadow:0 30px 70px -50px rgba(33,33,33,.5);}
+    .enq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;}
+    .enq-row{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+    .enq-row label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);}
+    .enq-row .opt{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);}
+    .enq-row input,.enq-row select,.enq-row textarea{font-family:var(--font-body);font-size:1rem;color:var(--ink);background:var(--cream);border:1px solid var(--hairline);border-radius:12px;padding:12px 14px;width:100%;min-width:0;}
+    .enq-row textarea{resize:vertical;min-height:92px;}
+    .enq-row input:focus,.enq-row select:focus,.enq-row textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.25);}
+    .enq-note{font-size:.8rem;color:var(--muted);margin:10px 0 0;}
+    .enq-success{display:none;text-align:center;padding:8px 0;}
+    .enq-success.show{display:block;}
+    .enq-success .tick{width:60px;height:60px;border-radius:50%;background:var(--green);display:grid;place-items:center;margin:0 auto 18px;}
+    .enq-success .tick svg{width:28px;height:28px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+    /* lightbox */
+    .gallery img{cursor:zoom-in;}
+    .lightbox{position:fixed;inset:0;z-index:400;background:rgba(20,21,19,.85);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+    .lightbox.show{display:flex;}
+    .lightbox img{max-width:94vw;max-height:90vh;border-radius:12px;}
+    /* sticky CTA */
+    .sticky-cta{position:fixed;left:0;right:0;bottom:0;z-index:150;background:var(--ink);color:var(--cream);transform:translateY(120%);transition:transform .3s;}
+    .sticky-cta.show{transform:none;}
+    .sticky-cta .inner{max-width:var(--maxw);margin:0 auto;padding:12px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .sticky-cta .txt{font-size:.95rem;} .sticky-cta .txt b{font-family:var(--font-display);font-weight:300;font-size:1.1rem;}
+    @media(max-width:760px){.species{grid-template-columns:1fr 1fr;}}
+    @media(max-width:600px){.enq-grid{grid-template-columns:1fr;} .resources{grid-template-columns:1fr;}}
+    @media(max-width:560px){.species{grid-template-columns:1fr;} .sticky-cta .txt{display:none;} .sticky-cta .inner{justify-content:center;}}
+  </style>
+</head>
+<body>
+  <header class="site-header"><div class="wrap"><nav class="nav" aria-label="Primary">
+    <a class="nav__logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" /></a>
+    <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="https://www.biofarm.co.uk/developers">Developers</a></li>
+      <li><a href="hub.html" aria-current="page">Habitat Banks</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="../june/stories/index.html">Stories</a></li>
+      <li><a class="btn btn--sm" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav></div></header>
+
+  <main>
+    <!-- HERO + KEY FACTS -->
+    <section class="bank-hero">
+      <img class="bank-hero__img" src="assets/sleight-grassland.jpg" alt="Species-rich grassland at Sleight Farm habitat bank in South West England" />
+      <div class="bank-hero__inner"><div class="wrap">
+        <p class="eyebrow">Habitat Bank &middot; Somerset, South West England</p>
+        <h1>Sleight Farm Habitat Bank</h1>
+        <p class="sub">A 70-hectare registered habitat bank where former grazing land is being restored into species-rich lowland meadow &mdash; delivering Biodiversity Net Gain with lasting ecological value.</p>
+        <div class="keyfacts">
+          <div class="keyfact"><div class="k">Area</div><div class="v">70 ha</div></div>
+          <div class="keyfact"><div class="k">BNG units<span class="note-ph"> *</span></div><div class="v">120</div></div>
+          <div class="keyfact"><div class="k">Status</div><div class="v">Registered</div></div>
+          <div class="keyfact"><div class="k">Host LPA<span class="note-ph"> *</span></div><div class="v">Somerset</div></div>
+        </div>
+        <div class="bank-hero__cta">
+          <a class="btn btn--on-green" href="#enquire">Enquire about units</a>
+          <a class="btn btn--ghost" href="#downloads" style="color:#fff!important;border-color:rgba(255,255,255,.5);">Download brochure (PDF)</a>
+        </div>
+      </div></div>
+    </section>
+
+    <div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="https://www.biofarm.co.uk/">Home</a> &nbsp;/&nbsp; <a href="hub.html">Habitat Banks</a> &nbsp;/&nbsp; Sleight Farm</nav></div>
+
+    <!-- ON-PAGE NAV -->
+    <nav class="page-nav" aria-label="On this page"><div class="wrap"><div class="page-nav__row">
+      <a href="#overview">Overview</a>
+      <a href="#location">Location</a>
+      <a href="#units">Units</a>
+      <a href="#legacy">The land</a>
+      <a href="#stewardship">Stewardship</a>
+      <a href="#timeline">Recovery</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#enquire">Enquire</a>
+    </div></div></nav>
+
+    <!-- OVERVIEW -->
+    <section class="section" id="overview"><div class="wrap"><div class="split">
+      <div>
+        <p class="eyebrow">Overview</p>
+        <h2>A landscape in recovery</h2>
+        <p>Sleight Farm is a 70-hectare registered habitat bank in South West England. Once a heavily grazed sheep and goat farm, the site is being carefully managed to allow species-rich grassland to re-establish &mdash; creating high-quality, locally available Biodiversity Net Gain for nearby development.</p>
+        <p>Through conservation grazing, carefully timed hay cuts and ongoing monitoring, the grasslands are beginning to reveal what remains within the site&rsquo;s natural seed bank. Recent surveys recorded lowland meadow indicator species and the first bee orchid on the site.</p>
+        <div class="stat-row">
+          <div class="stat"><span class="v">30<span style="font-size:1rem;">yr</span></span><span class="k">Secured &amp; managed</span></div>
+          <div class="stat"><span class="v">5+</span><span class="k">Target habitat types</span></div>
+          <div class="stat"><span class="v">1st</span><span class="k">Bee orchid recorded</span></div>
+        </div>
+      </div>
+      <div><img src="assets/bee-orchid-sleight.jpg" alt="Bee orchid recorded during botanical survey at Sleight Farm" style="border-radius:16px;width:100%;aspect-ratio:4/3;object-fit:cover;" /></div>
+    </div></div></section>
+
+    <!-- INTERACTIVE MAP -->
+    <section class="section section--cream2" id="location"><div class="wrap">
+      <p class="eyebrow">Location &amp; areas served</p>
+      <h2>Where it is, and where it can help</h2>
+      <p class="measure">Sleight Farm is well placed to serve nearby local planning authorities across the South West. The dashed ring shows the indicative catchment within which units can typically be applied, subject to the biodiversity gain spatial risk multiplier.</p>
+      <div class="map-panel" style="min-height:440px;margin-top:24px;">
+        <div class="leaflet-map" data-mode="single" data-bank="sleight" data-tiles="muted"></div>
+      </div>
+      <p class="note-ph" style="margin-top:10px;">Marker location is indicative &mdash; confirm exact boundary &amp; catchment.</p>
+      <div style="margin-top:22px;">
+        <p class="eyebrow" style="margin-bottom:.6rem;">Example LPAs served <span class="note-ph">(indicative)</span></p>
+        <div class="chips">
+          <span class="chip">Bath &amp; North East Somerset</span><span class="chip">Mendip</span><span class="chip">Somerset</span><span class="chip">Bristol</span><span class="chip">South Gloucestershire</span><span class="chip">Wiltshire</span>
+        </div>
+      </div>
+    </div></section>
+
+    <!-- HABITAT UNITS & TYPES -->
+    <section class="section" id="units"><div class="wrap">
+      <p class="eyebrow">Habitat units &amp; types</p>
+      <h2>What&rsquo;s available</h2>
+      <p class="measure">A mix of grassland and hedgerow habitats, each with a defined condition target and monitored over the 30-year management period. Unit figures below are indicative placeholders pending registered data.</p>
+      <table class="unit-table">
+        <thead><tr><th>Habitat type</th><th>Broad group</th><th>Condition target</th><th>Units <span class="note-ph">*</span></th></tr></thead>
+        <tbody>
+          <tr><td>Lowland meadow</td><td>Grassland</td><td>Good</td><td class="num">48</td></tr>
+          <tr><td>Other neutral grassland</td><td>Grassland</td><td>Moderate</td><td class="num">40</td></tr>
+          <tr><td>Native hedgerow</td><td>Hedgerow</td><td>Good</td><td class="num">18</td></tr>
+          <tr><td>Mixed scrub</td><td>Scrub</td><td>Moderate</td><td class="num">14</td></tr>
+          <tr><td><strong>Total available</strong></td><td></td><td></td><td class="num"><strong>120</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="chips" style="margin-top:18px;"><span class="chip">On-site delivery</span><span class="chip">30-year management</span><span class="chip">Registered on the BGS <span class="note-ph">*</span></span></div>
+    </div></section>
+
+    <!-- ABOUT THE LAND & LEGACY -->
+    <section class="section section--cream2" id="legacy"><div class="wrap"><div class="split">
+      <div><img src="assets/lesnewth-team-on-site.jpg" alt="Biofarm ecology team on site at Sleight Farm" style="border-radius:16px;width:100%;aspect-ratio:4/3;object-fit:cover;" /></div>
+      <div>
+        <p class="eyebrow">About the land &amp; its legacy</p>
+        <h2>From grazing land to living meadow</h2>
+        <p>For years, much of Sleight Farm supported relatively species-poor grassland under heavy grazing. Rather than force change, our management has focused on creating the conditions for nature to recover &mdash; letting the grasslands re-establish and reveal the diversity held within the soil.</p>
+        <p>That patience is beginning to pay off. Areas once classified as modified grassland are developing the characteristics of more diverse, neutral grassland, while one parcel is moving towards lowland meadow.</p>
+      </div>
+    </div></div></section>
+
+    <!-- ECOLOGICAL AMBITION & STEWARDSHIP -->
+    <section class="section" id="stewardship"><div class="wrap">
+      <p class="eyebrow">Ecological ambition &amp; long-term stewardship</p>
+      <h2 style="max-width:22ch;">Managed for at least 30 years</h2>
+      <div class="pillars" style="margin-top:36px;">
+        <div class="pillar"><h3>Species-rich grassland</h3><p>Establishing lowland meadow through conservation grazing, timed hay cuts and green-hay spreading of locally adapted wildflower seed.</p></div>
+        <div class="pillar"><h3>Structural diversity</h3><p>Grazing by ponies and cattle creates variation in sward height and structure, supporting invertebrates, small mammals and reptiles.</p></div>
+        <div class="pillar"><h3>Evidenced monitoring</h3><p>Ongoing botanical and wildlife monitoring tracks progress year on year &mdash; from meadow indicator species to barn owls and a juvenile tawny owl.</p></div>
+      </div>
+    </div></section>
+
+    <!-- RECOVERY TIMELINE -->
+    <section class="section section--cream2" id="timeline"><div class="wrap">
+      <p class="eyebrow">The recovery so far</p>
+      <h2 style="max-width:20ch;">A landscape finding its character</h2>
+      <div class="tl">
+        <div class="tl__item"><span class="tl__phase">At acquisition</span><h3>A heavily grazed farm</h3><p>Sleight Farm came to us as a sheep and goat farm, with relatively species-poor grassland and limited botanical diversity.</p></div>
+        <div class="tl__item"><span class="tl__phase">Management</span><h3>Conservation grazing &amp; hay cuts</h3><p>We introduced conservation grazing by ponies and cattle and carefully timed hay cuts, creating the conditions for nature to recover.</p></div>
+        <div class="tl__item"><span class="tl__phase">Latest botanical survey</span><h3>Meadow indicators &amp; a first bee orchid</h3><p>Knapweed, bird&rsquo;s-foot trefoil, betony and pignut recorded &mdash; and the first bee orchid on the site. <a class="inline-link" href="../june/stories/sleight-farm-botanical-survey.html">Read the survey &rarr;</a></p></div>
+        <div class="tl__item"><span class="tl__phase">Wildlife monitoring</span><h3>Owls, badgers &amp; bullfinches</h3><p>Cameras recorded barn owl, a juvenile tawny owl, badgers, fallow deer and Amber-list bullfinches. <a class="inline-link" href="../june/stories/sleight-farm-wildlife-monitoring.html">See what we found &rarr;</a></p></div>
+        <div class="tl__item"><span class="tl__phase">Coming this autumn</span><h3>Green-hay spreading</h3><p>Green hay from the richest areas will be spread across the site to accelerate the spread of wildflowers.</p></div>
+      </div>
+    </div></section>
+
+    <!-- SPECIES RECORDED -->
+    <section class="section"><div class="wrap">
+      <p class="eyebrow">What we&rsquo;ve recorded</p>
+      <h2 style="max-width:22ch;">Signs of a habitat coming to life</h2>
+      <div class="species">
+        <div class="sp"><span class="tag">Flora</span><h3>Bee orchid</h3><p>The first recorded on the site &mdash; a strong signal of developing species-rich grassland.</p></div>
+        <div class="sp"><span class="tag">Flora</span><h3>Knapweed</h3><p>Abundant in the area managed for lowland meadow; a characteristic meadow species.</p></div>
+        <div class="sp"><span class="tag">Flora</span><h3>Bird&rsquo;s-foot trefoil</h3><p>A lowland meadow indicator that supports pollinators across the sward.</p></div>
+        <div class="sp"><span class="tag">Fauna</span><h3>Barn &amp; tawny owl</h3><p>Recorded on wildlife cameras &mdash; owls depend on healthy small-mammal populations.</p></div>
+        <div class="sp"><span class="tag">Fauna</span><h3>Badger &amp; fallow deer</h3><p>Moving through a landscape that increasingly offers food, shelter and cover.</p></div>
+        <div class="sp"><span class="tag">Fauna</span><h3>Bullfinch</h3><p>On the UK&rsquo;s Amber List &mdash; relies on scrub, hedgerow and woodland-edge habitat.</p></div>
+      </div>
+    </div></section>
+
+    <!-- GALLERY -->
+    <section class="section section--cream2" id="gallery"><div class="wrap">
+      <p class="eyebrow">Photography &amp; gallery</p>
+      <h2>Sleight Farm through the seasons</h2>
+      <div class="gallery" style="margin-top:24px;">
+        <img class="g-lg" src="assets/sleight-grassland.jpg" alt="Wide view of species-rich grassland at Sleight Farm" />
+        <img src="assets/bee-orchid-sleight.jpg" alt="Bee orchid at Sleight Farm" />
+        <img src="assets/lesnewth-team-on-site.jpg" alt="Ecology team on site at Sleight Farm" />
+        <img src="assets/climate-resilience-drone.jpg" alt="Aerial view of habitat at Sleight Farm" />
+        <img src="assets/bee-orchid-sleight.jpg" alt="Wildflower detail at Sleight Farm" />
+      </div>
+      <p class="note-ph" style="margin-top:12px;">Representative imagery &mdash; replace with Sleight Farm photography.</p>
+    </div></section>
+
+    <!-- RESOURCES -->
+    <section class="section" id="downloads"><div class="wrap">
+      <p class="eyebrow">Resources</p>
+      <h2>Download the detail</h2>
+      <div class="resources">
+        <a class="res" href="#"><span><span class="rt">Site brochure</span><br /><span class="rm">Overview, habitats &amp; location &middot; PDF</span></span><span class="dl">Download</span></a>
+        <a class="res" href="#"><span><span class="rt">Ecology &amp; monitoring report</span><br /><span class="rm">Botanical &amp; wildlife survey summary &middot; PDF</span></span><span class="dl">Download</span></a>
+        <a class="res" href="#"><span><span class="rt">BGS registration</span><br /><span class="rm">Biodiversity Gain Sites Register &middot; link</span></span><span class="dl">View</span></a>
+        <a class="res" href="https://www.biofarm.co.uk/contact"><span><span class="rt">Unit price guide</span><br /><span class="rm">Pricing &amp; availability</span></span><span class="dl">On request</span></a>
+      </div>
+      <p class="note-ph" style="margin-top:12px;">Placeholder resources &mdash; wire to the real documents.</p>
+    </div></section>
+
+    <!-- RELATED BANKS -->
+    <section class="section"><div class="wrap">
+      <p class="eyebrow">Related habitat banks</p>
+      <h2>Explore more of our network</h2>
+      <div class="rel-grid" style="margin-top:24px;">
+        <a class="rel-card" href="#"><img src="assets/lesnewth-grassland-meadow.jpg" alt="Lesnewth habitat bank, North Cornwall" /><div class="rb"><span class="bank-card__region">North Cornwall</span><h3>Lesnewth</h3></div></a>
+        <a class="rel-card" href="#"><img src="assets/climate-resilience-drone.jpg" alt="Representative landscape for Habitat Bank 03" /><div class="rb"><span class="bank-card__region">South West <span class="note-ph">(TBC)</span></span><h3>Habitat Bank 03</h3></div></a>
+        <a class="rel-card" href="hub.html"><img src="assets/lesnewth-grassland-meadow.jpg" alt="Biofarm habitat banks" /><div class="rb"><span class="bank-card__region">Whole portfolio</span><h3>Browse all habitat banks &rarr;</h3></div></a>
+      </div>
+    </div></section>
+
+    <!-- ENQUIRY FORM -->
+    <section class="section section--cream2" id="enquire"><div class="wrap">
+      <p class="eyebrow">Enquire about units</p>
+      <h2 style="max-width:20ch;">Talk to us about Sleight Farm</h2>
+      <p class="measure" style="color:var(--muted);">Tell us a little about your scheme and we&rsquo;ll come back with unit availability, habitat types and pricing.</p>
+      <!-- TODO: point action at your enquiry endpoint (Pipedrive / Formspree / Mailchimp) -->
+      <form class="enq-card" id="enqForm" action="#" method="post" style="margin-top:24px;">
+        <div id="enqFields">
+          <div class="enq-grid">
+            <div class="enq-row"><label for="fn">First name</label><input id="fn" name="firstName" type="text" autocomplete="given-name" required /></div>
+            <div class="enq-row"><label for="ln">Last name</label><input id="ln" name="lastName" type="text" autocomplete="family-name" required /></div>
+          </div>
+          <div class="enq-grid">
+            <div class="enq-row"><label for="em">Email</label><input id="em" name="email" type="email" autocomplete="email" required /></div>
+            <div class="enq-row"><label for="og">Organisation <span class="opt">(optional)</span></label><input id="og" name="organisation" type="text" autocomplete="organization" /></div>
+          </div>
+          <div class="enq-row"><label for="un">Units needed <span class="opt">(estimate)</span></label>
+            <select id="un" name="units"><option value="">Select&hellip;</option><option>1&ndash;25</option><option>25&ndash;75</option><option>75&ndash;150</option><option>150+</option><option>Not sure yet</option></select>
+          </div>
+          <div class="enq-row"><label for="ms">About your scheme <span class="opt">(location, LPA, timeline)</span></label><textarea id="ms" name="message"></textarea></div>
+          <button type="submit" class="btn">Send enquiry</button>
+          <p class="enq-note">We&rsquo;ll only use your details to respond to your enquiry.</p>
+        </div>
+        <div class="enq-success" id="enqSuccess">
+          <div class="tick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <h2>Thanks &mdash; enquiry received.</h2>
+          <p style="color:var(--muted);">We&rsquo;ll be in touch shortly about unit availability at Sleight Farm.</p>
+        </div>
+      </form>
+    </div></section>
+
+    <!-- INTERNAL LINKS + CTA -->
+    <section class="section section--ink"><div class="wrap">
+      <div class="measure">
+        <p class="eyebrow">Ready to talk units?</p>
+        <h2 style="color:#fff;">Secure Biodiversity Net Gain at Sleight Farm</h2>
+        <p style="color:rgba(245,246,241,.85);">Get in touch to discuss unit availability, habitat types, pricing and planning requirements for your development.</p>
+        <div class="bank-hero__cta">
+          <a class="btn btn--on-green" href="#enquire">Enquire about units</a>
+          <a class="btn btn--ghost" href="#downloads" style="color:#fff!important;border-color:rgba(255,255,255,.5);">Download brochure (PDF)</a>
+        </div>
+      </div>
+      <div style="margin-top:36px;">
+        <p class="eyebrow">Related links</p>
+        <div class="ilinks">
+          <a href="../june/stories/sleight-farm-botanical-survey.html">Botanical survey: what we&rsquo;re seeing at Sleight Farm</a>
+          <a href="../june/stories/sleight-farm-wildlife-monitoring.html">Eyes on nature: wildlife monitoring</a>
+          <a href="../june/stories/biodiversity-net-gain-climate-resilience.html">BNG &amp; climate resilience</a>
+          <a href="https://www.biofarm.co.uk/developers">Biodiversity Net Gain for developers</a>
+          <a href="hub.html">All habitat banks</a>
+          <a href="https://www.biofarm.co.uk/contact">Contact us</a>
+        </div>
+      </div>
+    </div></section>
+  </main>
+
+  <!-- sticky enquiry bar -->
+  <div class="sticky-cta" id="stickyCta"><div class="inner"><span class="txt"><b>Sleight Farm</b> &middot; 120 units* &middot; Somerset, South West</span><a class="btn btn--on-green btn--sm" href="#enquire">Enquire about units</a></div></div>
+  <!-- gallery lightbox -->
+  <div class="lightbox" id="lightbox" aria-hidden="true"><button class="lightbox__close" aria-label="Close">&times;</button><img src="" alt="" /></div>
+
+  <footer class="site-footer"><div class="wrap"><div class="footer__row">
+    <a class="nav__logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" style="height:28px;" /></a>
+    <ul class="footer__links"><li><a href="hub.html">Habitat Banks</a></li><li><a href="../june/stories/index.html">Stories</a></li><li><a href="https://www.biofarm.co.uk/contact">Contact</a></li></ul>
+  </div><div class="footer__meta">&copy; Biofarm &middot; We&rsquo;re in the business of nature.</div></div></footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="map.js"></script>
+  <script src="sleight.js"></script>
+  <script>
+    var t=document.querySelector('.nav__toggle'),l=document.getElementById('navLinks');
+    t.addEventListener('click',function(){var o=l.classList.toggle('is-open');t.setAttribute('aria-expanded',o?'true':'false');});
+  </script>
+</body>
+</html>

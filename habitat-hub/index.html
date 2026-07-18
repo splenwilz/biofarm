@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Habitat Bank Hub — approach &amp; options | Biofarm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="hub.css" />
+  <style>
+    body{background:#1b1c1a;color:#d7dacf;}
+    .doc{max-width:1200px;margin:0 auto;padding:40px clamp(20px,5vw,56px) 90px;}
+    .doc h1,.doc h2,.doc h3{color:#f3f4ee;}
+    .kicker{font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:.78rem;color:#9aa093;margin:0 0 10px;}
+    .doc h1{font-size:clamp(2.2rem,4.5vw,3.4rem);margin:0 0 .3em;}
+    .doc .intro{font-size:1.15rem;color:#aeb3a6;max-width:72ch;}
+    .rec{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:34px 0 8px;}
+    .rec .item{background:#242621;border:1px solid #33362f;border-radius:16px;padding:20px 22px;}
+    .rec .item h3{margin:.1em 0 .4em;font-size:1.12rem;}
+    .rec .item .n{color:#9fc08a;font-weight:700;font-family:var(--font-display);font-size:1.3rem;}
+    .rec .item p{color:#aeb3a6;font-size:.94rem;margin:0;}
+    .divider{margin:60px 0 8px;border-top:1px solid #33362f;padding-top:34px;}
+    .divider h2{font-size:1.9rem;margin:0 0 4px;} .divider p{color:#9aa093;margin:0;font-size:.98rem;}
+    .opt{margin-top:40px;}
+    .opt .label-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 6px;}
+    .opt h3{font-size:1.4rem;margin:0;} .opt h3 .tag{font-size:.66rem;vertical-align:middle;margin-left:10px;background:#2f5d3a;color:#cdeab3;border-radius:20px;padding:3px 10px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--font-body);}
+    .opt .desc{color:#9aa093;font-size:.95rem;margin:0 0 16px;max-width:78ch;}
+    .opt .label-row a{color:#9fc08a;text-decoration:none;font-size:.92rem;white-space:nowrap;}
+    .frames{display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:start;}
+    .frame{background:#0f100e;border:1px solid #33362f;border-radius:14px;overflow:hidden;}
+    .frame__bar{display:flex;align-items:center;gap:6px;padding:9px 14px;border-bottom:1px solid #33362f;font-size:.7rem;color:#8a8f83;letter-spacing:.08em;text-transform:uppercase;}
+    .frame__bar i{width:9px;height:9px;border-radius:50%;background:#3a3d36;display:inline-block;}
+    .frame__bar span{margin-left:8px;}
+    .frame iframe{width:100%;border:0;display:block;background:#F5F6F1;}
+    .frame--desktop iframe{height:620px;}
+    .frame--mobile{width:380px;}
+    .frame--mobile iframe{width:375px;height:680px;}
+    @media(max-width:940px){.rec{grid-template-columns:1fr;} .frames{grid-template-columns:1fr;} .frame--mobile{width:100%;} .frame--mobile iframe{width:100%;}}
+  </style>
+</head>
+<body>
+  <div class="doc">
+    <p class="kicker">Biofarm &middot; Habitat Bank Hub &middot; Approach &amp; options</p>
+    <h1>A location-first Hub that scales</h1>
+    <p class="intro">Recommended organising model, plus brand mid-fidelity options to compare &mdash; <b>4 Hub concepts</b> and <b>3 Sleight Farm bank-page layouts</b>. Every page is responsive; the desktop and mobile frames are the same live pages at different widths.</p>
+
+    <p class="kicker" style="margin-top:40px;">The organising model (shared across all options)</p>
+    <div class="rec">
+      <div class="item"><span class="n">01</span><h3>Location-first</h3><p>Location is the primary organising principle &mdash; the main driver of a BNG buying decision &mdash; expressed through map, region grouping or search depending on the concept.</p></div>
+      <div class="item"><span class="n">02</span><h3>Areas served, not just points</h3><p>Each bank shows the catchment / LPAs it can serve (spatial-risk multiplier), not just a dot &mdash; the real question a developer is asking.</p></div>
+      <div class="item"><span class="n">03</span><h3>Search &amp; filter, not folders</h3><p>Postcode / LPA / habitat / units filtering scales to any number of banks without a rigid menu that dates as the network grows.</p></div>
+      <div class="item"><span class="n">04</span><h3>Never geographically limited</h3><p>A persistent national-capability band + &ldquo;can&rsquo;t see one near you?&rdquo; means six SW-weighted banks read as a growing network with national delivery.</p></div>
+      <div class="item"><span class="n">05</span><h3>Progressive disclosure</h3><p>Hub browses &amp; compares; bank pages carry the depth. Clear path: <b>Hub → Bank → Enquire</b>.</p></div>
+      <div class="item"><span class="n">06</span><h3>Mobile-first &amp; brand-native</h3><p>Collapsible map/list, sticky filters, stacked cards. RATI/Inter, black on off-white, green accent throughout.</p></div>
+    </div>
+
+    <!-- HUB OPTIONS -->
+    <div class="divider"><h2>Habitat Bank Hub &mdash; 4 concepts</h2><p>Same content &amp; model, different navigation experience.</p></div>
+
+    <div class="opt">
+      <div class="label-row"><h3>1 &middot; Map + List <span class="tag">Recommended</span></h3><a href="hub.html" target="_blank" rel="noopener">Open full &rarr;</a></div>
+      <p class="desc">Split screen: an interactive map synced with a filterable card list. Best of both &mdash; &ldquo;where&rsquo;s my site&rdquo; and the specifics (units, habitats, condition) together.</p>
+      <div class="frames">
+        <div class="frame frame--desktop"><div class="frame__bar"><i></i><i></i><i></i><span>Desktop</span></div><iframe src="hub.html" title="Hub Map+List desktop" loading="lazy"></iframe></div>
+        <div class="frame frame--mobile"><div class="frame__bar"><i></i><i></i><i></i><span>Mobile</span></div><iframe src="hub.html" title="Hub Map+List mobile" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <div class="opt">
+      <div class="label-row"><h3>2 &middot; Editorial / Regional</h3><a href="hub-editorial.html" target="_blank" rel="noopener">Open full &rarr;</a></div>
+      <p class="desc">Photography-led. Large image cards grouped by region &mdash; premium and magazine-like, leaning into the brief&rsquo;s emphasis on landscape photography.</p>
+      <div class="frames">
+        <div class="frame frame--desktop"><div class="frame__bar"><i></i><i></i><i></i><span>Desktop</span></div><iframe src="hub-editorial.html" title="Hub Editorial desktop" loading="lazy"></iframe></div>
+        <div class="frame frame--mobile"><div class="frame__bar"><i></i><i></i><i></i><span>Mobile</span></div><iframe src="hub-editorial.html" title="Hub Editorial mobile" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <div class="opt">
+      <div class="label-row"><h3>3 &middot; Map-first / Immersive</h3><a href="hub-map-first.html" target="_blank" rel="noopener">Open full &rarr;</a></div>
+      <p class="desc">The map is the hero: full-bleed interactive map with floating search and a results drawer of bank cards. App-like and most location-driven.</p>
+      <div class="frames">
+        <div class="frame frame--desktop"><div class="frame__bar"><i></i><i></i><i></i><span>Desktop</span></div><iframe src="hub-map-first.html" title="Hub Map-first desktop" loading="lazy"></iframe></div>
+        <div class="frame frame--mobile"><div class="frame__bar"><i></i><i></i><i></i><span>Mobile</span></div><iframe src="hub-map-first.html" title="Hub Map-first mobile" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <div class="opt">
+      <div class="label-row"><h3>4 &middot; Compare / Data-led</h3><a href="hub-compare.html" target="_blank" rel="noopener">Open full &rarr;</a></div>
+      <p class="desc">For planners &amp; ecologists: a sortable, filterable comparison table (units, habitat types, LPA served, condition) &mdash; fast to shortlist, map secondary.</p>
+      <div class="frames">
+        <div class="frame frame--desktop"><div class="frame__bar"><i></i><i></i><i></i><span>Desktop</span></div><iframe src="hub-compare.html" title="Hub Compare desktop" loading="lazy"></iframe></div>
+        <div class="frame frame--mobile"><div class="frame__bar"><i></i><i></i><i></i><span>Mobile</span></div><iframe src="hub-compare.html" title="Hub Compare mobile" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <!-- SLEIGHT OPTIONS -->
+    <div class="divider"><h2>Sleight Farm bank page &mdash; 3 layouts</h2><p>All cover the brief&rsquo;s sections; different reading experience.</p></div>
+
+    <div class="opt">
+      <div class="label-row"><h3>A &middot; Immersive hero</h3><a href="sleight-farm.html" target="_blank" rel="noopener">Open full &rarr;</a></div>
+      <p class="desc">Full-bleed image hero with key facts, then stacked editorial sections. Strong first impression, photography forward.</p>
+      <div class="frames">
+        <div class="frame frame--desktop"><div class="frame__bar"><i></i><i></i><i></i><span>Desktop</span></div><iframe src="sleight-farm.html" title="Sleight immersive desktop" loading="lazy"></iframe></div>
+        <div class="frame frame--mobile"><div class="frame__bar"><i></i><i></i><i></i><span>Mobile</span></div><iframe src="sleight-farm.html" title="Sleight immersive mobile" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <div class="opt">
+      <div class="label-row"><h3>B &middot; Spec-sheet</h3><a href="sleight-farm-spec.html" target="_blank" rel="noopener">Open full &rarr;</a></div>
+      <p class="desc">A sticky enquiry / spec rail beside scrolling content &mdash; keeps units, facts and &ldquo;Enquire&rdquo; in view at all times. Most action-oriented for developers.</p>
+      <div class="frames">
+        <div class="frame frame--desktop"><div class="frame__bar"><i></i><i></i><i></i><span>Desktop</span></div><iframe src="sleight-farm-spec.html" title="Sleight spec desktop" loading="lazy"></iframe></div>
+        <div class="frame frame--mobile"><div class="frame__bar"><i></i><i></i><i></i><span>Mobile</span></div><iframe src="sleight-farm-spec.html" title="Sleight spec mobile" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <div class="opt">
+      <div class="label-row"><h3>C &middot; Long-form story</h3><a href="sleight-farm-story.html" target="_blank" rel="noopener">Open full &rarr;</a></div>
+      <p class="desc">Narrative layout with big full-bleed imagery between sections &mdash; leans into storytelling and the land&rsquo;s legacy. Great for the secondary landowner audience.</p>
+      <div class="frames">
+        <div class="frame frame--desktop"><div class="frame__bar"><i></i><i></i><i></i><span>Desktop</span></div><iframe src="sleight-farm-story.html" title="Sleight story desktop" loading="lazy"></iframe></div>
+        <div class="frame frame--mobile"><div class="frame__bar"><i></i><i></i><i></i><span>Mobile</span></div><iframe src="sleight-farm-story.html" title="Sleight story mobile" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <p class="cap" style="color:#8a8f83;font-size:.85rem;margin-top:44px;border-top:1px solid #33362f;padding-top:24px;">Notes: maps are live &amp; interactive (Leaflet + OpenStreetMap — needs an internet connection; can switch to Mapbox / Google Maps with a key). Banks 03–06 locations, some Sleight figures (units, LPA, BGS) and representative photography are marked placeholders to swap for registered data. If your browser blocks <code>file://</code> iframes, use the &ldquo;Open full →&rdquo; links.</p>
+  </div>
+</body>
+</html>

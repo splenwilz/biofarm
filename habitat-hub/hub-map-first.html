@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Habitat Bank Hub — Map | Find Biofarm habitat banks near you</title>
+  <meta name="description" content="Explore Biofarm's registered habitat banks on an interactive map. Find Biodiversity Net Gain units and the areas each bank serves, with national delivery beyond our network." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="hub.css" />
+  <style>
+    .map-hero{position:relative;height:min(82vh,780px);overflow:hidden;border-bottom:1px solid var(--hairline);}
+    .map-hero .leaflet-map{position:absolute;inset:0;z-index:0;}
+    .map-hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 0 140px rgba(33,33,33,.20);}
+    .mf-card.is-active{border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.3),0 18px 44px -30px rgba(33,33,33,.45);}
+    .map-hero__search{position:absolute;z-index:1200;top:26px;left:50%;transform:translateX(-50%);width:min(760px,92%);background:rgba(255,255,255,.97);border:1px solid var(--hairline);border-radius:18px;box-shadow:0 24px 60px -34px rgba(33,33,33,.55);padding:14px;display:grid;grid-template-columns:1.5fr 1fr 1fr auto;gap:10px;}
+    .map-hero__search input,.map-hero__search select{font-family:var(--font-body);font-size:.98rem;color:var(--ink);background:var(--cream);border:1px solid var(--hairline);border-radius:10px;padding:11px 13px;}
+    .map-hero__title{position:absolute;z-index:1100;left:var(--gutter);bottom:104px;max-width:22ch;pointer-events:none;background:rgba(245,246,241,.9);border:1px solid var(--hairline);border-radius:14px;padding:12px 18px;}
+    .map-hero__title h1{font-size:clamp(1.5rem,2.6vw,2.2rem);margin:0;}
+    .drawer{position:relative;z-index:5;margin-top:-84px;padding-bottom:8px;}
+    .drawer__head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:0 var(--gutter) 12px;}
+    .drawer__head .lbl{font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:var(--cream);border:1px solid var(--hairline);padding:6px 12px;border-radius:20px;}
+    .drawer__head a{text-decoration:none;font-size:.9rem;color:var(--ink);}
+    .drawer__track{display:flex;gap:16px;overflow-x:auto;padding:6px var(--gutter) 14px;scroll-snap-type:x mandatory;}
+    .mf-card{position:relative;flex:0 0 auto;width:300px;scroll-snap-align:start;background:var(--white);border:1px solid var(--hairline);border-radius:16px;overflow:hidden;text-decoration:none;box-shadow:0 18px 44px -30px rgba(33,33,33,.45);transition:transform .15s,border-color .2s;}
+    .mf-card:hover{transform:translateY(-3px);border-color:var(--green);}
+    .mf-card__img,.mf-card__ph{width:100%;aspect-ratio:16/10;object-fit:cover;}
+    .mf-card__ph{background:repeating-linear-gradient(45deg,#e9ebe3,#e9ebe3 12px,#eef0e9 12px,#eef0e9 24px);display:grid;place-items:center;}
+    .mf-card__ph::after{content:"Image";font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:#9aa093;}
+    .mf-card__body{padding:15px 17px 18px;display:flex;flex-direction:column;gap:7px;}
+    .mf-card__region{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--green);}
+    .mf-card__body h3{font-size:1.2rem;margin:0;}
+    .mf-card__stats{font-size:.82rem;color:var(--muted);} .mf-card__stats b{color:var(--ink);}
+    @media(max-width:768px){
+      .map-hero{height:auto;display:flex;flex-direction:column;}
+      .map-hero::after{display:none;}
+      .map-hero .leaflet-map{position:relative;inset:auto;height:52vh;order:2;}
+      .map-hero__search{position:static;transform:none;width:100%;order:1;grid-template-columns:1fr;gap:10px;border:0;border-bottom:1px solid var(--hairline);border-radius:0;box-shadow:none;padding:14px var(--gutter);}
+      .map-hero__title{display:none;}
+      .drawer{margin-top:0;padding-top:12px;}
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header"><div class="wrap"><nav class="nav" aria-label="Primary">
+    <a class="nav__logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" /></a>
+    <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="https://www.biofarm.co.uk/developers">Developers</a></li>
+      <li><a href="hub.html" aria-current="page">Habitat Banks</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="../june/stories/index.html">Stories</a></li>
+      <li><a class="btn btn--sm" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav></div></header>
+
+  <main>
+    <!-- MAP HERO -->
+    <section class="map-hero" aria-label="Map of Biofarm habitat banks">
+      <div class="leaflet-map" data-mode="all" data-tiles="muted"></div>
+      <div class="map-hero__title"><h1>Find a habitat bank near your site</h1></div>
+      <form class="map-hero__search" id="mfFilter" onsubmit="return false" aria-label="Search habitat banks">
+        <input id="fLoc" type="text" placeholder="Postcode, LPA or region…" />
+        <select id="fHabitat"><option value="">Any habitat type</option><option value="grassland">Grassland</option><option value="meadow">Lowland meadow</option><option value="woodland">Woodland</option><option value="scrub">Scrub</option><option value="hedgerow">Hedgerow</option><option value="wetland">Wetland</option></select>
+        <select id="fUnits"><option value="">Any units</option><option value="0-25">1&ndash;25</option><option value="25-75">25&ndash;75</option><option value="75-99999">75+</option></select>
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </section>
+
+    <!-- RESULTS DRAWER -->
+    <section class="drawer">
+      <div class="drawer__head"><span class="lbl"><b id="drawerCount">6</b> habitat banks</span><a href="hub.html">Switch to list view &rarr;</a></div>
+      <div class="drawer__track">
+        <a class="mf-card" href="sleight-farm.html" data-bank="sleight" data-units="120" data-habitats="lowland meadow, neutral grassland, hedgerows" data-search="sleight farm somerset south west england lowland meadow"><img class="mf-card__img" src="assets/sleight-grassland.jpg" alt="Sleight Farm habitat bank" /><div class="mf-card__body"><span class="mf-card__region">Somerset &middot; South West</span><h3>Sleight Farm</h3><p class="mf-card__stats"><b>70 ha</b> &middot; <b>120</b> units* &middot; Lowland meadow</p></div></a>
+        <a class="mf-card" href="#" data-bank="lesnewth" data-units="130" data-habitats="species-rich grassland, woodland, scrub, cornish hedgerows" data-search="lesnewth north cornwall south west england"><img class="mf-card__img" src="assets/lesnewth-grassland-meadow.jpg" alt="Lesnewth habitat bank" /><div class="mf-card__body"><span class="mf-card__region">North Cornwall</span><h3>Lesnewth</h3><p class="mf-card__stats"><b>26.8 ha</b> &middot; <b>130</b> units &middot; Grassland, woodland</p></div></a>
+        <a class="mf-card" href="#" data-bank="b03" data-units="90" data-habitats="grassland, woodland" data-search="south west england"><img class="mf-card__img" src="assets/climate-resilience-drone.jpg" alt="Representative landscape for Habitat Bank 03" /><div class="mf-card__body"><span class="mf-card__region">South West (TBC)</span><h3>Habitat Bank 03</h3><p class="mf-card__stats"><b>~30 ha</b> &middot; <b>90</b> units*</p></div></a>
+        <a class="mf-card" href="#" data-bank="b04" data-units="140" data-habitats="wetland, grassland, hedgerows" data-search="england east"><img class="mf-card__img" src="assets/bee-orchid-sleight.jpg" alt="Representative landscape for Habitat Bank 04" /><div class="mf-card__body"><span class="mf-card__region">England (TBC)</span><h3>Habitat Bank 04</h3><p class="mf-card__stats"><b>~45 ha</b> &middot; <b>140</b> units*</p></div></a>
+        <a class="mf-card" href="#" data-bank="b05" data-units="60" data-habitats="species-rich grassland, scrub" data-search="england"><img class="mf-card__img" src="assets/lesnewth-team-on-site.jpg" alt="Representative landscape for Habitat Bank 05" /><div class="mf-card__body"><span class="mf-card__region">England (TBC)</span><h3>Habitat Bank 05</h3><p class="mf-card__stats"><b>~20 ha</b> &middot; <b>60</b> units*</p></div></a>
+        <a class="mf-card" href="#" data-bank="b06" data-units="110" data-habitats="woodland, grassland, hedgerows" data-search="england north west"><img class="mf-card__img" src="assets/climate-resilience-drone.jpg" alt="Representative landscape for Habitat Bank 06" /><div class="mf-card__body"><span class="mf-card__region">England (TBC)</span><h3>Habitat Bank 06</h3><p class="mf-card__stats"><b>~35 ha</b> &middot; <b>110</b> units*</p></div></a>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO STATS -->
+    <section class="section section--cream2"><div class="wrap">
+      <p class="eyebrow">Portfolio at a glance</p>
+      <div class="stat-band">
+        <div class="sb"><span class="v">6</span><span class="k">Registered banks</span></div>
+        <div class="sb"><span class="v">550+<span class="ast">*</span></span><span class="k">BNG units available</span></div>
+        <div class="sb"><span class="v">180+<span class="ast">*</span></span><span class="k">Hectares in stewardship</span></div>
+        <div class="sb"><span class="v">8<span class="ast">*</span></span><span class="k">Habitat types</span></div>
+      </div>
+      <p class="note-ph" style="margin:16px 0 0;">* Indicative portfolio totals &mdash; confirm against registered data.</p>
+    </div></section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section"><div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2 style="max-width:20ch;">From first enquiry to lasting outcome</h2>
+      <div class="steps">
+        <div class="step"><span class="n">01</span><h3>Find</h3><p>Tell us your site, planning authority and unit requirement. We match you to the nearest suitable habitat bank &mdash; or our wider delivery capability.</p></div>
+        <div class="step"><span class="n">02</span><h3>Reserve</h3><p>Confirm unit availability, habitat types and pricing, and reserve the units your scheme needs.</p></div>
+        <div class="step"><span class="n">03</span><h3>Secure</h3><p>Units are allocated and secured against your development, with the documentation your local planning authority requires.</p></div>
+        <div class="step"><span class="n">04</span><h3>Steward</h3><p>We create and manage the habitats for at least 30 years, with monitoring that evidences real ecological gain.</p></div>
+      </div>
+    </div></section>
+
+    <!-- WHAT IS A HABITAT BANK + FAQ -->
+    <section class="section section--cream2"><div class="wrap">
+      <div class="split" style="align-items:start;">
+        <div>
+          <p class="eyebrow">The basics</p>
+          <h2>What is a habitat bank?</h2>
+          <p>A habitat bank is an area of land where habitats are created or enhanced, then secured and managed for the long term to generate Biodiversity Net Gain units. Developers buy units to meet their BNG obligation; landowners earn a long-term return from managing land for nature.</p>
+          <p>Every Biofarm habitat bank is a registered site, managed for at least 30 years, with ongoing ecological monitoring.</p>
+          <div class="ilinks" style="margin-top:14px;">
+            <a href="https://www.biofarm.co.uk/developers">BNG for developers</a>
+            <a href="../june/stories/index.html">Ecology stories</a>
+            <a href="https://www.biofarm.co.uk/contact">Contact us</a>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow">Developer FAQs</p>
+          <div class="faq">
+            <details><summary>Does location matter for BNG units?</summary><p>Yes. The biodiversity gain spatial risk multiplier means units delivered closer to your development &mdash; or within the same local planning authority or National Character Area &mdash; carry more value. Each bank shows the areas it can serve.</p></details>
+            <details><summary>How long are the habitats managed?</summary><p>Every Biofarm habitat bank is secured and managed for a minimum of 30 years, with monitoring to evidence progress over time.</p></details>
+            <details><summary>How is availability and pricing confirmed?</summary><p>Unit availability, habitat types and pricing are confirmed on enquiry for your specific requirement &mdash; get in touch and we&rsquo;ll talk you through it.</p></details>
+            <details><summary>What if you don&rsquo;t have a bank near my site?</summary><p>Our registered network is growing and our delivery reaches beyond it. If nothing serves your area today, we can source, create and manage a solution for your scheme.</p></details>
+            <details><summary>Are the habitat banks registered?</summary><p>Yes &mdash; our banks are registered habitat banks, giving developers and planners confidence in their integrity and longevity.</p></details>
+          </div>
+        </div>
+      </div>
+    </div></section>
+
+    <section class="section section--green national"><div class="wrap"><div class="measure">
+      <p class="eyebrow">National by nature, local by design</p>
+      <h2>Can&rsquo;t see one near your site?</h2>
+      <p class="lead">Our registered network is growing and our delivery reaches beyond it. If none of our current banks serve your area, we can source, create and manage a solution for your scheme.</p>
+      <a class="btn btn--on-green" href="https://www.biofarm.co.uk/contact" style="margin-top:8px;">Talk to us about your site</a>
+    </div></div></section>
+  </main>
+
+  <footer class="site-footer"><div class="wrap"><div class="footer__row">
+    <a class="nav__logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" style="height:28px;" /></a>
+    <ul class="footer__links"><li><a href="hub.html">Habitat Banks</a></li><li><a href="../june/stories/index.html">Stories</a></li><li><a href="https://www.biofarm.co.uk/contact">Contact</a></li></ul>
+  </div><div class="footer__meta">&copy; Biofarm &middot; We&rsquo;re in the business of nature.</div></div></footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="map.js"></script>
+  <script src="mapfirst.js"></script>
+  <script>
+    var t=document.querySelector('.nav__toggle'),l=document.getElementById('navLinks');
+    t.addEventListener('click',function(){var o=l.classList.toggle('is-open');t.setAttribute('aria-expanded',o?'true':'false');});
+  </script>
+</body>
+</html>
