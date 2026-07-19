@@ -16,6 +16,12 @@
     var cards  = Array.prototype.slice.call(document.querySelectorAll('.bank-card[data-bank]'));
     if (!form || !cards.length) return;
 
+    // Each card is wrapped in .card-wrap (see compare init below) so the absolutely
+    // positioned compare button rides with it. Filtering/sorting must target the wrap,
+    // otherwise hidden cards leave their floating button behind. Falls back to the card
+    // itself if the wrap hasn't been created yet.
+    function wrapOf(c){ var p = c.parentNode; return (p && p.classList && p.classList.contains('card-wrap')) ? p : c; }
+
     function unitsMatch(v, band) {
       if (!band) return true;
       var p = band.split('-'); return v >= +p[0] && v <= +p[1];
@@ -47,7 +53,7 @@
       var shown = 0;
       cards.forEach(function (c) {
         var ok = matches(c);
-        c.style.display = ok ? '' : 'none';
+        wrapOf(c).style.display = ok ? '' : 'none';
         if (ok) shown++;
       });
       count.textContent = shown;
@@ -55,8 +61,8 @@
       // Map ops are opportunistic — only if the map is ready.
       if (window.__hubMap) {
         var hub = window.__hubMap;
-        cards.forEach(function (c) { setVisible(hub, c.getAttribute('data-bank'), c.style.display !== 'none'); });
-        var pts = cards.filter(function (c) { return c.style.display !== 'none'; })
+        cards.forEach(function (c) { setVisible(hub, c.getAttribute('data-bank'), wrapOf(c).style.display !== 'none'); });
+        var pts = cards.filter(function (c) { return wrapOf(c).style.display !== 'none'; })
                        .map(function (c) { var m = hub.markers[c.getAttribute('data-bank')]; return m && m.getLatLng(); })
                        .filter(Boolean);
         if (pts.length) hub.map.flyToBounds(pts, { padding:[45,45], maxZoom:9, duration:.5 });
@@ -72,7 +78,7 @@
         if (v === 'name') return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent);
         return 0;
       });
-      arr.forEach(function (c) { list.insertBefore(c, noRes); }); // reorder before the no-results/footnote
+      arr.forEach(function (c) { list.insertBefore(wrapOf(c), noRes); }); // reorder before the no-results/footnote
     }
 
     // events (debounce the text input so the map doesn't re-fit on every keystroke)
@@ -144,7 +150,7 @@
           var ulat = pos.coords.latitude, ulng = pos.coords.longitude, byId = {};
           hub.banks.forEach(function (b) { byId[b.id] = b; });
           cards.forEach(function (c) { var b = byId[c.getAttribute('data-bank')]; c.__dist = b ? haversine(ulat, ulng, b.lat, b.lng) : 1e9; });
-          cards.slice().sort(function (a, b) { return a.__dist - b.__dist; }).forEach(function (c) { list.insertBefore(c, noRes); });
+          cards.slice().sort(function (a, b) { return a.__dist - b.__dist; }).forEach(function (c) { list.insertBefore(wrapOf(c), noRes); });
           if (geo) geo.textContent = 'Nearest first from your location';
           if (sort) sort.value = 'default';
           try { L.marker([ulat, ulng], { title:'You' }).addTo(hub.map).bindPopup('You are here'); hub.map.flyTo([ulat, ulng], 8, { duration:.6 }); } catch (e) {}

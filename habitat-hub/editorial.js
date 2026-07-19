@@ -16,8 +16,12 @@
     var cards = Array.prototype.slice.call(document.querySelectorAll('.ed-card[data-bank]'));
     if (!cards.length) return;
 
+    // Each card is wrapped in .card-wrap (compare init below); filter/sort on the wrap so
+    // hidden cards don't leave their absolutely-positioned compare button behind.
+    function wrapOf(c){ var p = c.parentNode; return (p && p.classList && p.classList.contains('card-wrap')) ? p : c; }
+
     // approximate coordinates (mirror map.js)
-    var COORD = { sleight:[51.302,-2.468], lesnewth:[50.688,-4.630], b03:[50.72,-3.53], b04:[52.21,-1.50], b05:[52.63,1.13], b06:[53.40,-2.60] };
+    var COORD = { sleight:[51.302,-2.468], lesnewth:[50.688,-4.630], b03:[52.190,-1.710], b04:[54.100,-1.550], b05:[51.720,-1.030] };
 
     function unitsMatch(v, band){ if (!band) return true; var p = band.split('-'); return v >= +p[0] && v <= +p[1]; }
     function matches(c){
@@ -29,7 +33,7 @@
     }
     function apply(){
       var n = 0;
-      cards.forEach(function (c) { var ok = matches(c); c.style.display = ok ? '' : 'none'; if (ok) n++; });
+      cards.forEach(function (c) { var ok = matches(c); wrapOf(c).style.display = ok ? '' : 'none'; if (ok) n++; });
       count.textContent = n;
       noRes.classList.toggle('show', n === 0);
     }
@@ -41,7 +45,7 @@
         if (v === 'name') return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent);
         return 0;
       });
-      arr.forEach(function (c) { grid.appendChild(c); });
+      arr.forEach(function (c) { grid.appendChild(wrapOf(c)); });
     }
 
     // chips
@@ -73,7 +77,7 @@
       navigator.geolocation.getCurrentPosition(function (pos) {
         var ul = pos.coords.latitude, ug = pos.coords.longitude;
         cards.forEach(function (c) { var k = COORD[c.getAttribute('data-bank')]; c.__d = k ? hav(ul, ug, k[0], k[1]) : 1e9; });
-        cards.slice().sort(function (a, b) { return a.__d - b.__d; }).forEach(function (c) { grid.appendChild(c); });
+        cards.slice().sort(function (a, b) { return a.__d - b.__d; }).forEach(function (c) { grid.appendChild(wrapOf(c)); });
         if (sort) sort.value = 'default';
         if (geo) geo.textContent = 'Nearest first from your location';
       }, function () { if (geo) geo.textContent = "Couldn't get your location."; });

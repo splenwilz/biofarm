@@ -72,22 +72,32 @@
     </div></section>
 
     <section class="section" style="padding-top:clamp(24px,3vw,36px);"><div class="wrap">
-      <div class="toolbar"><span class="count"><b id="resultCount">6</b> registered banks</span><a href="hub-map-first.html">View on map &rarr;</a></div>
+      <div class="toolbar"><span class="count"><b id="resultCount">5</b> registered banks</span><a href="hub-map-first.html">View on map &rarr;</a></div>
       <div class="table-scroll">
         <table class="cmp">
           <thead><tr><th data-sort="name">Habitat bank</th><th data-sort="region">Region / LPA</th><th data-sort="area">Area</th><th data-sort="units">Units</th><th>Habitat types</th><th data-sort="condition">Condition</th><th>Status</th><th></th></tr></thead>
           <tbody id="cmpBody">
-            <tr data-bank="sleight" data-units="120" data-habitats="lowland meadow, neutral grassland, hedgerows" data-search="sleight farm somerset south west" data-condition="good" data-name="Sleight Farm" data-region="Somerset · South West" data-area="70 ha" data-img="assets/sleight-grassland.jpg" data-href="sleight-farm.html">
+            <tr data-bank="sleight" data-units="374" data-habitats="lowland meadow, neutral grassland, woodland, scrub, hedgerows" data-search="sleight farm bath north east somerset west of england bristol" data-condition="good" data-name="Sleight Farm" data-region="Bath &amp; NE Somerset · West of England" data-area="70 ha" data-img="assets/sleight-grassland.jpg" data-href="sleight-farm.html">
               <td class="bank"><a href="sleight-farm.html">Sleight Farm</a></td>
-              <td>Somerset &middot; South West<br /><span class="muted">Serves SW LPAs</span></td>
+              <td>Bath &amp; NE Somerset &middot; West of England<br /><span class="muted">Bristol Avon Valleys &amp; Ridges NCA</span></td>
               <td class="num">70 ha</td>
-              <td class="num">120<span class="note-ph"> *</span></td>
-              <td><div class="chips"><span class="chip">Lowland meadow</span><span class="chip">Neutral grassland</span><span class="chip">Hedgerows</span></div></td>
+              <td class="num">374</td>
+              <td><div class="chips"><span class="chip">Lowland meadow</span><span class="chip">Neutral grassland</span><span class="chip">Woodland</span><span class="chip">Scrub</span><span class="chip">Hedgerows</span></div></td>
               <td>Good</td>
               <td><span class="pill-status">Registered</span></td>
               <td><div class="row-actions"><a class="btn" href="sleight-farm.html">View</a><button type="button" class="row-cmp" data-bank="sleight">+ Compare</button></div></td>
             </tr>
-            <tr data-bank="lesnewth" data-units="130" data-habitats="species-rich grassland, woodland, scrub, cornish hedgerows" data-search="lesnewth north cornwall" data-condition="good" data-name="Lesnewth" data-region="North Cornwall" data-area="26.8 ha" data-img="assets/lesnewth-grassland-meadow.jpg" data-href="#">
+            <tr data-bank="b04" data-units="232" data-habitats="neutral grassland, scrub, hedgerows, trees" data-search="badger bank farm north yorkshire magnesian limestone leeds york east midlands" data-condition="good" data-name="Badger Bank Farm" data-region="North Yorkshire · Magnesian Limestone" data-area="30 ha" data-img="assets/lesnewth-team-on-site.jpg" data-href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf">
+              <td class="bank">Badger Bank Farm</td>
+              <td>North Yorkshire &middot; Magnesian Limestone<br /><span class="muted">North Yorkshire Council</span></td>
+              <td class="num">30 ha</td>
+              <td class="num">232</td>
+              <td><div class="chips"><span class="chip">Neutral grassland</span><span class="chip">Mixed scrub</span><span class="chip">Native hedgerows</span><span class="chip">Rural trees</span></div></td>
+              <td>Good</td>
+              <td><span class="pill-status">Registered</span></td>
+              <td><div class="row-actions"><a class="btn" href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener">Brochure</a><button type="button" class="row-cmp" data-bank="b04">+ Compare</button></div></td>
+            </tr>
+            <tr data-bank="lesnewth" data-units="130" data-habitats="species-rich grassland, woodland, scrub, cornish hedgerows" data-search="lesnewth north cornwall river valency" data-condition="good" data-name="Lesnewth" data-region="North Cornwall" data-area="26.8 ha" data-img="assets/lesnewth-grassland-meadow.jpg" data-href="#">
               <td class="bank"><a href="#">Lesnewth</a></td>
               <td>North Cornwall<br /><span class="muted">Cornwall Council</span></td>
               <td class="num">26.8 ha</td>
@@ -97,61 +107,41 @@
               <td><span class="pill-status">Registered</span></td>
               <td><div class="row-actions"><a class="btn" href="#">View</a><button type="button" class="row-cmp" data-bank="lesnewth">+ Compare</button></div></td>
             </tr>
-            <tr data-bank="b03" data-units="90" data-habitats="grassland, woodland" data-search="south west england" data-condition="moderate" data-name="Habitat Bank 03" data-region="South West (TBC)" data-area="~30 ha" data-img="assets/climate-resilience-drone.jpg" data-href="#">
-              <td class="bank">Habitat Bank 03</td>
-              <td>South West <span class="note-ph">(TBC)</span></td>
-              <td class="num">~30 ha</td>
-              <td class="num">90<span class="note-ph"> *</span></td>
-              <td><div class="chips"><span class="chip">Grassland</span><span class="chip">Woodland</span></div></td>
-              <td>Moderate</td>
-              <td><span class="pill-status">Registered</span></td>
-              <td><div class="row-actions"><a class="btn" href="#">View</a><button type="button" class="row-cmp" data-bank="b03">+ Compare</button></div></td>
-            </tr>
-            <tr data-bank="b04" data-units="140" data-habitats="wetland, grassland, hedgerows" data-search="england east" data-condition="good" data-name="Habitat Bank 04" data-region="England (TBC)" data-area="~45 ha" data-img="assets/bee-orchid-sleight.jpg" data-href="#">
-              <td class="bank">Habitat Bank 04</td>
-              <td>England <span class="note-ph">(TBC)</span></td>
-              <td class="num">~45 ha</td>
-              <td class="num">140<span class="note-ph"> *</span></td>
-              <td><div class="chips"><span class="chip">Wetland</span><span class="chip">Grassland</span><span class="chip">Hedgerows</span></div></td>
+            <tr data-bank="b03" data-units="110" data-habitats="species-rich meadow, wetland, hedgerows" data-search="avon meadows stratford warwickshire severn avon vales" data-condition="good" data-name="Avon Meadows" data-region="Warwickshire · Severn &amp; Avon Vales" data-area="17.4 ha" data-img="assets/climate-resilience-drone.jpg" data-href="brochures/Avon%20Meadows_Biofarm_BNG.pdf">
+              <td class="bank">Avon Meadows</td>
+              <td>Warwickshire &middot; Severn &amp; Avon Vales<br /><span class="muted">Stratford-on-Avon DC</span></td>
+              <td class="num">17.4 ha</td>
+              <td class="num">110</td>
+              <td><div class="chips"><span class="chip">Species-rich meadow</span><span class="chip">Wetland</span><span class="chip">Hedgerows</span></div></td>
               <td>Good</td>
               <td><span class="pill-status">Registered</span></td>
-              <td><div class="row-actions"><a class="btn" href="#">View</a><button type="button" class="row-cmp" data-bank="b04">+ Compare</button></div></td>
+              <td><div class="row-actions"><a class="btn" href="brochures/Avon%20Meadows_Biofarm_BNG.pdf" target="_blank" rel="noopener">Brochure</a><button type="button" class="row-cmp" data-bank="b03">+ Compare</button></div></td>
             </tr>
-            <tr data-bank="b05" data-units="60" data-habitats="species-rich grassland, scrub" data-search="england" data-condition="moderate" data-name="Habitat Bank 05" data-region="England (TBC)" data-area="~20 ha" data-img="assets/lesnewth-team-on-site.jpg" data-href="#">
-              <td class="bank">Habitat Bank 05</td>
-              <td>England <span class="note-ph">(TBC)</span></td>
-              <td class="num">~20 ha</td>
-              <td class="num">60<span class="note-ph"> *</span></td>
-              <td><div class="chips"><span class="chip">Species-rich grassland</span><span class="chip">Scrub</span></div></td>
+            <tr data-bank="b05" data-units="78" data-habitats="mixed scrub, neutral grassland" data-search="rycote farm oxfordshire upper thames clay vales south oxfordshire" data-condition="moderate" data-name="Rycote Farm" data-region="Oxfordshire · Upper Thames Clay Vales" data-area="11.6 ha" data-img="assets/bee-orchid-sleight.jpg" data-href="brochures/Rycote%20Farm_Biofarm_BNG.pdf">
+              <td class="bank">Rycote Farm</td>
+              <td>Oxfordshire &middot; Upper Thames Clay Vales<br /><span class="muted">South Oxfordshire DC</span></td>
+              <td class="num">11.6 ha</td>
+              <td class="num">78</td>
+              <td><div class="chips"><span class="chip">Mixed scrub</span><span class="chip">Neutral grassland</span></div></td>
               <td>Moderate</td>
               <td><span class="pill-status">Registered</span></td>
-              <td><div class="row-actions"><a class="btn" href="#">View</a><button type="button" class="row-cmp" data-bank="b05">+ Compare</button></div></td>
-            </tr>
-            <tr data-bank="b06" data-units="110" data-habitats="woodland, grassland, hedgerows" data-search="england north west" data-condition="good" data-name="Habitat Bank 06" data-region="England (TBC)" data-area="~35 ha" data-img="assets/climate-resilience-drone.jpg" data-href="#">
-              <td class="bank">Habitat Bank 06</td>
-              <td>England <span class="note-ph">(TBC)</span></td>
-              <td class="num">~35 ha</td>
-              <td class="num">110<span class="note-ph"> *</span></td>
-              <td><div class="chips"><span class="chip">Woodland</span><span class="chip">Grassland</span><span class="chip">Hedgerows</span></div></td>
-              <td>Good</td>
-              <td><span class="pill-status">Registered</span></td>
-              <td><div class="row-actions"><a class="btn" href="#">View</a><button type="button" class="row-cmp" data-bank="b06">+ Compare</button></div></td>
+              <td><div class="row-actions"><a class="btn" href="brochures/Rycote%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener">Brochure</a><button type="button" class="row-cmp" data-bank="b05">+ Compare</button></div></td>
             </tr>
             <tr id="noRow" style="display:none;"><td colspan="8" style="text-align:center;padding:28px;color:var(--muted);">No banks match those filters. <a href="https://www.biofarm.co.uk/contact" style="color:var(--green-d);">Tell us your requirement</a> &mdash; we deliver nationally.</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note-ph" style="margin-top:12px;">* Placeholder figures for banks 03&ndash;06 and unconfirmed Sleight units &mdash; swap for registered data. Click a column header to sort; tick <b>+ Compare</b> to shortlist.</p>
+      <p class="note-ph" style="margin-top:12px;">Figures from the registered brochures; imagery is representative pending site photography. Click a column header to sort; tick <b>+ Compare</b> to shortlist.</p>
     </div></section>
 
     <!-- PORTFOLIO STATS -->
     <section class="section section--cream2"><div class="wrap">
       <p class="eyebrow">Portfolio at a glance</p>
       <div class="stat-band">
-        <div class="sb"><span class="v">6</span><span class="k">Registered banks</span></div>
-        <div class="sb"><span class="v">550+<span class="ast">*</span></span><span class="k">BNG units available</span></div>
-        <div class="sb"><span class="v">180+<span class="ast">*</span></span><span class="k">Hectares in stewardship</span></div>
-        <div class="sb"><span class="v">8<span class="ast">*</span></span><span class="k">Habitat types</span></div>
+        <div class="sb"><span class="v">5</span><span class="k">Registered banks</span></div>
+        <div class="sb"><span class="v">900+</span><span class="k">BNG units available</span></div>
+        <div class="sb"><span class="v">155 ha</span><span class="k">Hectares in stewardship</span></div>
+        <div class="sb"><span class="v">9</span><span class="k">Habitat types</span></div>
       </div>
     </div></section>
 

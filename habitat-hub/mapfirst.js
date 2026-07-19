@@ -12,6 +12,10 @@
     var cards = Array.prototype.slice.call(document.querySelectorAll('.mf-card[data-bank]'));
     if (!cards.length) return;
 
+    // Each card is wrapped in .card-wrap (compare init below); filter on the wrap so hidden
+    // cards don't leave their absolutely-positioned compare button behind in the drawer.
+    function wrapOf(c){ var p = c.parentNode; return (p && p.classList && p.classList.contains('card-wrap')) ? p : c; }
+
     function withMap(cb) {
       if (window.__hubMap) return cb(window.__hubMap);
       var el = document.querySelector('.leaflet-map');
@@ -31,18 +35,18 @@
     function apply(){
       // Filter the drawer cards first — works even if Leaflet never loads.
       var shown = 0;
-      cards.forEach(function (c) { var ok = matches(c); c.style.display = ok ? '' : 'none'; if (ok) shown++; });
+      cards.forEach(function (c) { var ok = matches(c); wrapOf(c).style.display = ok ? '' : 'none'; if (ok) shown++; });
       if (count) count.textContent = shown;
       // Map ops only if the map is ready.
       if (window.__hubMap) {
         var hub = window.__hubMap;
         cards.forEach(function (c) {
-          var on = c.style.display !== 'none', id = c.getAttribute('data-bank');
+          var on = wrapOf(c).style.display !== 'none', id = c.getAttribute('data-bank');
           var m = hub.markers[id], r = hub.rings[id];
           if (m) { on ? m.addTo(hub.map) : hub.map.removeLayer(m); }
           if (r) { on ? r.addTo(hub.map) : hub.map.removeLayer(r); }
         });
-        var pts = cards.filter(function (c) { return c.style.display !== 'none'; })
+        var pts = cards.filter(function (c) { return wrapOf(c).style.display !== 'none'; })
                        .map(function (c) { var m = hub.markers[c.getAttribute('data-bank')]; return m && m.getLatLng(); }).filter(Boolean);
         if (pts.length) hub.map.flyToBounds(pts, { padding:[60,60], maxZoom:9, duration:.6 });
       }

@@ -2,6 +2,7 @@
 BIOFARM_BRAND_GUIDELINES/
 **/*.docx
 **/*.pdf
+!habitat-hub/brochures/*.pdf
 **/*.mp4
 **/*.mov
 **/wetransfer_*/

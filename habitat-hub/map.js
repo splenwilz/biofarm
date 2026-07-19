@@ -7,12 +7,11 @@
 
   // Approximate locations. Sleight + banks 03–06 are indicative / to confirm.
   var BANKS = [
-    { id:'sleight',  name:'Sleight Farm',   region:'Somerset · South West', lat:51.302, lng:-2.468, units:'120*', url:'sleight-farm.html', served:38000, real:true },
-    { id:'lesnewth', name:'Lesnewth',       region:'North Cornwall',        lat:50.688, lng:-4.630, units:'130',  url:'#',               served:34000, real:true },
-    { id:'b03',      name:'Habitat Bank 03',region:'South West (to confirm)',lat:50.720, lng:-3.530, units:'90*',  url:'#',               served:34000, real:false },
-    { id:'b04',      name:'Habitat Bank 04',region:'England (to confirm)',   lat:52.210, lng:-1.500, units:'140*', url:'#',               served:40000, real:false },
-    { id:'b05',      name:'Habitat Bank 05',region:'England (to confirm)',   lat:52.630, lng: 1.130, units:'60*',  url:'#',               served:30000, real:false },
-    { id:'b06',      name:'Habitat Bank 06',region:'England (to confirm)',   lat:53.400, lng:-2.600, units:'110*', url:'#',               served:34000, real:false }
+    { id:'sleight',  name:'Sleight Farm',     region:'Bath &amp; NE Somerset · West of England', lat:51.302, lng:-2.468, units:'374', url:'sleight-farm.html', served:45000, real:true, brochure:'brochures/Sleight%20Farm_Biofarm_BNG.pdf' },
+    { id:'lesnewth', name:'Lesnewth',         region:'North Cornwall',                          lat:50.688, lng:-4.630, units:'130', url:'#', served:34000, real:true },
+    { id:'b03',      name:'Avon Meadows',     region:'Warwickshire · Severn &amp; Avon Vales',   lat:52.190, lng:-1.710, units:'110', url:'#', served:42000, real:true, brochure:'brochures/Avon%20Meadows_Biofarm_BNG.pdf' },
+    { id:'b04',      name:'Badger Bank Farm', region:'North Yorkshire · Magnesian Limestone',   lat:54.100, lng:-1.550, units:'232', url:'#', served:48000, real:true, brochure:'brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf' },
+    { id:'b05',      name:'Rycote Farm',      region:'Oxfordshire · Upper Thames Clay Vales',    lat:51.720, lng:-1.030, units:'78',  url:'#', served:34000, real:true, brochure:'brochures/Rycote%20Farm_Biofarm_BNG.pdf' }
   ];
 
   function pin(active) {
@@ -35,8 +34,11 @@
       dashArray:'5 6', fillColor:'#71977A', fillOpacity:strong?0.08:0.05 }).addTo(map);
   }
   function popup(b) {
-    var s = '<b>'+b.name+'</b><br>'+b.region+'<br>'+b.units+' units';
+    var s = '<b>'+b.name+'</b>';
+    if (b.region) s += '<br>'+b.region;
+    s += '<br>'+b.units+' units';
     if (b.url && b.url !== '#') s += '<br><a href="'+b.url+'">View habitat bank &rarr;</a>';
+    if (b.brochure) s += '<br><a href="'+b.brochure+'" target="_blank" rel="noopener">Download brochure (PDF) &rarr;</a>';
     if (!b.real) s += '<br><span style="color:#8a8f83;font-style:italic;">Location to confirm</span>';
     return s;
   }
