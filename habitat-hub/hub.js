@@ -130,6 +130,8 @@
     var resetMapBtn = document.getElementById('resetMap');
     if (resetMapBtn) resetMapBtn.addEventListener('click', function () {
       withMap(function (hub) {
+        // Restore the same framing as initial load (banks + pipeline areas).
+        if (hub.bounds) return hub.map.flyToBounds(hub.bounds, { padding:[45,45], duration:.5 });
         var pts = cards.map(function (c) { var m = hub.markers[c.getAttribute('data-bank')]; return m && m.getLatLng(); }).filter(Boolean);
         if (pts.length) hub.map.flyToBounds(pts, { padding:[45,45], duration:.5 });
       });

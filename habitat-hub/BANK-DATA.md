@@ -41,3 +41,11 @@ and bank pages.
 - **Coords (approx):** 51.72, -1.03
 
 _Portfolio = 5 banks with data (was 6 with placeholders; b06 removed as unknown). Confirm whether a 6th registered bank exists._
+
+## Pipeline areas (PLACEHOLDERS — confirm with Biofarm)
+Shown on maps as muted-stone LNRS areas ("In the pipeline"), no pin/brochure, popup links to
+contact. Defined in `catchments.js` (`LNRS_PIPELINE`). Current three are **indicative only**,
+chosen to demo the mechanism — replace with the real pipeline list before publishing:
+- p01 · Greater Lincolnshire
+- p02 · Kent and Medway
+- p03 · Lancashire

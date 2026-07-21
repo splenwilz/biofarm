@@ -190,10 +190,11 @@ p{margin:0 0 1.1em;}
 .bank-card{scroll-margin-top:96px;}
 .bank-card.is-active{border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.28);}
 .bank-card.is-dim{opacity:.5;}
-.map-legend{position:absolute;z-index:500;bottom:12px;left:12px;background:rgba(255,255,255,.94);border:1px solid var(--hairline);border-radius:12px;padding:8px 12px;font-size:.74rem;color:var(--ink);display:flex;gap:16px;align-items:center;}
+.map-legend{position:absolute;z-index:500;bottom:12px;left:12px;max-width:calc(100% - 24px);background:rgba(255,255,255,.94);border:1px solid var(--hairline);border-radius:12px;padding:8px 12px;font-size:.74rem;color:var(--ink);display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;}
 .map-legend .lg{display:flex;align-items:center;gap:7px;}
 .map-legend .lg-pin{width:12px;height:12px;border-radius:50% 50% 50% 0;background:var(--green);transform:rotate(-45deg);}
 .map-legend .lg-ring{width:15px;height:15px;border-radius:50%;border:1.5px dashed var(--green);}
+.map-legend .lg-pipe{width:15px;height:15px;border-radius:50%;border:1.5px dotted #857A5E;background:rgba(179,163,121,.45);}
 .bpin{transition:transform .12s;}
 .bpin.is-hi{transform:rotate(-45deg) scale(1.35);}
 .no-results{display:none;background:var(--white);border:1px solid var(--hairline);border-radius:16px;padding:32px 28px;text-align:center;}
