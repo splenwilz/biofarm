@@ -32,7 +32,7 @@
       if (noRow) noRow.style.display = n === 0 ? '' : 'none';
     }
     form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
-    loc.addEventListener('input', apply);
+    ['input','change'].forEach(function (ev) { loc.addEventListener(ev, apply); });
     [hab, units, cond].forEach(function (el) { el.addEventListener('change', apply); });
 
     // sortable columns

@@ -60,23 +60,23 @@
     return s;
   }
 
-  // Pipeline coverage: LNRS areas where new banks are in development — shown as
-  // muted-stone areas only (no pin, no brochure), clearly distinct from the green
-  // registered-bank boundaries. Clicking the area invites an interest enquiry.
-  var PIPE_STYLE = { color:'#857A5E', weight:1.4, dashArray:'2 5',
-                     fillColor:'#B3A379', fillOpacity:0.28 };
+  // Pipeline coverage: Biofarm's real coming-soon sites (from their public site map),
+  // shown as small stone markers — no brochure yet, clearly distinct from the green
+  // registered-bank pins. Clicking invites an interest enquiry.
+  function pipePin() {
+    return L.divIcon({ className:'', html:'<span class="ppin"></span>',
+      iconSize:[14,14], iconAnchor:[7,7], popupAnchor:[0,-8] });
+  }
   function addPipeline(map, bounds) {
-    if (typeof LNRS_PIPELINE === 'undefined') return;
-    Object.keys(LNRS_PIPELINE).forEach(function (k) {
-      var p = LNRS_PIPELINE[k];
-      var lyr = L.geoJSON(p.geometry, { style:PIPE_STYLE,
-        attribution:'Boundaries &copy; Natural England &amp; OS Crown copyright (OGL)' })
+    if (typeof PIPELINE_SITES === 'undefined') return;
+    PIPELINE_SITES.forEach(function (p) {
+      L.marker([p.lat, p.lng], { icon:pipePin(), zIndexOffset:-1000 }).addTo(map)
         .bindPopup('<span style="font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:#857A5E;">In the pipeline</span>'
-          +'<br><b>'+p.lnrs+'</b>'
-          +'<br><span style="color:#8a8f83;">New habitat bank in development &mdash; details &amp; brochure to follow.</span>'
-          +'<br><a href="https://www.biofarm.co.uk/contact">Register interest &rarr;</a>')
-        .addTo(map);
-      if (bounds) bounds.extend(lyr.getBounds());
+          +'<br><b>'+p.name+'</b>'
+          +'<br>'+p.lpa+' &middot; '+p.nca
+          +'<br><span style="color:#8a8f83;">Coming soon &mdash; details &amp; brochure to follow.</span>'
+          +'<br><a href="https://www.biofarm.co.uk/contact">Register interest &rarr;</a>');
+      if (bounds) bounds.extend([p.lat, p.lng]);
     });
   }
 
@@ -88,10 +88,35 @@
     if (mode === 'single') {
       var id = el.getAttribute('data-bank');
       var b = BANKS.filter(function (x) { return x.id === id; })[0] || BANKS[0];
-      var r = ring(map, b, true);
-      // Frame the whole catchment when we have the real boundary; otherwise centre the pin.
-      if (r.getBounds) map.fitBounds(r.getBounds(), { padding:[24,24] });
-      else map.setView([b.lat, b.lng], 10);
+      var srm = (id === 'sleight' && typeof SLEIGHT_SRM !== 'undefined') ? SLEIGHT_SRM : null;
+      if (srm) {
+        // Two-tier SRM view (mirrors Biofarm's own SRM map): hatched neighbouring (0.75x)
+        // beneath a solid local LPA+NCA zone (1.0x).
+        var nbrL = L.geoJSON(srm.neighbouring, {
+          style: { color:'#8a8f83', weight:1, dashArray:'3 5', fillColor:'#71977A', fillOpacity:1, className:'srm-nbr' },
+          attribution: 'Boundaries &copy; ONS &amp; Natural England, OS Crown copyright (OGL)'
+        }).addTo(map).bindPopup('<b>Neighbouring LPAs &amp; NCAs</b><br>Units eligible at an adjusted rate (0.75&times;) under the spatial risk multiplier.');
+        var locL = L.geoJSON(srm.local, {
+          style: { color:'#4c6b55', weight:1.6, fillColor:'#71977A', fillOpacity:0.28 }
+        }).addTo(map).bindPopup('<b>Full BNG value (1.0&times;)</b><br>' + srm.localLabel);
+        map.fitBounds(nbrL.getBounds(), { padding:[18,18] });
+        // inject the diagonal-hatch pattern into Leaflet's SVG renderer
+        setTimeout(function () {
+          var svg = el.querySelector('.leaflet-overlay-pane svg');
+          if (svg && !svg.querySelector('#srmHatch')) {
+            var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            defs.innerHTML = '<pattern id="srmHatch" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">'
+              + '<rect width="7" height="7" fill="#71977A" fill-opacity="0.06"/>'
+              + '<line x1="0" y1="0" x2="0" y2="7" stroke="#5c7a64" stroke-width="1.3" stroke-opacity="0.5"/></pattern>';
+            svg.insertBefore(defs, svg.firstChild);
+          }
+        }, 50);
+      } else {
+        var r = ring(map, b, true);
+        // Frame the whole catchment when we have the real boundary; otherwise centre the pin.
+        if (r.getBounds) map.fitBounds(r.getBounds(), { padding:[24,24] });
+        else map.setView([b.lat, b.lng], 10);
+      }
       L.marker([b.lat, b.lng], { icon:pin(true) }).addTo(map).bindPopup(popup(b));
     } else {
       var pts = [], markers = {}, rings = {};

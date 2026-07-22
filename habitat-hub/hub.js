@@ -84,7 +84,7 @@
     // events (debounce the text input so the map doesn't re-fit on every keystroke)
     var debTimer;
     form.addEventListener('submit', apply);
-    loc.addEventListener('input', function () { clearTimeout(debTimer); debTimer = setTimeout(apply, 200); });
+    ['input','change'].forEach(function (ev) { loc.addEventListener(ev, function () { clearTimeout(debTimer); debTimer = setTimeout(apply, 150); }); });
     [hab, units].forEach(function (el) { el.addEventListener('change', apply); });
     if (sort) sort.addEventListener('change', function () { sortCards(); });
 

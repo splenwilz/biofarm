@@ -42,10 +42,20 @@ and bank pages.
 
 _Portfolio = 5 banks with data (was 6 with placeholders; b06 removed as unknown). Confirm whether a 6th registered bank exists._
 
-## Pipeline areas (PLACEHOLDERS — confirm with Biofarm)
-Shown on maps as muted-stone LNRS areas ("In the pipeline"), no pin/brochure, popup links to
-contact. Defined in `catchments.js` (`LNRS_PIPELINE`). Current three are **indicative only**,
-chosen to demo the mechanism — replace with the real pipeline list before publishing:
-- p01 · Greater Lincolnshire
-- p02 · Kent and Medway
-- p03 · Lancashire
+## Pipeline sites (REAL — from Biofarm's public site map, July 2026)
+Source: Google My Maps embedded on biofarm.co.uk "our sites and coverage" story
+(mid=1_0Y6MlTcCB2SSTEzCayZw8mZM5aYG50). 5 "Site Registered" + **23 "Coming Soon"** sites,
+each with postcode/LPA/NCA; coordinates geocoded from postcodes (approximate).
+Defined in `catchments.js` (`PIPELINE_SITES`); shown as stone dot markers + region
+coming-soon cards. By Chris's regions:
+- **E&SE (11):** Houghton Hall · Bicester · Framlingham · Highways Farm · Broadlands ·
+  Chatteris · Stoke by Nayland · Worth Abbey · Biddenden · Snodland · Key Street
+- **South West (6):** Iris Fen · Banks Farm · Beech Tor · Bodstone Barns · Chapmanslade · Highfold Farm
+- **Midlands (5):** Skegness · The Vine · Leominster · Wolverhampton · Ellesmere
+- **The North (1):** Cookridge (Leeds)
+
+Also from the site map: **Badger Bank BGS = BGS-060526001** (brochure didn't show it);
+Lesnewth NCA per their data = Cornish Killas (our pages say River Valency — theirs is the
+formal NCA). Live map shows **5** registered vs brief's "six" — Worth Abbey story suggests
+it's next. Note: Herefordshire (Leominster, The Vine area) is missing from Chris's county
+list — filed under Midlands, confirm.

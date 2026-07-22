@@ -59,7 +59,7 @@ p{margin:0 0 1.1em;}
 .hub-tabs{display:none;} /* mobile map/list toggle */
 
 /* stylised interactive-map mockup */
-.map-panel{position:sticky;top:96px;border:1px solid var(--hairline);border-radius:18px;overflow:hidden;background:
+.map-panel{position:sticky;top:96px;isolation:isolate;border:1px solid var(--hairline);border-radius:18px;overflow:hidden;background:
   radial-gradient(120% 90% at 30% 10%, #e7ede4, #dfe6dc 60%, #d7ded2 100%);
   min-height:560px;}
 .map-panel__label{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.9);border:1px solid var(--hairline);border-radius:20px;padding:6px 14px;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
@@ -195,6 +195,25 @@ p{margin:0 0 1.1em;}
 .map-legend .lg-pin{width:12px;height:12px;border-radius:50% 50% 50% 0;background:var(--green);transform:rotate(-45deg);}
 .map-legend .lg-ring{width:15px;height:15px;border-radius:50%;border:1.5px dashed var(--green);}
 .map-legend .lg-pipe{width:15px;height:15px;border-radius:50%;border:1.5px dotted #857A5E;background:rgba(179,163,121,.45);}
+/* Pipeline site marker (coming-soon dot on maps) */
+.ppin{display:block;width:13px;height:13px;border-radius:50%;background:#B3A379;border:2px solid #fff;box-shadow:0 0 0 1.5px #857A5E,0 2px 6px rgba(33,33,33,.3);}
+/* Coming-soon (pipeline) editorial cards */
+.ed-card--soon{border-style:dashed;border-color:#B3A379;}
+.ed-card--soon:hover{border-color:#857A5E;}
+.ed-card__ph{width:100%;aspect-ratio:3/2;display:grid;place-items:center;background:repeating-linear-gradient(45deg,rgba(179,163,121,.16) 0 12px,rgba(179,163,121,.05) 12px 24px);}
+.ed-card__ph span{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#857A5E;}
+.ed-card__region--soon{color:#857A5E !important;}
+.pill-status--soon{background:rgba(179,163,121,.22);color:#6d6448;border-color:#B3A379;}
+/* "+N more coming soon" reveal card */
+.ed-card--more{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:300px;cursor:pointer;padding:24px;background:repeating-linear-gradient(45deg,rgba(179,163,121,.10) 0 12px,rgba(179,163,121,.03) 12px 24px);font-family:var(--font-body);text-align:center;color:var(--ink);}
+.ed-card--more .big{font-family:var(--font-display);font-weight:300;font-size:2.6rem;color:#857A5E;line-height:1;}
+.ed-card--more .lbl{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#857A5E;}
+.ed-card--more .cta{margin-top:6px;font-family:var(--font-display);font-size:1.15rem;}
+.ed-card--more:hover .cta{text-decoration:underline;}
+/* Sleight SRM two-tier view */
+.srm-nbr{fill:url(#srmHatch);}
+.map-legend .lg-local{width:15px;height:15px;border-radius:4px;background:rgba(113,151,122,.4);border:1.5px solid #4c6b55;}
+.map-legend .lg-nbr{width:15px;height:15px;border-radius:4px;border:1px solid #8a8f83;background:repeating-linear-gradient(45deg,rgba(92,122,100,.5) 0 2px,rgba(113,151,122,.07) 2px 6px);}
 .bpin{transition:transform .12s;}
 .bpin.is-hi{transform:rotate(-45deg) scale(1.35);}
 .no-results{display:none;background:var(--white);border:1px solid var(--hairline);border-radius:16px;padding:32px 28px;text-align:center;}

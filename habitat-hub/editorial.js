@@ -23,22 +23,55 @@
     // approximate coordinates (mirror map.js)
     var COORD = { sleight:[51.302,-2.468], lesnewth:[50.688,-4.630], b03:[52.190,-1.710], b04:[54.100,-1.550], b05:[51.720,-1.030] };
 
+    // Pipeline ("coming soon") cards: region-only filtering, never in the registered count.
+    // Capped at SOON_LIMIT with a "+N more" reveal card so pipeline never floods the grid.
+    function isSoon(c){ return c.hasAttribute('data-pipeline'); }
+    var SOON_LIMIT = 5, soonExpanded = false;
+    var moreBtn = document.getElementById('soonMore');
+    if (moreBtn) moreBtn.addEventListener('click', function () { soonExpanded = !soonExpanded; apply(); });
+    function updateMoreBtn(hidden, shown){
+      if (!moreBtn) return;
+      if (hidden > 0) {
+        moreBtn.style.display = '';
+        moreBtn.setAttribute('aria-expanded', 'false');
+        moreBtn.innerHTML = '<span class="big">+' + hidden + '</span><span class="lbl">more coming soon</span><span class="cta">See all &rarr;</span>';
+      } else if (soonExpanded && shown > SOON_LIMIT) {
+        moreBtn.style.display = '';
+        moreBtn.setAttribute('aria-expanded', 'true');
+        moreBtn.innerHTML = '<span class="lbl">Showing all coming soon</span><span class="cta">Show fewer &uarr;</span>';
+      } else {
+        moreBtn.style.display = 'none';
+      }
+    }
     function unitsMatch(v, band){ if (!band) return true; var p = band.split('-'); return v >= +p[0] && v <= +p[1]; }
     function matches(c){
       var q = (loc.value || '').trim().toLowerCase();
+      if (isSoon(c)) {
+        if (hab.value || units.value) return false;
+        return !q || (c.getAttribute('data-search') || '').indexOf(q) !== -1;
+      }
       if (q && (c.getAttribute('data-search') || '').indexOf(q) === -1) return false;
       if (hab.value && (c.getAttribute('data-habitats') || '').indexOf(hab.value) === -1) return false;
       if (!unitsMatch(+c.getAttribute('data-units'), units.value)) return false;
       return true;
     }
     function apply(){
-      var n = 0;
-      cards.forEach(function (c) { var ok = matches(c); wrapOf(c).style.display = ok ? '' : 'none'; if (ok) n++; });
+      var n = 0, visible = 0, soonShown = 0, soonHidden = 0;
+      cards.forEach(function (c) {
+        var ok = matches(c);
+        if (ok && isSoon(c)) {
+          if (!soonExpanded && soonShown >= SOON_LIMIT) { ok = false; soonHidden++; }
+          else soonShown++;
+        }
+        wrapOf(c).style.display = ok ? '' : 'none';
+        if (ok) { visible++; if (!isSoon(c)) n++; }
+      });
       count.textContent = n;
-      noRes.classList.toggle('show', n === 0);
+      noRes.classList.toggle('show', visible === 0);
+      updateMoreBtn(soonHidden, soonShown);
     }
     function sortCards(){
-      var v = sort.value, arr = cards.slice();
+      var v = sort.value, arr = cards.filter(function (c) { return !isSoon(c); });
       arr.sort(function (a, b) {
         if (v === 'units-desc') return (+b.getAttribute('data-units')) - (+a.getAttribute('data-units'));
         if (v === 'units-asc')  return (+a.getAttribute('data-units')) - (+b.getAttribute('data-units'));
@@ -46,6 +79,8 @@
         return 0;
       });
       arr.forEach(function (c) { grid.appendChild(wrapOf(c)); });
+      cards.forEach(function (c) { if (isSoon(c)) grid.appendChild(wrapOf(c)); }); // pipeline always last
+      if (moreBtn) grid.appendChild(moreBtn);
     }
 
     // chips
@@ -54,13 +89,14 @@
     chips.forEach(function (c) { c.addEventListener('click', function () { hab.value = c.getAttribute('data-hab'); syncChips(); apply(); }); });
 
     form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
-    loc.addEventListener('input', apply);
+    ['input','change'].forEach(function (ev) { loc.addEventListener(ev, apply); });
     [hab, units].forEach(function (el) { el.addEventListener('change', function () { syncChips(); apply(); }); });
     if (sort) sort.addEventListener('change', sortCards);
 
     var resetBtn = document.getElementById('resetFilters');
     if (resetBtn) resetBtn.addEventListener('click', function () {
       loc.value = ''; hab.value = ''; units.value = ''; if (sort) sort.value = 'default';
+      soonExpanded = false;
       syncChips(); if (geo) geo.textContent = ''; sortCards(); apply();
     });
 
@@ -77,7 +113,9 @@
       navigator.geolocation.getCurrentPosition(function (pos) {
         var ul = pos.coords.latitude, ug = pos.coords.longitude;
         cards.forEach(function (c) { var k = COORD[c.getAttribute('data-bank')]; c.__d = k ? hav(ul, ug, k[0], k[1]) : 1e9; });
-        cards.slice().sort(function (a, b) { return a.__d - b.__d; }).forEach(function (c) { grid.appendChild(wrapOf(c)); });
+        cards.slice().sort(function (a, b) { return a.__d - b.__d; }).forEach(function (c) { if (!isSoon(c)) grid.appendChild(wrapOf(c)); });
+        cards.forEach(function (c) { if (isSoon(c)) grid.appendChild(wrapOf(c)); }); // pipeline always last
+        if (moreBtn) grid.appendChild(moreBtn);
         if (sort) sort.value = 'default';
         if (geo) geo.textContent = 'Nearest first from your location';
       }, function () { if (geo) geo.textContent = "Couldn't get your location."; });
@@ -93,6 +131,7 @@
         area:stat ? stat.textContent : '—', habs:habs, img:(card.querySelector('img') || {}).src || '', href:card.getAttribute('href') };
     }
     cards.forEach(function (card) {
+      if (isSoon(card)) return; // no compare toggle for coming-soon sites
       var id = card.getAttribute('data-bank'); byCard[id] = card;
       var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'compare-toggle'; btn.textContent = '+ Compare';
       btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); toggleSel(id, btn); });

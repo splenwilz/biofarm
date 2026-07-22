@@ -63,7 +63,7 @@
         <p class="lead">Everything you need to shortlist, side by side &mdash; units, habitat types, area and the local planning authorities each bank can serve. Filter, sort any column, or tick banks to compare in detail.</p>
       </div>
       <form class="filters" id="cmpFilter" onsubmit="return false" aria-label="Filter habitat banks">
-        <label>Location <input id="fLoc" type="text" placeholder="Region / LPA" /></label>
+        <label>Region <select id="fLoc"><option value="">All regions</option><option value="south east">East &amp; South East</option><option value="south west">South West</option><option value="midlands">Midlands</option><option value="the north">The North</option></select></label>
         <label>Habitat type <select id="fHabitat"><option value="">Any</option><option value="grassland">Grassland</option><option value="meadow">Lowland meadow</option><option value="woodland">Woodland</option><option value="scrub">Scrub</option><option value="hedgerow">Hedgerows</option><option value="wetland">Wetland</option></select></label>
         <label>Units needed <select id="fUnits"><option value="">Any</option><option value="0-25">1&ndash;25</option><option value="25-75">25&ndash;75</option><option value="75-150">75&ndash;150</option><option value="150-99999">150+</option></select></label>
         <label>Condition <select id="fCond"><option value="">Any</option><option value="Good">Good</option><option value="Moderate">Moderate</option></select></label>
@@ -77,7 +77,7 @@
         <table class="cmp">
           <thead><tr><th data-sort="name">Habitat bank</th><th data-sort="region">Region / LPA</th><th data-sort="area">Area</th><th data-sort="units">Units</th><th>Habitat types</th><th data-sort="condition">Condition</th><th>Status</th><th></th></tr></thead>
           <tbody id="cmpBody">
-            <tr data-bank="sleight" data-units="374" data-habitats="lowland meadow, neutral grassland, woodland, scrub, hedgerows" data-search="sleight farm bath north east somerset west of england bristol" data-condition="good" data-name="Sleight Farm" data-region="Bath &amp; NE Somerset · West of England" data-area="70 ha" data-img="assets/sleight-grassland.jpg" data-href="sleight-farm.html">
+            <tr data-bank="sleight" data-units="374" data-habitats="lowland meadow, neutral grassland, woodland, scrub, hedgerows" data-search="sleight farm bath north east somerset west of england bristol south west" data-condition="good" data-name="Sleight Farm" data-region="Bath &amp; NE Somerset · West of England" data-area="70 ha" data-img="assets/sleight-grassland.jpg" data-href="sleight-farm.html">
               <td class="bank"><a href="sleight-farm.html">Sleight Farm</a></td>
               <td>Bath &amp; NE Somerset &middot; West of England<br /><span class="muted">Bristol Avon Valleys &amp; Ridges NCA</span></td>
               <td class="num">70 ha</td>
@@ -87,7 +87,7 @@
               <td><span class="pill-status">Registered</span></td>
               <td><div class="row-actions"><a class="btn" href="sleight-farm.html">View</a><button type="button" class="row-cmp" data-bank="sleight">+ Compare</button></div></td>
             </tr>
-            <tr data-bank="b04" data-units="232" data-habitats="neutral grassland, scrub, hedgerows, trees" data-search="badger bank farm north yorkshire magnesian limestone leeds york east midlands" data-condition="good" data-name="Badger Bank Farm" data-region="North Yorkshire · Magnesian Limestone" data-area="30 ha" data-img="assets/lesnewth-team-on-site.jpg" data-href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf">
+            <tr data-bank="b04" data-units="232" data-habitats="neutral grassland, scrub, hedgerows, trees" data-search="badger bank farm north yorkshire magnesian limestone leeds york the north" data-condition="good" data-name="Badger Bank Farm" data-region="North Yorkshire · Magnesian Limestone" data-area="30 ha" data-img="assets/lesnewth-team-on-site.jpg" data-href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf">
               <td class="bank">Badger Bank Farm</td>
               <td>North Yorkshire &middot; Magnesian Limestone<br /><span class="muted">North Yorkshire Council</span></td>
               <td class="num">30 ha</td>
@@ -97,7 +97,7 @@
               <td><span class="pill-status">Registered</span></td>
               <td><div class="row-actions"><a class="btn" href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener">Brochure</a><button type="button" class="row-cmp" data-bank="b04">+ Compare</button></div></td>
             </tr>
-            <tr data-bank="lesnewth" data-units="130" data-habitats="species-rich grassland, woodland, scrub, cornish hedgerows" data-search="lesnewth north cornwall river valency" data-condition="good" data-name="Lesnewth" data-region="North Cornwall" data-area="26.8 ha" data-img="assets/lesnewth-grassland-meadow.jpg" data-href="#">
+            <tr data-bank="lesnewth" data-units="130" data-habitats="species-rich grassland, woodland, scrub, cornish hedgerows" data-search="lesnewth north cornwall river valency south west" data-condition="good" data-name="Lesnewth" data-region="North Cornwall" data-area="26.8 ha" data-img="assets/lesnewth-grassland-meadow.jpg" data-href="#">
               <td class="bank"><a href="#">Lesnewth</a></td>
               <td>North Cornwall<br /><span class="muted">Cornwall Council</span></td>
               <td class="num">26.8 ha</td>
@@ -107,7 +107,7 @@
               <td><span class="pill-status">Registered</span></td>
               <td><div class="row-actions"><a class="btn" href="#">View</a><button type="button" class="row-cmp" data-bank="lesnewth">+ Compare</button></div></td>
             </tr>
-            <tr data-bank="b03" data-units="110" data-habitats="species-rich meadow, wetland, hedgerows" data-search="avon meadows stratford warwickshire severn avon vales" data-condition="good" data-name="Avon Meadows" data-region="Warwickshire · Severn &amp; Avon Vales" data-area="17.4 ha" data-img="assets/climate-resilience-drone.jpg" data-href="brochures/Avon%20Meadows_Biofarm_BNG.pdf">
+            <tr data-bank="b03" data-units="110" data-habitats="species-rich meadow, wetland, hedgerows" data-search="avon meadows stratford warwickshire severn avon vales midlands" data-condition="good" data-name="Avon Meadows" data-region="Warwickshire · Severn &amp; Avon Vales" data-area="17.4 ha" data-img="assets/climate-resilience-drone.jpg" data-href="brochures/Avon%20Meadows_Biofarm_BNG.pdf">
               <td class="bank">Avon Meadows</td>
               <td>Warwickshire &middot; Severn &amp; Avon Vales<br /><span class="muted">Stratford-on-Avon DC</span></td>
               <td class="num">17.4 ha</td>
@@ -117,7 +117,7 @@
               <td><span class="pill-status">Registered</span></td>
               <td><div class="row-actions"><a class="btn" href="brochures/Avon%20Meadows_Biofarm_BNG.pdf" target="_blank" rel="noopener">Brochure</a><button type="button" class="row-cmp" data-bank="b03">+ Compare</button></div></td>
             </tr>
-            <tr data-bank="b05" data-units="78" data-habitats="mixed scrub, neutral grassland" data-search="rycote farm oxfordshire upper thames clay vales south oxfordshire" data-condition="moderate" data-name="Rycote Farm" data-region="Oxfordshire · Upper Thames Clay Vales" data-area="11.6 ha" data-img="assets/bee-orchid-sleight.jpg" data-href="brochures/Rycote%20Farm_Biofarm_BNG.pdf">
+            <tr data-bank="b05" data-units="78" data-habitats="mixed scrub, neutral grassland" data-search="rycote farm oxfordshire upper thames clay vales south oxfordshire east and south east south east" data-condition="moderate" data-name="Rycote Farm" data-region="Oxfordshire · Upper Thames Clay Vales" data-area="11.6 ha" data-img="assets/bee-orchid-sleight.jpg" data-href="brochures/Rycote%20Farm_Biofarm_BNG.pdf">
               <td class="bank">Rycote Farm</td>
               <td>Oxfordshire &middot; Upper Thames Clay Vales<br /><span class="muted">South Oxfordshire DC</span></td>
               <td class="num">11.6 ha</td>

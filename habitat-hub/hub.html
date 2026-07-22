@@ -40,8 +40,8 @@
     <!-- STICKY FILTER -->
     <div class="filter-sticky"><div class="wrap">
       <form class="filterbar" id="hubFilter" onsubmit="return false" aria-label="Filter habitat banks">
-        <label>Location &nbsp;<span class="note-ph">(region / LPA)</span>
-          <input id="fLoc" type="text" placeholder="e.g. Cornwall, or Somerset" />
+        <label>Region
+          <select id="fLoc"><option value="">All regions</option><option value="south east">East &amp; South East</option><option value="south west">South West</option><option value="midlands">Midlands</option><option value="the north">The North</option></select>
         </label>
         <label>Habitat type
           <select id="fHabitat"><option value="">Any habitat type</option><option value="grassland">Species-rich grassland</option><option value="meadow">Lowland meadow</option><option value="woodland">Woodland</option><option value="scrub">Scrub</option><option value="hedgerow">Hedgerows</option><option value="wetland">Wetland / ponds</option></select>
@@ -88,7 +88,7 @@
               <select id="fSort"><option value="default">Featured</option><option value="units-desc">Units: high&ndash;low</option><option value="units-asc">Units: low&ndash;high</option><option value="name">Name A&ndash;Z</option></select>
             </label>
           </div>
-          <a class="bank-card" href="sleight-farm.html" data-bank="sleight" data-units="374" data-habitats="lowland meadow, neutral grassland, woodland, scrub, hedgerow" data-search="sleight farm bath north east somerset west of england bristol">
+          <a class="bank-card" href="sleight-farm.html" data-bank="sleight" data-units="374" data-habitats="lowland meadow, neutral grassland, woodland, scrub, hedgerow" data-search="sleight farm bath north east somerset west of england bristol south west">
             <img class="bank-card__img" src="assets/sleight-grassland.jpg" alt="Species-rich grassland at Sleight Farm habitat bank" />
             <div class="bank-card__body">
               <span class="bank-card__region">Bath &amp; NE Somerset &middot; West of England</span>
@@ -99,7 +99,7 @@
             </div>
           </a>
 
-          <a class="bank-card" href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b04" data-units="232" data-habitats="neutral grassland, scrub, hedgerow, trees" data-search="badger bank farm north yorkshire magnesian limestone leeds york east midlands">
+          <a class="bank-card" href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b04" data-units="232" data-habitats="neutral grassland, scrub, hedgerow, trees" data-search="badger bank farm north yorkshire magnesian limestone leeds york the north">
             <img class="bank-card__img" src="assets/lesnewth-team-on-site.jpg" alt="Representative landscape for Badger Bank Farm" />
             <div class="bank-card__body">
               <span class="bank-card__region">North Yorkshire &middot; Magnesian Limestone</span>
@@ -121,7 +121,7 @@
             </div>
           </a>
 
-          <a class="bank-card" href="brochures/Avon%20Meadows_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b03" data-units="110" data-habitats="species-rich meadow, grassland, wetland, hedgerow" data-search="avon meadows warwickshire severn avon vales stratford worcestershire gloucester">
+          <a class="bank-card" href="brochures/Avon%20Meadows_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b03" data-units="110" data-habitats="species-rich meadow, grassland, wetland, hedgerow" data-search="avon meadows warwickshire severn avon vales stratford worcestershire gloucester midlands">
             <img class="bank-card__img" src="assets/climate-resilience-drone.jpg" alt="Representative landscape for Avon Meadows" />
             <div class="bank-card__body">
               <span class="bank-card__region">Warwickshire &middot; Severn &amp; Avon Vales</span>
@@ -132,7 +132,7 @@
             </div>
           </a>
 
-          <a class="bank-card" href="brochures/Rycote%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b05" data-units="78" data-habitats="mixed scrub, neutral grassland" data-search="rycote farm oxfordshire upper thames clay vales thame">
+          <a class="bank-card" href="brochures/Rycote%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b05" data-units="78" data-habitats="mixed scrub, neutral grassland" data-search="rycote farm oxfordshire upper thames clay vales thame east and south east south east">
             <img class="bank-card__img" src="assets/bee-orchid-sleight.jpg" alt="Representative landscape for Rycote Farm" />
             <div class="bank-card__body">
               <span class="bank-card__region">Oxfordshire &middot; Upper Thames Clay Vales</span>

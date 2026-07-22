@@ -53,7 +53,7 @@
     }
     var debTimer;
     form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
-    loc.addEventListener('input', function () { clearTimeout(debTimer); debTimer = setTimeout(apply, 200); });
+    ['input','change'].forEach(function (ev) { loc.addEventListener(ev, function () { clearTimeout(debTimer); debTimer = setTimeout(apply, 150); }); });
     [hab, units].forEach(function (el) { el.addEventListener('change', apply); });
 
     // immersive map <-> drawer sync

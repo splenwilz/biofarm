@@ -3,13 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Habitat Bank Hub — Editorial | Biofarm registered habitat banks</title>
-  <meta name="description" content="Browse Biofarm's registered habitat banks. Premium landscape photography, Biodiversity Net Gain units and habitat types — with national delivery beyond our network." />
+  <title>Habitat Bank Hub — Banner | Biofarm habitat banks &amp; BNG units</title>
+  <meta name="description" content="Find a Biofarm habitat bank near your development. Search by location, habitat type and units — real catchment areas on the map, with national delivery beyond our registered network." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="hub.css" />
   <style>
+    /* ===== Unified layout: sticky search bar + full-width map band, editorial grid below ===== */
+    .map-band .map-panel{position:relative;top:auto;min-height:min(56vh,520px);}
+    .map-band .leaflet-map{position:absolute;inset:0;}
+    @media(max-width:768px){.map-band .map-panel{min-height:340px;}}
+    .ed-card.is-active{border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.3),0 26px 54px -30px rgba(33,33,33,.45);}
+    /* editorial grid (same as concept 2) */
     .ed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,30px);}
     .ed-card{position:relative;display:flex;flex-direction:column;text-decoration:none;background:var(--white);border:1px solid var(--hairline);border-radius:18px;overflow:hidden;transition:transform .15s,box-shadow .2s,border-color .2s;}
     .ed-card:hover{transform:translateY(-4px);box-shadow:0 26px 54px -30px rgba(33,33,33,.45);border-color:var(--green);}
@@ -20,7 +27,11 @@
     .ed-card__stats{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.88rem;color:var(--muted);}
     .ed-card__stats b{color:var(--ink);font-weight:700;}
     .ed-card__more{margin-top:2px;font-family:'RATI_v2',var(--font-display);}
-    @media(max-width:900px){.ed-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:900px){
+      .finder{grid-template-columns:1fr;}
+      .finder .map-panel{min-height:340px;}
+      .ed-grid{grid-template-columns:repeat(2,1fr);}
+    }
     @media(max-width:600px){.ed-grid{grid-template-columns:1fr;}}
   </style>
 </head>
@@ -30,7 +41,7 @@
     <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
     <ul class="nav__links" id="navLinks">
       <li><a href="https://www.biofarm.co.uk/developers">Developers</a></li>
-      <li><a href="hub.html" aria-current="page">Habitat Banks</a></li>
+      <li><a href="hub-unified-banner.html" aria-current="page">Habitat Banks</a></li>
       <li><a href="https://www.biofarm.co.uk/about">About</a></li>
       <li><a href="../june/stories/index.html">Stories</a></li>
       <li><a class="btn btn--sm" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
@@ -40,105 +51,115 @@
   <main>
     <div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="https://www.biofarm.co.uk/">Home</a> &nbsp;/&nbsp; Habitat Banks</nav></div>
 
+    <!-- HERO -->
     <section class="hub-hero"><div class="wrap">
       <div class="measure">
         <p class="eyebrow">Habitat Bank Hub</p>
-        <h1>Our habitat banks</h1>
-        <p class="lead">Registered habitat banks restoring nature across the country. Explore each to find the Biodiversity Net Gain units and habitats right for your development.</p>
+        <h1>Find a Biofarm habitat bank</h1>
+        <p class="lead">Search our registered habitat banks by location, see the real catchment each bank serves, and find the Biodiversity Net Gain units right for your development &mdash; wherever you&rsquo;re building.</p>
       </div>
     </div></section>
 
-    <div class="hub-scope">
-      <div class="filter-sticky"><div class="wrap">
-        <form class="filterbar" id="hubFilter" onsubmit="return false" aria-label="Filter habitat banks">
-          <label>Region
-            <select id="fLoc"><option value="">All regions</option><option value="south east">East &amp; South East</option><option value="south west">South West</option><option value="midlands">Midlands</option><option value="the north">The North</option></select>
-          </label>
-          <label>Habitat type
-            <select id="fHabitat"><option value="">Any habitat type</option><option value="grassland">Species-rich grassland</option><option value="meadow">Lowland meadow</option><option value="woodland">Woodland</option><option value="scrub">Scrub</option><option value="hedgerow">Hedgerows</option><option value="wetland">Wetland / ponds</option></select>
-          </label>
-          <label>Units needed
-            <select id="fUnits"><option value="">Any</option><option value="0-25">1&ndash;25</option><option value="25-75">25&ndash;75</option><option value="75-150">75&ndash;150</option><option value="150-99999">150+</option></select>
-          </label>
-          <button class="btn" type="submit">Search</button>
-        </form>
-        <div class="filter-extra">
-          <div class="chips chips--filter" id="habChips">
-            <button type="button" class="fchip is-on" data-hab="">All</button>
-            <button type="button" class="fchip" data-hab="grassland">Grassland</button>
-            <button type="button" class="fchip" data-hab="meadow">Meadow</button>
-            <button type="button" class="fchip" data-hab="woodland">Woodland</button>
-            <button type="button" class="fchip" data-hab="scrub">Scrub</button>
-            <button type="button" class="fchip" data-hab="hedgerow">Hedgerow</button>
-            <button type="button" class="fchip" data-hab="wetland">Wetland</button>
-          </div>
-          <div class="filter-actions">
-            <span id="geoStatus" class="geo-status"></span>
-            <button class="linkbtn" id="useLoc" type="button">&#9678; Use my location</button>
-            <button class="linkbtn" id="resetFilters" type="button">Reset</button>
-          </div>
+    <!-- STICKY SEARCH BAR + FULL-WIDTH MAP BAND -->
+    <div class="filter-sticky"><div class="wrap">
+      <form class="filterbar" id="hubFilter" onsubmit="return false" aria-label="Search habitat banks">
+        <label>Region
+          <select id="fLoc"><option value="">All regions</option><option value="south east">East &amp; South East</option><option value="south west">South West</option><option value="midlands">Midlands</option><option value="the north">The North</option></select>
+        </label>
+        <label>Habitat type
+          <select id="fHabitat"><option value="">Any habitat type</option><option value="grassland">Species-rich grassland</option><option value="meadow">Lowland meadow</option><option value="woodland">Woodland</option><option value="scrub">Scrub</option><option value="hedgerow">Hedgerows</option><option value="wetland">Wetland / ponds</option></select>
+        </label>
+        <label>Units needed
+          <select id="fUnits"><option value="">Any</option><option value="0-25">1&ndash;25</option><option value="25-75">25&ndash;75</option><option value="75-150">75&ndash;150</option><option value="150-99999">150+</option></select>
+        </label>
+        <button class="btn" type="submit">Search</button>
+      </form>
+      <div class="filter-extra">
+        <div class="chips chips--filter" id="habChips">
+          <button type="button" class="fchip is-on" data-hab="">All</button>
+          <button type="button" class="fchip" data-hab="grassland">Grassland</button>
+          <button type="button" class="fchip" data-hab="meadow">Meadow</button>
+          <button type="button" class="fchip" data-hab="woodland">Woodland</button>
+          <button type="button" class="fchip" data-hab="scrub">Scrub</button>
+          <button type="button" class="fchip" data-hab="hedgerow">Hedgerow</button>
+          <button type="button" class="fchip" data-hab="wetland">Wetland</button>
         </div>
-      </div></div>
-
-      <section class="hub-body"><div class="wrap">
-        <div class="list-head">
-          <span class="count"><b id="resultCount">5</b> habitat banks</span>
-          <label class="sort">Sort
-            <select id="fSort"><option value="default">Featured</option><option value="units-desc">Units: high&ndash;low</option><option value="units-asc">Units: low&ndash;high</option><option value="name">Name A&ndash;Z</option></select>
-          </label>
+        <div class="filter-actions">
+          <span id="geoStatus" class="geo-status"></span>
+          <button class="linkbtn" id="useLoc" type="button">&#9678; Use my location</button>
+          <button class="linkbtn" id="resetFilters" type="button">Reset</button>
         </div>
+      </div>
+    </div></div>
 
-        <div class="ed-grid" id="edGrid">
-          <a class="ed-card" href="sleight-farm.html" data-bank="sleight" data-units="374" data-habitats="lowland meadow, neutral grassland, woodland, scrub, hedgerow" data-search="sleight farm bath north east somerset west of england bristol south west">
-            <img class="ed-card__img" src="assets/sleight-grassland.jpg" alt="Species-rich grassland at Sleight Farm habitat bank" />
-            <div class="ed-card__body">
-              <span class="ed-card__region">Bath &amp; NE Somerset &middot; West of England</span>
-              <h3>Sleight Farm</h3>
-              <div class="ed-card__stats"><span><b>70 ha</b></span><span><b>374</b> units</span><span><span class="pill-status">Registered</span></span></div>
-              <div class="chips"><span class="chip">Lowland meadow</span><span class="chip">Neutral grassland</span><span class="chip">Woodland</span><span class="chip">Scrub</span><span class="chip">Hedgerows</span></div>
-              <span class="ed-card__more">View habitat bank &rarr;</span>
-            </div>
-          </a>
-          <a class="ed-card" href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b04" data-units="232" data-habitats="neutral grassland, scrub, hedgerow, trees" data-search="badger bank farm north yorkshire magnesian limestone leeds york the north">
-            <img class="ed-card__img" src="assets/lesnewth-team-on-site.jpg" alt="Representative landscape for Badger Bank Farm" />
-            <div class="ed-card__body">
-              <span class="ed-card__region">North Yorkshire &middot; Magnesian Limestone</span>
-              <h3>Badger Bank Farm</h3>
-              <div class="ed-card__stats"><span><b>30 ha</b></span><span><b>232</b> units</span><span><span class="pill-status">Registered</span></span></div>
-              <div class="chips"><span class="chip">Neutral grassland</span><span class="chip">Mixed scrub</span><span class="chip">Hedgerow</span><span class="chip">Rural trees</span></div>
-              <span class="ed-card__more">View brochure (PDF) &rarr;</span>
-            </div>
-          </a>
-          <a class="ed-card" href="https://www.biofarm.co.uk/contact" data-bank="lesnewth" data-units="130" data-habitats="species-rich grassland, woodland, scrub, cornish hedgerows" data-search="lesnewth north cornwall river valency south west">
-            <img class="ed-card__img" src="assets/lesnewth-grassland-meadow.jpg" alt="Grassland meadow at Lesnewth habitat bank, North Cornwall" />
-            <div class="ed-card__body">
-              <span class="ed-card__region">North Cornwall &middot; River Valency</span>
-              <h3>Lesnewth</h3>
-              <div class="ed-card__stats"><span><b>26.8 ha</b></span><span><b>130</b> units</span><span><span class="pill-status">Registered</span></span></div>
-              <div class="chips"><span class="chip">Species-rich grassland</span><span class="chip">Woodland</span><span class="chip">Cornish hedgerows</span></div>
-              <span class="ed-card__more">Brochure to follow</span>
-            </div>
-          </a>
-          <a class="ed-card" href="brochures/Avon%20Meadows_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b03" data-units="110" data-habitats="species-rich meadow, grassland, wetland, hedgerow" data-search="avon meadows warwickshire severn avon vales stratford worcestershire midlands">
-            <img class="ed-card__img" src="assets/climate-resilience-drone.jpg" alt="Representative landscape for Avon Meadows" />
-            <div class="ed-card__body">
-              <span class="ed-card__region">Warwickshire &middot; Severn &amp; Avon Vales</span>
-              <h3>Avon Meadows</h3>
-              <div class="ed-card__stats"><span><b>17.4 ha</b></span><span><b>110</b> units</span><span><span class="pill-status">Registered</span></span></div>
-              <div class="chips"><span class="chip">Species-rich meadow</span><span class="chip">Wetland</span><span class="chip">Hedgerows</span></div>
-              <span class="ed-card__more">View brochure (PDF) &rarr;</span>
-            </div>
-          </a>
-          <a class="ed-card" href="brochures/Rycote%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b05" data-units="78" data-habitats="mixed scrub, neutral grassland" data-search="rycote farm oxfordshire upper thames clay vales thame east and south east south east">
-            <img class="ed-card__img" src="assets/bee-orchid-sleight.jpg" alt="Representative landscape for Rycote Farm" />
-            <div class="ed-card__body">
-              <span class="ed-card__region">Oxfordshire &middot; Upper Thames Clay Vales</span>
-              <h3>Rycote Farm</h3>
-              <div class="ed-card__stats"><span><b>11.6 ha</b></span><span><b>78</b> units</span><span><span class="pill-status">Registered</span></span></div>
-              <div class="chips"><span class="chip">Mixed scrub</span><span class="chip">Neutral grassland</span></div>
-              <span class="ed-card__more">View brochure (PDF) &rarr;</span>
-            </div>
-          </a>
+    <section class="section map-band" style="padding-top:clamp(20px,2.5vw,32px);padding-bottom:0;"><div class="wrap">
+      <div class="map-panel" aria-label="Map of Biofarm habitat banks">
+        <div class="leaflet-map" data-mode="all" data-tiles="muted"></div>
+        <button class="map-reset" id="resetMap" type="button">Reset view</button>
+        <div class="map-legend"><span class="lg"><span class="lg-pin"></span> Registered bank</span><span class="lg"><span class="lg-ring"></span> Full-value area (LNRS)</span><span class="lg"><span class="lg-pipe"></span> In the pipeline</span></div>
+      </div>
+    </div></section>
+
+    <!-- BANK GRID (editorial) -->
+    <section class="section" style="padding-top:clamp(16px,2vw,28px);"><div class="wrap">
+      <div class="list-head">
+        <span class="count"><b id="resultCount">5</b> habitat banks</span>
+        <label class="sort">Sort
+          <select id="fSort"><option value="default">Featured</option><option value="units-desc">Units: high&ndash;low</option><option value="units-asc">Units: low&ndash;high</option><option value="name">Name A&ndash;Z</option></select>
+        </label>
+      </div>
+
+      <div class="ed-grid" id="edGrid">
+        <a class="ed-card" href="sleight-farm.html" data-bank="sleight" data-units="374" data-habitats="lowland meadow, neutral grassland, woodland, scrub, hedgerow" data-search="sleight farm bath north east somerset west of england bristol south west">
+          <img class="ed-card__img" src="assets/sleight-grassland.jpg" alt="Species-rich grassland at Sleight Farm habitat bank" />
+          <div class="ed-card__body">
+            <span class="ed-card__region">Bath &amp; NE Somerset &middot; West of England</span>
+            <h3>Sleight Farm</h3>
+            <div class="ed-card__stats"><span><b>70 ha</b></span><span><b>374</b> units</span><span><span class="pill-status">Registered</span></span></div>
+            <div class="chips"><span class="chip">Lowland meadow</span><span class="chip">Neutral grassland</span><span class="chip">Woodland</span><span class="chip">Scrub</span><span class="chip">Hedgerows</span></div>
+            <span class="ed-card__more">View habitat bank &rarr;</span>
+          </div>
+        </a>
+        <a class="ed-card" href="brochures/Badger%20Bank%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b04" data-units="232" data-habitats="neutral grassland, scrub, hedgerow, trees" data-search="badger bank farm north yorkshire magnesian limestone leeds york the north">
+          <img class="ed-card__img" src="assets/lesnewth-team-on-site.jpg" alt="Representative landscape for Badger Bank Farm" />
+          <div class="ed-card__body">
+            <span class="ed-card__region">North Yorkshire &middot; Magnesian Limestone</span>
+            <h3>Badger Bank Farm</h3>
+            <div class="ed-card__stats"><span><b>30 ha</b></span><span><b>232</b> units</span><span><span class="pill-status">Registered</span></span></div>
+            <div class="chips"><span class="chip">Neutral grassland</span><span class="chip">Mixed scrub</span><span class="chip">Hedgerow</span><span class="chip">Rural trees</span></div>
+            <span class="ed-card__more">View brochure (PDF) &rarr;</span>
+          </div>
+        </a>
+        <a class="ed-card" href="https://www.biofarm.co.uk/contact" data-bank="lesnewth" data-units="130" data-habitats="species-rich grassland, woodland, scrub, cornish hedgerows" data-search="lesnewth north cornwall river valency south west">
+          <img class="ed-card__img" src="assets/lesnewth-grassland-meadow.jpg" alt="Grassland meadow at Lesnewth habitat bank, North Cornwall" />
+          <div class="ed-card__body">
+            <span class="ed-card__region">North Cornwall &middot; River Valency</span>
+            <h3>Lesnewth</h3>
+            <div class="ed-card__stats"><span><b>26.8 ha</b></span><span><b>130</b> units</span><span><span class="pill-status">Registered</span></span></div>
+            <div class="chips"><span class="chip">Species-rich grassland</span><span class="chip">Woodland</span><span class="chip">Cornish hedgerows</span></div>
+            <span class="ed-card__more">Brochure to follow</span>
+          </div>
+        </a>
+        <a class="ed-card" href="brochures/Avon%20Meadows_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b03" data-units="110" data-habitats="species-rich meadow, grassland, wetland, hedgerow" data-search="avon meadows warwickshire severn avon vales stratford worcestershire midlands">
+          <img class="ed-card__img" src="assets/climate-resilience-drone.jpg" alt="Representative landscape for Avon Meadows" />
+          <div class="ed-card__body">
+            <span class="ed-card__region">Warwickshire &middot; Severn &amp; Avon Vales</span>
+            <h3>Avon Meadows</h3>
+            <div class="ed-card__stats"><span><b>17.4 ha</b></span><span><b>110</b> units</span><span><span class="pill-status">Registered</span></span></div>
+            <div class="chips"><span class="chip">Species-rich meadow</span><span class="chip">Wetland</span><span class="chip">Hedgerows</span></div>
+            <span class="ed-card__more">View brochure (PDF) &rarr;</span>
+          </div>
+        </a>
+        <a class="ed-card" href="brochures/Rycote%20Farm_Biofarm_BNG.pdf" target="_blank" rel="noopener" data-bank="b05" data-units="78" data-habitats="mixed scrub, neutral grassland" data-search="rycote farm oxfordshire upper thames clay vales thame east and south east south east">
+          <img class="ed-card__img" src="assets/bee-orchid-sleight.jpg" alt="Representative landscape for Rycote Farm" />
+          <div class="ed-card__body">
+            <span class="ed-card__region">Oxfordshire &middot; Upper Thames Clay Vales</span>
+            <h3>Rycote Farm</h3>
+            <div class="ed-card__stats"><span><b>11.6 ha</b></span><span><b>78</b> units</span><span><span class="pill-status">Registered</span></span></div>
+            <div class="chips"><span class="chip">Mixed scrub</span><span class="chip">Neutral grassland</span></div>
+            <span class="ed-card__more">View brochure (PDF) &rarr;</span>
+          </div>
+        </a>
         <a class="ed-card ed-card--soon" href="https://www.biofarm.co.uk/contact" data-bank="p01" data-pipeline="1" data-search="iris fen somerset somerset levels and moors south west coming soon pipeline">
           <div class="ed-card__ph"><span>Coming soon</span></div>
           <div class="ed-card__body">
@@ -347,16 +368,15 @@
           </div>
         </a>
         <button type="button" class="ed-card ed-card--soon ed-card--more" id="soonMore" aria-controls="edGrid" aria-expanded="false"><span class="big">+18</span><span class="lbl">more coming soon</span><span class="cta">See all &rarr;</span></button>
-        </div>
+      </div>
 
-        <div class="no-results" id="noResults">
-          <h3>No banks match those filters yet</h3>
-          <p>Our registered network is growing and we deliver nationally. Tell us your location and requirement and we&rsquo;ll find or create the right solution.</p>
-          <a class="btn" href="https://www.biofarm.co.uk/contact">Talk to us about your site</a>
-        </div>
-        <p class="note-ph" style="margin:16px 2px 0;">Figures from the registered brochures; imagery is representative pending site photography.</p>
-      </div></section>
-    </div><!-- /hub-scope -->
+      <div class="no-results" id="noResults">
+        <h3>No banks match those filters yet</h3>
+        <p>Our registered network is growing and we deliver nationally. Tell us your location and requirement and we&rsquo;ll find or create the right solution.</p>
+        <a class="btn" href="https://www.biofarm.co.uk/contact">Talk to us about your site</a>
+      </div>
+      <p class="note-ph" style="margin:16px 2px 0;">Figures from the registered brochures; imagery is representative pending site photography.</p>
+    </div></section>
 
     <!-- PORTFOLIO STATS -->
     <section class="section section--cream2"><div class="wrap">
@@ -419,10 +439,13 @@
 
   <footer class="site-footer"><div class="wrap"><div class="footer__row">
     <a class="nav__logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" style="height:28px;" /></a>
-    <ul class="footer__links"><li><a href="hub.html">Habitat Banks</a></li><li><a href="../june/stories/index.html">Stories</a></li><li><a href="https://www.biofarm.co.uk/contact">Contact</a></li></ul>
+    <ul class="footer__links"><li><a href="hub-unified.html">Habitat Banks</a></li><li><a href="../june/stories/index.html">Stories</a></li><li><a href="https://www.biofarm.co.uk/contact">Contact</a></li></ul>
   </div><div class="footer__meta">&copy; Biofarm &middot; We&rsquo;re in the business of nature.</div></div></footer>
 
-  <script src="editorial.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="catchments.js"></script>
+  <script src="map.js"></script>
+  <script src="unified.js"></script>
   <script>
     var t=document.querySelector('.nav__toggle'),l=document.getElementById('navLinks');
     t.addEventListener('click',function(){var o=l.classList.toggle('is-open');t.setAttribute('aria-expanded',o?'true':'false');});
