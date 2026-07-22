@@ -67,6 +67,10 @@
     return L.divIcon({ className:'', html:'<span class="ppin"></span>',
       iconSize:[14,14], iconAnchor:[7,7], popupAnchor:[0,-8] });
   }
+  // must mirror soon.js slug()
+  function soonSlug(name){
+    return name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
   function addPipeline(map, bounds) {
     if (typeof PIPELINE_SITES === 'undefined') return;
     PIPELINE_SITES.forEach(function (p) {
@@ -75,7 +79,7 @@
           +'<br><b>'+p.name+'</b>'
           +'<br>'+p.lpa+' &middot; '+p.nca
           +'<br><span style="color:#8a8f83;">Coming soon &mdash; details &amp; brochure to follow.</span>'
-          +'<br><a href="https://www.biofarm.co.uk/contact">Register interest &rarr;</a>');
+          +'<br><a href="coming-soon.html?site='+soonSlug(p.name)+'">View site &amp; register interest &rarr;</a>');
       if (bounds) bounds.extend([p.lat, p.lng]);
     });
   }
