@@ -30,7 +30,7 @@
       var q = (loc.value || '').trim().toLowerCase();
       if (q && (card.getAttribute('data-search') || '').indexOf(q) === -1) return false;
       if (hab.value && (card.getAttribute('data-habitats') || '').indexOf(hab.value) === -1) return false;
-      if (!unitsMatch(+card.getAttribute('data-units'), units.value)) return false;
+      if (units && !unitsMatch(+card.getAttribute('data-units'), units.value)) return false;
       return true;
     }
 
@@ -85,7 +85,7 @@
     var debTimer;
     form.addEventListener('submit', apply);
     ['input','change'].forEach(function (ev) { loc.addEventListener(ev, function () { clearTimeout(debTimer); debTimer = setTimeout(apply, 150); }); });
-    [hab, units].forEach(function (el) { el.addEventListener('change', apply); });
+    [hab, units].forEach(function (el) { if (el) el.addEventListener('change', apply); });
     if (sort) sort.addEventListener('change', function () { sortCards(); });
 
     // map <-> list sync
@@ -122,7 +122,7 @@
     var geo = document.getElementById('geoStatus');
     var resetBtn = document.getElementById('resetFilters');
     if (resetBtn) resetBtn.addEventListener('click', function () {
-      loc.value = ''; hab.value = ''; units.value = ''; if (sort) sort.value = 'default';
+      loc.value = ''; hab.value = ''; if (units) units.value = ''; if (sort) sort.value = 'default';
       syncChips(); if (geo) geo.textContent = ''; sortCards(); apply();
     });
 

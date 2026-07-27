@@ -190,7 +190,7 @@ p{margin:0 0 1.1em;}
 .bank-card{scroll-margin-top:96px;}
 .bank-card.is-active{border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.28);}
 .bank-card.is-dim{opacity:.5;}
-.map-legend{position:absolute;z-index:500;bottom:12px;left:12px;max-width:calc(100% - 24px);background:rgba(255,255,255,.94);border:1px solid var(--hairline);border-radius:12px;padding:8px 12px;font-size:.74rem;color:var(--ink);display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;}
+.map-legend{position:absolute;z-index:500;bottom:12px;left:12px;max-width:calc(100% - 24px);pointer-events:none;background:rgba(255,255,255,.94);border:1px solid var(--hairline);border-radius:12px;padding:8px 12px;font-size:.74rem;color:var(--ink);display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;}
 .map-legend .lg{display:flex;align-items:center;gap:7px;}
 .map-legend .lg-pin{width:12px;height:12px;border-radius:50% 50% 50% 0;background:var(--green);transform:rotate(-45deg);}
 .map-legend .lg-ring{width:15px;height:15px;border-radius:50%;border:1.5px dashed var(--green);}
@@ -219,7 +219,9 @@ p{margin:0 0 1.1em;}
 .no-results{display:none;background:var(--white);border:1px solid var(--hairline);border-radius:16px;padding:32px 28px;text-align:center;}
 .no-results.show{display:block;}
 .no-results h3{margin:0 0 .3em;} .no-results p{color:var(--muted);max-width:46ch;margin:0 auto 18px;}
-@media(max-width:960px){.map-legend{bottom:auto;top:12px;}}
+/* legend stays bottom-left at all sizes — top-left would cover the zoom control.
+   On small screens: compact + lifted above the (2-line) attribution. */
+@media(max-width:700px){.map-legend{bottom:46px;font-size:.66rem;gap:3px 10px;padding:6px 10px;}}
 
 /* ===== Filter power-ups ===== */
 .filter-sticky{position:sticky;top:61px;z-index:90;background:rgba(245,246,241,.96);-webkit-backdrop-filter:saturate(180%) blur(8px);backdrop-filter:saturate(180%) blur(8px);border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);padding-block:18px 20px;}

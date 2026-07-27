@@ -2,7 +2,7 @@
    Any element with class .leaflet-map is initialised.
    data-mode="all"  -> plots the whole portfolio and fits bounds.
    data-mode="single" data-bank="sleight" -> centres one bank + catchment.
-   Load catchments.js first for real LNRS boundary polygons (optional). */
+   Load catchments.js first for real LPA+NCA boundary polygons (optional). */
 (function () {
   if (typeof L === 'undefined') return;
 
@@ -30,11 +30,11 @@
       }).addTo(map);
     }
   }
-  // "Area served" = the bank's LNRS area (real boundary from catchments.js), where its
-  // units carry full value under the BNG spatial risk multiplier. Falls back to an
-  // indicative radius for any bank without boundary data.
+  // "Area served" = the bank's combined LPA + NCA area (real boundaries from
+  // catchments.js) where units carry full value under the BNG spatial risk
+  // multiplier. LNRS joins as the legal basis in 2027. Radius fallback if no data.
   function catchment(b) {
-    return (typeof LNRS_CATCHMENTS !== 'undefined' && LNRS_CATCHMENTS[b.id]) || null;
+    return (typeof BANK_CATCHMENTS !== 'undefined' && BANK_CATCHMENTS[b.id]) || null;
   }
   function ring(map, b, strong) {
     var c = catchment(b);
@@ -42,7 +42,7 @@
       return L.geoJSON(c.geometry, {
         style: { color:'#71977A', weight:strong?1.5:1, dashArray:'5 6',
                  fillColor:'#71977A', fillOpacity:strong?0.08:0.05 },
-        attribution: 'Boundaries &copy; Natural England &amp; OS Crown copyright (OGL)'
+        attribution: 'Boundaries &copy; ONS &amp; Natural England, OS Crown copyright (OGL)'
       }).addTo(map);
     }
     return L.circle([b.lat,b.lng], { radius:b.served, color:'#71977A', weight:strong?1.5:1,
@@ -53,7 +53,7 @@
     var s = '<b>'+b.name+'</b>';
     if (b.region) s += '<br>'+b.region;
     s += '<br>'+b.units+' units';
-    if (c) s += '<br><span style="color:#5c7a64;">Full-value area: '+c.lnrs+' LNRS</span>';
+    if (c) s += '<br><span style="color:#5c7a64;">Full value: '+c.label+'</span>';
     if (b.url && b.url !== '#') s += '<br><a href="'+b.url+'">View habitat bank &rarr;</a>';
     if (b.brochure) s += '<br><a href="'+b.brochure+'" target="_blank" rel="noopener">Download brochure (PDF) &rarr;</a>';
     if (!b.real) s += '<br><span style="color:#8a8f83;font-style:italic;">Location to confirm</span>';

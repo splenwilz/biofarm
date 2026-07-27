@@ -21,7 +21,7 @@
       var q = (loc.value || '').trim().toLowerCase();
       if (q && (r.getAttribute('data-search') || '').indexOf(q) === -1) return false;
       if (hab.value && (r.getAttribute('data-habitats') || '').indexOf(hab.value) === -1) return false;
-      if (!unitsMatch(+r.getAttribute('data-units'), units.value)) return false;
+      if (units && !unitsMatch(+r.getAttribute('data-units'), units.value)) return false;
       if (cond.value && (r.getAttribute('data-condition') || '') !== cond.value.toLowerCase()) return false;
       return true;
     }
@@ -33,7 +33,7 @@
     }
     form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
     ['input','change'].forEach(function (ev) { loc.addEventListener(ev, apply); });
-    [hab, units, cond].forEach(function (el) { el.addEventListener('change', apply); });
+    [hab, units, cond].forEach(function (el) { if (el) el.addEventListener('change', apply); });
 
     // sortable columns
     var dir = {};

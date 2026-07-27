@@ -29,7 +29,7 @@
       var q = (loc.value || '').trim().toLowerCase();
       if (q && (c.getAttribute('data-search') || '').indexOf(q) === -1) return false;
       if (hab.value && (c.getAttribute('data-habitats') || '').indexOf(hab.value) === -1) return false;
-      if (!unitsMatch(+c.getAttribute('data-units'), units.value)) return false;
+      if (units && !unitsMatch(+c.getAttribute('data-units'), units.value)) return false;
       return true;
     }
     function apply(){
@@ -54,7 +54,7 @@
     var debTimer;
     form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
     ['input','change'].forEach(function (ev) { loc.addEventListener(ev, function () { clearTimeout(debTimer); debTimer = setTimeout(apply, 150); }); });
-    [hab, units].forEach(function (el) { el.addEventListener('change', apply); });
+    [hab, units].forEach(function (el) { if (el) el.addEventListener('change', apply); });
 
     // immersive map <-> drawer sync
     withMap(function (hub) {

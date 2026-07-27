@@ -40,6 +40,14 @@ and bank pages.
 - **Habitats:** Mixed scrub · Other neutral grassland (River Thame corridor)
 - **Coords (approx):** 51.72, -1.03
 
+## Catchment basis (changed 27 Jul per Chris)
+Full-value catchments on all maps = **LPA + NCA combined** per bank (ONS LAD May-2025 +
+Natural England NCA unions in `catchments.js` → `BANK_CATCHMENTS`). Chris: LNRS doesn't
+legally take effect until ~2027 — re-add the LNRS layer then (the generation script/query
+approach is in the git history; all 48 LNRS areas come from the same Defra ArcGIS service).
+"Units needed" filter removed from all search rails on Chris's instruction (kept in
+enquiry/register-interest forms).
+
 _Portfolio = 5 banks with data (was 6 with placeholders; b06 removed as unknown). Confirm whether a 6th registered bank exists._
 
 ## Pipeline sites (REAL — from Biofarm's public site map, July 2026)

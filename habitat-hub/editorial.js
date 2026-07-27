@@ -47,12 +47,12 @@
     function matches(c){
       var q = (loc.value || '').trim().toLowerCase();
       if (isSoon(c)) {
-        if (hab.value || units.value) return false;
+        if (hab.value || (units && units.value)) return false;
         return !q || (c.getAttribute('data-search') || '').indexOf(q) !== -1;
       }
       if (q && (c.getAttribute('data-search') || '').indexOf(q) === -1) return false;
       if (hab.value && (c.getAttribute('data-habitats') || '').indexOf(hab.value) === -1) return false;
-      if (!unitsMatch(+c.getAttribute('data-units'), units.value)) return false;
+      if (units && !unitsMatch(+c.getAttribute('data-units'), units.value)) return false;
       return true;
     }
     function apply(){
@@ -90,12 +90,12 @@
 
     form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
     ['input','change'].forEach(function (ev) { loc.addEventListener(ev, apply); });
-    [hab, units].forEach(function (el) { el.addEventListener('change', function () { syncChips(); apply(); }); });
+    [hab, units].forEach(function (el) { if (el) el.addEventListener('change', function () { syncChips(); apply(); }); });
     if (sort) sort.addEventListener('change', sortCards);
 
     var resetBtn = document.getElementById('resetFilters');
     if (resetBtn) resetBtn.addEventListener('click', function () {
-      loc.value = ''; hab.value = ''; units.value = ''; if (sort) sort.value = 'default';
+      loc.value = ''; hab.value = ''; if (units) units.value = ''; if (sort) sort.value = 'default';
       soonExpanded = false;
       syncChips(); if (geo) geo.textContent = ''; sortCards(); apply();
     });

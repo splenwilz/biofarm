@@ -62,12 +62,11 @@
     <!-- MAP HERO -->
     <section class="map-hero" aria-label="Map of Biofarm habitat banks">
       <div class="leaflet-map" data-mode="all" data-tiles="muted"></div>
-      <div class="map-legend"><span class="lg"><span class="lg-pin"></span> Registered bank</span><span class="lg"><span class="lg-ring"></span> Full-value area (LNRS)</span><span class="lg"><span class="lg-pipe"></span> In the pipeline</span></div>
+      <div class="map-legend"><span class="lg"><span class="lg-pin"></span> Registered bank</span><span class="lg"><span class="lg-ring"></span> Full-value area (LPA + NCA)</span><span class="lg"><span class="lg-pipe"></span> In the pipeline</span></div>
       <div class="map-hero__title"><h1>Find a habitat bank near your site</h1></div>
       <form class="map-hero__search" id="mfFilter" onsubmit="return false" aria-label="Search habitat banks">
         <select id="fLoc" aria-label="Region"><option value="">All regions</option><option value="south east">East &amp; South East</option><option value="south west">South West</option><option value="midlands">Midlands</option><option value="the north">The North</option></select>
         <select id="fHabitat"><option value="">Any habitat type</option><option value="grassland">Grassland</option><option value="meadow">Lowland meadow</option><option value="woodland">Woodland</option><option value="scrub">Scrub</option><option value="hedgerow">Hedgerow</option><option value="wetland">Wetland</option></select>
-        <select id="fUnits"><option value="">Any units</option><option value="0-25">1&ndash;25</option><option value="25-75">25&ndash;75</option><option value="75-99999">75+</option></select>
         <button class="btn" type="submit">Search</button>
       </form>
     </section>

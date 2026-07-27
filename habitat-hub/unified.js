@@ -55,12 +55,12 @@
     function matches(c){
       var q = (loc.value || '').trim().toLowerCase();
       if (isSoon(c)) {
-        if (hab.value || units.value) return false;
+        if (hab.value || (units && units.value)) return false;
         return !q || (c.getAttribute('data-search') || '').indexOf(q) !== -1;
       }
       if (q && (c.getAttribute('data-search') || '').indexOf(q) === -1) return false;
       if (hab.value && (c.getAttribute('data-habitats') || '').indexOf(hab.value) === -1) return false;
-      if (!unitsMatch(+c.getAttribute('data-units'), units.value)) return false;
+      if (units && !unitsMatch(+c.getAttribute('data-units'), units.value)) return false;
       return true;
     }
     function apply(){
@@ -105,7 +105,7 @@
     var debTimer;
     form.addEventListener('submit', apply);
     ['input','change'].forEach(function (ev) { loc.addEventListener(ev, function () { clearTimeout(debTimer); debTimer = setTimeout(apply, 150); }); });
-    [hab, units].forEach(function (el) { el.addEventListener('change', apply); });
+    [hab, units].forEach(function (el) { if (el) el.addEventListener('change', apply); });
     if (sort) sort.addEventListener('change', sortCards);
 
     /* ===== Quick habitat chips ===== */
@@ -117,7 +117,7 @@
     /* ===== Reset filters ===== */
     var resetBtn = document.getElementById('resetFilters');
     if (resetBtn) resetBtn.addEventListener('click', function () {
-      loc.value = ''; hab.value = ''; units.value = ''; if (sort) sort.value = 'default';
+      loc.value = ''; hab.value = ''; if (units) units.value = ''; if (sort) sort.value = 'default';
       soonExpanded = false;
       syncChips(); if (geo) geo.textContent = ''; sortCards(); apply();
     });
