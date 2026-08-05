@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biofarm — proposed Developers page section: off-site first (mockup)</title>
+<style>
+  :root {
+    --ink: #111111;
+    --body: #5b5f57;
+    --green: #71977A;
+    --green-deep: #3e5c48;
+    --lime: #C8F06E;
+    --paper: #F7F8F3;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #e9ebe4;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .review-note {
+    max-width: 1100px;
+    margin: 24px auto 0;
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--body);
+    background: #fff9df;
+    border: 1px solid #e6dfae;
+    border-radius: 8px;
+  }
+  .review-note strong { color: var(--ink); }
+
+  /* ============ THE PROPOSED SECTION ============ */
+  .bng-offsite-first {
+    max-width: 1100px;
+    margin: 24px auto;
+    background: var(--paper);
+    padding: 72px 56px;
+    border-radius: 16px;
+  }
+  .bng-offsite-first .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+    background: var(--lime);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  .bng-offsite-first h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    max-width: 640px;
+    margin-bottom: 20px;
+  }
+  .bng-offsite-first .lead {
+    font-size: 18px;
+    color: var(--body);
+    max-width: 680px;
+    margin-bottom: 12px;
+  }
+  .bng-offsite-first .lead strong { color: var(--ink); }
+  .bng-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin: 40px 0 36px;
+  }
+  .bng-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 28px 24px;
+    border-top: 4px solid var(--green);
+  }
+  .bng-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .bng-card p {
+    font-size: 15px;
+    color: var(--body);
+  }
+  .bng-smallprint {
+    font-size: 14px;
+    color: var(--body);
+    max-width: 680px;
+    margin-bottom: 32px;
+    padding-left: 14px;
+    border-left: 3px solid var(--green);
+  }
+  .bng-cta-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .bng-cta {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--lime);
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 15px 32px;
+    border-radius: 999px;
+  }
+  .bng-cta:hover { background: var(--green-deep); }
+  .bng-cta-aside { font-size: 14px; color: var(--body); }
+  @media (max-width: 640px) {
+    .bng-offsite-first { padding: 48px 24px; }
+  }
+
+  /* ============ PLAIN COPY BLOCK (not part of the section) ============ */
+  .copy-block {
+    max-width: 1100px;
+    margin: 40px auto 64px;
+    background: var(--white);
+    border: 1px solid #d8dbd0;
+    border-radius: 12px;
+    padding: 32px 36px;
+  }
+  .copy-block h2 {
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--green-deep);
+    margin-bottom: 16px;
+  }
+  .copy-block pre {
+    white-space: pre-wrap;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="review-note">
+  <strong>Internal mockup — not for publication.</strong> Proposed new section for
+  biofarm.co.uk/developers. Suggested placement: directly after the “Breaking down the
+  walls” intro, before “BNG that’s designed to get approved”. Plain CMS copy is at the
+  bottom of this page.
+</div>
+
+<!-- ============================================================
+     PROPOSED SECTION STARTS HERE
+     ============================================================ -->
+<section class="bng-offsite-first">
+  <span class="eyebrow">New BNG rules · from 6 August 2026</span>
+  <h2>Go straight to off-site, from day one</h2>
+  <p class="lead">
+    The biodiversity gain hierarchy has changed. For planning applications made from
+    6&nbsp;August&nbsp;2026, <strong>minor sites above 0.2 hectares no longer need to
+    exhaust on-site options first</strong> — off-site biodiversity gains now carry the
+    same weight as on-site, from the first instance.
+  </p>
+  <p class="lead">
+    In practice, that means you can design your site for what it’s actually for — and
+    secure your biodiversity units from one of our habitat banks from the outset.
+  </p>
+
+  <div class="bng-cards">
+    <div class="bng-card">
+      <h3>Keep your masterplan</h3>
+      <p>No more carving habitat out of a tight site. Use your land for development,
+      and let an established habitat bank deliver the biodiversity.</p>
+    </div>
+    <div class="bng-card">
+      <h3>Certainty at planning</h3>
+      <p>Units from legally secured habitat banks, managed and monitored for at least
+      30 years — a clear, robust line in your biodiversity gain plan.</p>
+    </div>
+    <div class="bng-card">
+      <h3>Sorted early</h3>
+      <p>Bring us in at pre-app. We’ll match your scheme to locally relevant units and
+      stay with you through approval, compliance and beyond.</p>
+    </div>
+  </div>
+
+  <p class="bng-smallprint">
+    Also new: sites of 0.2 hectares or below are now exempt from mandatory BNG unless
+    priority habitat is affected, and temporary development of five years or less is
+    exempt too. Not sure where your scheme lands under the new rules? We’ll help you
+    work it out.
+  </p>
+
+  <div class="bng-cta-row">
+    <a class="bng-cta" href="/contact">Talk to our team</a>
+    <span class="bng-cta-aside">Early conversations make for easier approvals.</span>
+  </div>
+</section>
+<!-- ============================================================
+     PROPOSED SECTION ENDS HERE
+     ============================================================ -->
+
+<div class="copy-block">
+  <h2>Copy for CMS (plain text)</h2>
+  <pre>
+EYEBROW / TAG
+New BNG rules · from 6 August 2026
+
+HEADING
+Go straight to off-site, from day one
+
+LEAD
+The biodiversity gain hierarchy has changed. For planning applications made from
+6 August 2026, minor sites above 0.2 hectares no longer need to exhaust on-site
+options first — off-site biodiversity gains now carry the same weight as on-site,
+from the first instance.
+
+In practice, that means you can design your site for what it’s actually for — and
+secure your biodiversity units from one of our habitat banks from the outset.
+
+SUPPORTING POINTS
+
+Keep your masterplan
+No more carving habitat out of a tight site. Use your land for development, and let
+an established habitat bank deliver the biodiversity.
+
+Certainty at planning
+Units from legally secured habitat banks, managed and monitored for at least
+30 years — a clear, robust line in your biodiversity gain plan.
+
+Sorted early
+Bring us in at pre-app. We’ll match your scheme to locally relevant units and stay
+with you through approval, compliance and beyond.
+
+SMALL PRINT / SUPPORTING LINE
+Also new: sites of 0.2 hectares or below are now exempt from mandatory BNG unless
+priority habitat is affected, and temporary development of five years or less is
+exempt too. Not sure where your scheme lands under the new rules? We’ll help you
+work it out.
+
+CALL TO ACTION
+Talk to our team  →  links to /contact
+Aside line: Early conversations make for easier approvals.
+  </pre>
+</div>
+
+</body>
+</html>

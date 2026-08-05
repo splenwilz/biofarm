@@ -1,0 +1,144 @@
+<!--
+  BIOFARM — DEVELOPERS PAGE — NEW SECTION: "Go straight to off-site, from day one"
+
+  WHERE TO PLACE IT
+  Insert on https://www.biofarm.co.uk/developers directly AFTER the section
+  "Breaking down the walls, so you can build them" (white theme) and BEFORE
+  "BNG that's designed to get approved" (dark/green theme).
+  This section uses the site's BLACK theme so the page reads white -> black -> green,
+  avoiding green-on-green with the section below. The intro says BNG doesn't have
+  to be a burden; this section proves it just got easier; the four-step section
+  then explains how we deliver.
+
+  HOW TO USE
+  Paste this whole file into a Squarespace Code Block at that position.
+  All styles are scoped under .bf-osf so nothing leaks into the rest of the page.
+  Fonts load from the site's own CDN (same files the site already uses).
+
+  CLAIMS SOURCE
+  The Biodiversity Gain (Town and Country Planning) (Amendments and Transitional
+  Provisions) (England) Regulations 2026 (SI 2026/790), in force 6 August 2026.
+-->
+<style>
+  @font-face {
+    font-family: 'BF-RATI';
+    src: url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+         url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight: 300;
+    font-display: swap;
+  }
+  .bf-osf {
+    background: #111111;
+    color: #F5F6F1;
+    padding: clamp(48px, 8vw, 104px) clamp(20px, 5vw, 64px);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.65;
+    box-sizing: border-box;
+  }
+  .bf-osf *, .bf-osf *::before, .bf-osf *::after { box-sizing: border-box; }
+  .bf-osf__wrap { max-width: 1200px; margin: 0 auto; }
+  .bf-osf__grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: start;
+  }
+  .bf-osf__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #C8F06E;
+    margin: 0 0 1rem;
+  }
+  .bf-osf h2 {
+    font-family: 'BF-RATI', Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(1.9rem, 4.2vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    margin: 0 0 0.4em;
+  }
+  .bf-osf h2 em { font-style: normal; color: #C8F06E; }
+  .bf-osf__lead {
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    color: rgba(245,246,241,0.92);
+    margin: 0 0 1.1em;
+  }
+  .bf-osf__lead strong { color: #C8F06E; font-weight: 500; }
+  .bf-osf__cta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 28px; }
+  .bf-osf__btn {
+    display: inline-block;
+    font-family: 'BF-RATI', Georgia, serif;
+    font-size: 18px;
+    line-height: 1;
+    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    background: #C8F06E;
+    color: #111111 !important;
+    border: 1.5px solid #C8F06E;
+    transition: background-color 300ms;
+    cursor: pointer;
+  }
+  .bf-osf__btn:hover { background: #b9e64f; border-color: #b9e64f; }
+  .bf-osf__aside { font-size: 0.95rem; color: rgba(245,246,241,0.8); }
+  .bf-osf__card {
+    background: #F5F6F1;
+    color: #111111;
+    border-radius: 16px;
+    border-top: 4px solid #C8F06E;
+    padding: clamp(24px, 3vw, 36px);
+  }
+  .bf-osf__card h4 {
+    font-family: 'BF-RATI', Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(1.15rem, 2vw, 1.35rem);
+    line-height: 1.15;
+    margin: 0 0 0.8em;
+  }
+  .bf-osf__ticks { list-style: none; margin: 0; padding: 0; }
+  .bf-osf__ticks li { position: relative; padding-left: 34px; margin: 0 0 14px; font-size: 1.02rem; }
+  .bf-osf__ticks li::before { content: "\2713"; position: absolute; left: 0; top: 0; color: #71977A; font-weight: 700; }
+  .bf-osf__ticks li strong { font-weight: 600; }
+  .bf-osf__note {
+    font-size: 0.85rem;
+    color: #5b5f57;
+    margin: 18px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(17,17,17,0.12);
+  }
+  @media (max-width: 900px) {
+    .bf-osf__grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<section class="bf-osf" id="offsite-first">
+  <div class="bf-osf__wrap">
+    <div class="bf-osf__grid">
+      <div>
+        <p class="bf-osf__eyebrow">New BNG rules &middot; from 6 August 2026</p>
+        <h2>Go straight to <em>off-site</em>, from day one</h2>
+        <p class="bf-osf__lead">The biodiversity gain hierarchy has changed. For planning applications made from 6&nbsp;August&nbsp;2026, <strong>minor sites above 0.2 hectares no longer need to exhaust on-site options first</strong> &mdash; off-site biodiversity gains now carry the same weight as on-site, from the first instance.</p>
+        <p class="bf-osf__lead">Keep your masterplan for what it&rsquo;s actually for, and secure your biodiversity units from one of our habitat banks from the outset.</p>
+        <div class="bf-osf__cta">
+          <a class="bf-osf__btn" href="/contact">TALK TO OUR TEAM</a>
+          <span class="bf-osf__aside">Early conversations make for easier approvals.</span>
+        </div>
+      </div>
+      <div class="bf-osf__card">
+        <h4>The changes at a glance</h4>
+        <ul class="bf-osf__ticks">
+          <li><strong>Minor sites above 0.2 hectares</strong> can now go straight to off-site biodiversity units &mdash; no need to exhaust on-site options first.</li>
+          <li><strong>Sites of 0.2 hectares or below</strong> are exempt from mandatory BNG, unless priority habitat is affected.</li>
+          <li><strong>Temporary development</strong> of five years or less is exempt.</li>
+          <li><strong>Self-build and custom-build</strong> schemes are no longer automatically exempt &mdash; many now fall under the small-sites exemption instead.</li>
+        </ul>
+        <p class="bf-osf__note">Applies to planning applications made on or after 6 August 2026. Not sure where your scheme lands? We&rsquo;ll help you work it out.</p>
+      </div>
+    </div>
+  </div>
+</section>
