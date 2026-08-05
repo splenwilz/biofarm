@@ -1,0 +1,69 @@
+/* ============================================================
+   Habitat Banks page — bank card styling (approved ed-card look)
+   Scoped to the Habitat Banks page only via its collection ID,
+   so no other page or summary block on the site is affected.
+   Paste at the BOTTOM of Website > Custom CSS.
+   ============================================================ */
+@font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
+
+#collection-6a687c0d5a396e73c9b9ef10 .summary-item{
+  background:#fff;
+  border:1px solid rgba(33,33,33,.14);
+  border-radius:18px;
+  overflow:hidden;
+  transition:transform .15s, box-shadow .2s, border-color .2s;
+}
+#collection-6a687c0d5a396e73c9b9ef10 .summary-item:hover{
+  transform:translateY(-4px);
+  box-shadow:0 26px 54px -30px rgba(33,33,33,.45);
+  border-color:#71977A;
+}
+/* image flush to the card edges — kill every inset/radius the theme adds */
+#collection-6a687c0d5a396e73c9b9ef10 .summary-item{padding:0 !important;}
+#collection-6a687c0d5a396e73c9b9ef10 .summary-thumbnail-outer-container{margin:0 !important;padding:0 !important;}
+#collection-6a687c0d5a396e73c9b9ef10 .summary-thumbnail-container{display:block;margin:0 !important;padding:0 !important;border-radius:0 !important;overflow:hidden;}
+#collection-6a687c0d5a396e73c9b9ef10 .summary-thumbnail,
+#collection-6a687c0d5a396e73c9b9ef10 .summary-thumbnail.img-wrapper,
+#collection-6a687c0d5a396e73c9b9ef10 img.summary-thumbnail-image{border-radius:0 !important;}
+/* text area padding inside the card */
+#collection-6a687c0d5a396e73c9b9ef10 .summary-content{padding:18px 22px 24px;}
+/* bank name in the brand display font */
+#collection-6a687c0d5a396e73c9b9ef10 .summary-title{
+  font-family:'RATI_v2', Georgia, serif;
+  font-weight:300;
+  font-size:1.5rem;
+  letter-spacing:-.01em;
+  line-height:1.15;
+}
+#collection-6a687c0d5a396e73c9b9ef10 .summary-title a{text-decoration:none;}
+/* excerpt line */
+#collection-6a687c0d5a396e73c9b9ef10 .summary-excerpt,
+#collection-6a687c0d5a396e73c9b9ef10 .summary-excerpt p{
+  color:#5f6659;font-size:.92rem;line-height:1.5;margin:6px 0 0;
+}
+/* belt-and-braces: never show dates/metadata on these cards */
+#collection-6a687c0d5a396e73c9b9ef10 .summary-metadata-container{display:none !important;}
+
+/* ------------------------------------------------------------
+   Lock the grids to exactly 3 cards per row on ANY screen size
+   (Squarespace's own layout packs by pixel width — 4-5 on wide
+   monitors). Falls to 2 columns on tablet, 1 on phones.
+   ------------------------------------------------------------ */
+#collection-6a687c0d5a396e73c9b9ef10 .summary-item-list{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:28px !important;
+  height:auto !important;
+}
+#collection-6a687c0d5a396e73c9b9ef10 .summary-item{
+  position:static !important;
+  float:none !important;
+  width:auto !important;
+  clear:none !important;
+}
+@media (max-width:900px){
+  #collection-6a687c0d5a396e73c9b9ef10 .summary-item-list{grid-template-columns:repeat(2,1fr) !important;}
+}
+@media (max-width:600px){
+  #collection-6a687c0d5a396e73c9b9ef10 .summary-item-list{grid-template-columns:1fr !important;}
+}

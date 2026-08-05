@@ -1,0 +1,96 @@
+/* ===================================================================
+   SLEIGHT FARM — native hero styling
+   -------------------------------------------------------------------
+   WHERE: Squarespace → Website → Website Tools → Custom CSS (append).
+   Scoped to the Sleight page (collection 6a704336e90d030a377df7af) and
+   its hero section — nothing else on the site is touched.
+
+   Targets the native blocks by their block IDs:
+     • title  #block-09bec7f808a46b64eafb  (H1)
+     • sub    #block-8804ad24ab56b851f9f7  (paragraph)
+     • eyebrow #block-5dcfcbdbdca363b1dfda (paragraph)
+   If you rebuild any of these blocks its ID changes — grab the new ID
+   (right-click block → Inspect, or ask) and swap it in.
+   =================================================================== */
+
+@font-face{
+  font-family:'RATI_v2';
+  src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');
+  font-weight:300;font-display:swap;
+}
+
+/* --- Immersive gradient over the SECTION BACKGROUND photo ---------- */
+/* (Set the grass photo as the section Background first — see steps.)   */
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] .section-background::after{
+  content:"";position:absolute;inset:0;
+  /* darker / more opaque than the first pass — tune these two alphas to taste */
+  background:linear-gradient(180deg,rgba(33,33,33,.45),rgba(33,33,33,.82));
+  pointer-events:none;
+}
+
+/* --- All hero text white over the photo ---------------------------- */
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] h1,
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] .sqs-block-html p{
+  color:#fff !important;
+}
+
+/* --- Title → design size (was ~99px; design tops at 4rem) ---------- */
+#block-09bec7f808a46b64eafb h1{
+  font-family:'RATI_v2',Georgia,serif !important;
+  font-weight:300 !important;
+  font-size:clamp(2.4rem,5vw,4rem) !important;
+  line-height:1.08 !important;
+  letter-spacing:-.015em !important;
+  max-width:18ch;
+}
+
+/* --- Sub / lead ---------------------------------------------------- */
+#block-8804ad24ab56b851f9f7 p{
+  font-size:clamp(1.05rem,1.6vw,1.25rem) !important;
+  line-height:1.5 !important;
+  color:rgba(255,255,255,.92) !important;
+  max-width:54ch;
+}
+
+/* --- Eyebrow ------------------------------------------------------- */
+#block-5dcfcbdbdca363b1dfda p{
+  font-size:.8rem !important;
+  font-weight:700 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.16em !important;
+  line-height:1.5 !important;
+  color:#F5F6F1 !important;
+}
+
+/* --- Native buttons in the hero ------------------------------------ */
+/* Add two Button blocks: set one to PRIMARY (Enquire), one to
+   SECONDARY (Download brochure). These rules style both to the design. */
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] .sqs-block-button-element{
+  font-family:'RATI_v2',Georgia,serif !important;
+  font-weight:300 !important;
+  font-size:18px !important;
+  line-height:1 !important;
+  letter-spacing:0 !important;
+  text-transform:none !important;
+  border-radius:25px !important;
+  padding:14px 28px !important;
+  /* Fluid Engine stretches the anchor to fill its (tall) block cell → 72px.
+     height:auto makes it hug its content → ~47px, matching the design. */
+  height:auto !important;
+  align-self:flex-start !important;
+  transition:background-color .3s,border-color .2s,transform .15s !important;
+}
+/* Primary = cream pill */
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] .sqs-button-element--primary{
+  background:#F5F6F1 !important;color:#212121 !important;border:1.5px solid #F5F6F1 !important;
+}
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] .sqs-button-element--primary:hover{
+  background:#fff !important;transform:translateY(-1px);
+}
+/* Secondary = ghost / outline */
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] .sqs-button-element--secondary{
+  background:transparent !important;color:#fff !important;border:1.5px solid rgba(255,255,255,.55) !important;
+}
+#collection-6a704336e90d030a377df7af [data-section-id="6a706d1bd66bd569871cfd53"] .sqs-button-element--secondary:hover{
+  background:rgba(255,255,255,.14) !important;border-color:#fff !important;
+}

@@ -1,0 +1,73 @@
+/* ===================================================================
+   HABITAT BANKS — page-wide type harmony
+   -------------------------------------------------------------------
+   WHERE TO PASTE: Squarespace → Website → Website Tools → Custom CSS
+   (append at the very end). Verified live on 2026-07-31.
+
+   WHY: the page mixes native Squarespace blocks (hero, intro, FAQ,
+   green CTA) with our finder/section code blocks. The native blocks
+   used the theme's typography, which drifted from the design:
+     • eyebrows rendered as 17px bold body text (not the small
+       uppercase letter-spaced eyebrow)
+     • section headings had loose line-height (1.41) so they looked
+       oversized next to the code sections (1.13)
+     • FAQ questions were 26px (design ~19–22px)
+     • body paragraphs were line-height 1.80 (design 1.65)
+
+   Everything below is scoped to THIS page only via its body id
+   (#collection-6a687c0d5a396e73c9b9ef10) — nothing else on the site
+   is affected. It also unifies our own .bf-h2 to the same size, so
+   native + code headings match exactly.
+   =================================================================== */
+
+/* Section headings — one size, tight leading (native was airy 1.41) */
+#collection-6a687c0d5a396e73c9b9ef10 h2 {
+  font-size: clamp(1.8rem, 3.4vw, 2.6rem) !important;
+  font-weight: 300 !important;
+  line-height: 1.14 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* FAQ questions — pull the oversized native accordion titles back in scale */
+#collection-6a687c0d5a396e73c9b9ef10 .accordion-item__title {
+  font-size: 1.25rem !important;
+  font-weight: 300 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* "What is a habitat bank?" + FAQ section — lift the reading text so the left
+   intro isn't dwarfed by the RATI FAQ questions on the right (both ~20px now). */
+[data-section-id="6a6c5cf82414092afc69f09e"] p {
+  font-size: 1.18rem !important;
+}
+
+/* Body copy — one consistent leading everywhere (native paragraphs were 1.8) */
+#collection-6a687c0d5a396e73c9b9ef10 p {
+  line-height: 1.65 !important;
+}
+
+/* Eyebrows — every native eyebrow is "a paragraph that is only a bold line",
+   so this one selector catches them all (cream sections, the green CTA, and
+   the hero) and restyles them to the small uppercase letter-spaced eyebrow
+   used in the code sections. Body paragraphs are untouched. */
+#collection-6a687c0d5a396e73c9b9ef10 p strong:only-child {
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.16em !important;
+  line-height: 1.6 !important;
+}
+
+/* -------------------------------------------------------------------
+   OPTIONAL — tighten the hero title.
+   The hero currently renders ~99px; the original design tops out ~4rem.
+   Uncomment the block below if you want the hero brought to the design
+   scale. Leave it commented to keep the big hero.
+   -------------------------------------------------------------------
+#collection-6a687c0d5a396e73c9b9ef10 h1 {
+  font-size: clamp(2.6rem, 5.2vw, 4rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.015em !important;
+}
+------------------------------------------------------------------- */

@@ -1,0 +1,138 @@
+<!-- Coming-soon template (all 23 sites via ?site=) — paste this whole file into ONE Code Block on the Squarespace page.
+     Squarespace supplies the site header/nav/footer around it. -->
+<div class="bf-hub">
+<style>
+/* split hero: hatched photo slot + facts card (mirrors sleight-farm-spec) */
+    .cs-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(20px,3vw,32px);align-items:stretch;margin-top:8px;}
+    .cs-hero__ph{min-height:340px;border-radius:18px;display:grid;place-items:center;background:repeating-linear-gradient(45deg,rgba(179,163,121,.16) 0 14px,rgba(179,163,121,.05) 14px 28px);border:1px dashed #B3A379;}
+    .cs-hero__ph span{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#857A5E;}
+    .cs-card{background:var(--cream-2);border:1px solid var(--hairline);border-radius:18px;padding:clamp(24px,3vw,36px);display:flex;flex-direction:column;justify-content:center;}
+    .cs-card h1{font-size:clamp(2rem,3.6vw,2.8rem);margin:.1em 0 .3em;}
+    .cs-facts{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin:18px 0 22px;}
+    .cs-facts .k{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+    .cs-facts .v{font-family:var(--font-display);font-size:1.35rem;}
+    .cs-facts .v.tbc{color:#857A5E;}
+    #location .map-panel{position:relative;top:auto;min-height:380px;}
+    /* internal content checklist for Vix */
+    .source-list{background:var(--white);border:1px dashed #B3A379;border-radius:16px;padding:22px 26px;max-width:760px;}
+    .source-list h3{margin:0 0 6px;font-size:1.25rem;}
+    .source-list p{color:var(--muted);font-size:.9rem;margin:0 0 12px;}
+    .source-list ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;}
+    .source-list li{display:flex;gap:10px;align-items:baseline;font-size:.95rem;}
+    .source-list li::before{content:"\25EF";color:#857A5E;font-size:.8rem;}
+    .enq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;}
+    .enq-row{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+    .enq-row label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);}
+    .enq-row input,.enq-row select,.enq-row textarea{font-family:var(--font-body);font-size:1rem;color:var(--ink);background:var(--cream);border:1px solid var(--hairline);border-radius:12px;padding:12px 14px;width:100%;min-width:0;}
+    .enq-row textarea{resize:vertical;min-height:92px;}
+    .enq-row input:focus,.enq-row select:focus,.enq-row textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(113,151,122,.25);}
+    .enq-success{display:none;text-align:center;padding:8px 0;}
+    .enq-success.show{display:block;}
+    @media(max-width:960px){.cs-hero{grid-template-columns:1fr;} .cs-hero__ph{min-height:220px;}}
+    @media(max-width:600px){.enq-grid{grid-template-columns:1fr;}}
+</style>
+<div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="https://www.biofarm.co.uk/">Home</a> &nbsp;/&nbsp; <a href="/habitat-banks">Habitat Banks</a> &nbsp;/&nbsp; <span id="crumbName">Coming soon</span></nav>
+
+      <!-- HERO -->
+      <div class="cs-hero">
+        <div class="cs-hero__ph"><span>Site photography to follow</span></div>
+        <div class="cs-card">
+          <p class="eyebrow" style="color:#857A5E;">In the pipeline &middot; <span id="heroRegion">&hellip;</span></p>
+          <h1 id="siteName">Coming soon</h1>
+          <p style="color:var(--muted);margin:0;">A new Biofarm habitat bank in development &mdash; register interest to be first in line for units when the site is registered.</p>
+          <div class="cs-facts">
+            <div><div class="k">Host LPA</div><div class="v" id="factLpa">&hellip;</div></div>
+            <div><div class="k">National Character Area</div><div class="v" id="factNca">&hellip;</div></div>
+            <div><div class="k">Area</div><div class="v tbc">To confirm</div></div>
+            <div><div class="k">BNG units</div><div class="v tbc">To confirm</div></div>
+          </div>
+          <div><span class="pill-status pill-status--soon">Coming soon</span></div>
+          <a class="btn" href="#register" style="margin-top:20px;align-self:flex-start;">Register interest</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOCATION -->
+    <section class="section" id="location"><div class="wrap">
+      <p class="eyebrow">Location</p>
+      <h2 style="max-width:22ch;">Where the new bank is taking shape</h2>
+      <p class="measure" id="locCopy">The site sits within its host planning authority and National Character Area. Its full catchment &mdash; the areas where units will carry full value &mdash; will be confirmed when the site is registered.</p>
+      <div class="map-panel" style="margin-top:20px;">
+        <div id="csMap" class="leaflet-map"></div>
+      </div>
+      <p class="note-ph" style="margin-top:10px;">Marker shows the approximate location.</p>
+    </div></section>
+
+    <!-- WHAT'S COMING -->
+    <section class="section section--cream2"><div class="wrap">
+      <p class="eyebrow">What&rsquo;s coming</p>
+      <h2 style="max-width:22ch;">Habitats &amp; units on the way</h2>
+      <p class="measure">Habitat creation plans, unit numbers and pricing are finalised as the site moves through assessment and registration. Register interest and we&rsquo;ll share the detail &mdash; and the brochure &mdash; the moment it&rsquo;s ready.</p>
+      <div class="steps" style="margin-top:28px;">
+        <div class="step"><span class="n">01</span><h3>Assessment</h3><p>Baseline ecological surveys and habitat design for the site.</p></div>
+        <div class="step"><span class="n">02</span><h3>Registration</h3><p>The site joins the national Biodiversity Gain Sites Register.</p></div>
+        <div class="step"><span class="n">03</span><h3>Units released</h3><p>Confirmed habitat types, unit numbers and pricing published.</p></div>
+        <div class="step"><span class="n">04</span><h3>30-year stewardship</h3><p>Long-term management and monitoring &mdash; the Biofarm standard.</p></div>
+      </div>
+    </div></section>
+
+    <!-- GALLERY PLACEHOLDER -->
+    <section class="section"><div class="wrap">
+      <p class="eyebrow">Gallery</p>
+      <h2>The site, as it grows</h2>
+      <div class="gallery" style="margin-top:24px;">
+        <div class="g-ph g-lg"></div><div class="g-ph"></div><div class="g-ph"></div><div class="g-ph"></div><div class="g-ph"></div>
+      </div>
+      <p class="note-ph" style="margin-top:12px;">Photography to follow as work begins on site.</p>
+    </div></section>
+
+    <!-- INTERNAL CONTENT CHECKLIST -->
+    <section class="section section--cream2"><div class="wrap">
+      <p class="eyebrow" style="color:#857A5E;">Internal &mdash; remove before launch</p>
+      <div class="source-list">
+        <h3>Content to source for this page</h3>
+        <p>Per coming-soon site &mdash; everything else on this page is already populated from the site map.</p>
+        <ul>
+          <li>Hero photograph (landscape, 1600px+) and 4&ndash;6 gallery images</li>
+          <li>Site story &mdash; 2&ndash;3 short paragraphs: the land, its history, the restoration plan</li>
+          <li>Site area (hectares) and projected BNG units</li>
+          <li>Planned habitat types (list)</li>
+          <li>Expected registration window (e.g. &ldquo;registering winter 2026&rdquo;)</li>
+          <li>Optional: landowner/partner quote</li>
+        </ul>
+      </div>
+    </div></section>
+
+    <!-- REGISTER INTEREST -->
+    <section class="section" id="register"><div class="wrap">
+      <p class="eyebrow">Register interest</p>
+      <h2 style="max-width:22ch;">Be first in line for <span id="formSiteName">this site</span></h2>
+      <p class="measure">Tell us about your scheme and we&rsquo;ll contact you with unit availability and pricing as soon as the site is registered.</p>
+      <div class="enq-card" style="margin-top:26px;">
+        <form id="enqForm">
+          <div class="enq-grid">
+            <div class="enq-row"><label for="nm">Name</label><input id="nm" name="name" required /></div>
+            <div class="enq-row"><label for="em">Email</label><input id="em" name="email" type="email" required /></div>
+            <div class="enq-row"><label for="co">Company</label><input id="co" name="company" /></div>
+            <div class="enq-row"><label for="un">Units needed</label>
+              <select id="un" name="units"><option value="">Select&hellip;</option><option>1&ndash;25</option><option>25&ndash;75</option><option>75&ndash;150</option><option>150+</option><option>Not sure yet</option></select>
+            </div>
+          </div>
+          <div class="enq-row"><label for="ms">About your scheme</label><textarea id="ms" name="message" placeholder="Location, LPA, timeline&hellip;"></textarea></div>
+          <button class="btn" type="submit">Register interest</button>
+        </form>
+        <div class="enq-success" id="enqSuccess">
+          <h3>Thank you &mdash; you&rsquo;re on the list.</h3>
+          <p style="color:var(--muted);">We&rsquo;ll be in touch as soon as this site is registered.</p>
+        </div>
+      </div>
+    </div></section>
+
+    <!-- REGISTERED ALTERNATIVES -->
+    <section class="section section--green national"><div class="wrap"><div class="measure">
+      <p class="eyebrow">Need units sooner?</p>
+      <h2>Five registered banks are ready today</h2>
+      <p class="lead">If your scheme can&rsquo;t wait, our registered habitat banks have units available now &mdash; and we deliver nationally.</p>
+      <a class="btn btn--on-green" href="/habitat-banks" style="margin-top:8px;">Browse registered banks</a>
+    </div></div></section>
+</div>
