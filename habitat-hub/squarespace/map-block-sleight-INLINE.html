@@ -60,7 +60,7 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
 
   // Figures from the registered brochures; coordinates are approximate site locations.
   var BANKS = [
-    { id:'sleight',  name:'Sleight Farm',     region:'Bath &amp; NE Somerset · West of England', lat:51.302, lng:-2.468, units:'374', url:'/habitat-banks-list/sleight-farm', served:45000, real:true, brochure:'/s/Sleight%20Farm_Biofarm_BNG.pdf' },
+    { id:'sleight',  name:'Sleight Farm',     region:'Bath &amp; NE Somerset · West of England', lat:51.302, lng:-2.468, units:'374', url:'/habitat-banks-lists/sleight-farm', served:45000, real:true, brochure:'/s/Biofarm-Habitat-Bank-Brochure-Sleight-Farm_FINAL.pdf' },
     { id:'lesnewth', name:'Lesnewth',         region:'North Cornwall',                          lat:50.688, lng:-4.630, units:'130', url:'#', served:34000, real:true },
     { id:'b03',      name:'Avon Meadows',     region:'Warwickshire · Severn &amp; Avon Vales',   lat:52.190, lng:-1.710, units:'110', url:'#', served:42000, real:true, brochure:'/s/Avon%20Meadows_Biofarm_BNG.pdf' },
     { id:'b04',      name:'Badger Bank Farm', region:'North Yorkshire · Magnesian Limestone',   lat:54.100, lng:-1.550, units:'232', url:'#', served:48000, real:true, brochure:'/s/Badger%20Bank%20Farm_Biofarm_BNG.pdf' },
@@ -127,11 +127,11 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
     if (typeof PIPELINE_SITES === 'undefined') return;
     PIPELINE_SITES.forEach(function (p) {
       L.marker([p.lat, p.lng], { icon:pipePin(), zIndexOffset:-1000 }).addTo(map)
-        .bindPopup('<span style="font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:#857A5E;">In the pipeline</span>'
+        .bindPopup('<span style="font-size:.66rem;letter-spacing:.09em;font-weight:700;color:#857A5E;">In the pipeline</span>'
           +'<br><b>'+p.name+'</b>'
           +'<br>'+p.lpa+' &middot; '+p.nca
-          +'<br><span style="color:#8a8f83;">Coming soon &mdash; details &amp; brochure to follow.</span>'
-          +'<br><a href="/habitat-banks-list/'+soonSlug(p.name)+'">View site &amp; register interest &rarr;</a>');
+          +'<br><span style="color:#8a8f83;">Coming soon, details &amp; brochure to follow.</span>'
+          +'<br><a href="/habitat-banks-lists/'+soonSlug(p.name)+'">View site &amp; register interest &rarr;</a>');
       if (bounds) bounds.extend([p.lat, p.lng]);
     });
   }

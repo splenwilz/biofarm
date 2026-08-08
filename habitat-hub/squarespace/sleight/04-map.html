@@ -1,4 +1,4 @@
-<!-- SLEIGHT two-tier catchment map — paste into one Code Block on the Sleight item/page.
+<!-- SLEIGHT two-tier catchment map, paste into one Code Block on the Sleight item/page.
      Fully self-contained: data + map logic inlined. -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -27,10 +27,10 @@
 <script>
 /* Biofarm map-only bundle for Squarespace (UI-first build).
    Contains: real catchment/pipeline data + Leaflet map init. NO grid/filter
-   logic — cards and filtering are native Squarespace.
+   logic, cards and filtering are native Squarespace.
    To update data later: edit BANK_CATCHMENTS / PIPELINE_SITES below and
    re-upload this one file. Popup links assume collection at /habitat-banks/. */
-/* Biofarm Habitat Bank Hub — real BNG catchment boundaries.
+/* Biofarm Habitat Bank Hub, real BNG catchment boundaries.
    BANK_CATCHMENTS: each registered bank's combined LPA + NCA area = the zone
    where its units carry full value under the BNG spatial risk multiplier
    (same-area 1.0x). LNRS becomes the legal basis in 2027 - regenerate then.
@@ -50,7 +50,7 @@ var SLEIGHT_SRM = {"local":{"type":"Polygon","coordinates":[[[-2.342,51.4394],[-
 var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels & Moors","region":"south west","lat":51.1338,"lng":-2.7636},{"name":"Houghton Hall","lpa":"King's Lynn & West Norfolk","nca":"North West Norfolk","region":"south east","lat":52.8167,"lng":0.6555},{"name":"Banks Farm","lpa":"Somerset","nca":"Yeovil Scarplands","region":"south west","lat":51.1764,"lng":-2.4886},{"name":"Bicester","lpa":"Buckinghamshire","nca":"Upper Thames Clay Vales","region":"south east","lat":51.8603,"lng":-0.9873},{"name":"Skegness","lpa":"East Lindsay","nca":"Lincolnshire Coast & Marches","region":"midlands","lat":53.1646,"lng":0.2645},{"name":"Framlingham","lpa":"East Suffolk","nca":"South Suffolk & High Suffolk Claylands","region":"south east","lat":52.2312,"lng":1.5023},{"name":"Beech Tor","lpa":"South Hams","nca":"South Devon","region":"south west","lat":50.2889,"lng":-3.8993},{"name":"Highways Farm","lpa":"Elmbridge","nca":"Thames Basin Lowlands","region":"south east","lat":51.3065,"lng":-0.4167},{"name":"Broadlands","lpa":"Test Valley","nca":"South Hampshire Lowlands","region":"south east","lat":50.9868,"lng":-1.4936},{"name":"Chatteris","lpa":"East Cambridgeshire","nca":"The Fens","region":"south east","lat":52.4063,"lng":0.2236},{"name":"Stoke by Nayland","lpa":"Babergh","nca":"South Suffolk & North Essex Claylands","region":"south east","lat":51.9884,"lng":0.8959},{"name":"Bodstone Barns","lpa":"North Devon","nca":"Exmoor","region":"south west","lat":51.1852,"lng":-4.0398},{"name":"Worth Abbey","lpa":"Mid Sussex","nca":"High Weald","region":"south east","lat":51.1188,"lng":-0.1539},{"name":"Biddenden","lpa":"Ashford","nca":"Low Weald","region":"south east","lat":51.0953,"lng":0.7978},{"name":"The Vine","lpa":"Malvern Hills","nca":"Herefordshire Plateau","region":"midlands","lat":52.2783,"lng":-2.5684},{"name":"Leominster","lpa":"Herefodshire","nca":"Herefordshire Lowlands","region":"midlands","lat":52.2335,"lng":-2.7732},{"name":"Snodland","lpa":"Tonbridge & Mallling","nca":"North Downs","region":"south east","lat":51.3706,"lng":0.4964},{"name":"Chapmanslade","lpa":"Wiltshire","nca":"Avon Vales","region":"south west","lat":51.262,"lng":-2.1823},{"name":"Highfold Farm","lpa":"Stroud","nca":"Cotswolds","region":"south west","lat":51.7343,"lng":-2.1935},{"name":"Wolverhampton","lpa":"South Staffordshire","nca":"Mid Severn Sandstone Plateau","region":"midlands","lat":52.5523,"lng":-2.1554},{"name":"Key Street","lpa":"Swale","nca":"North Kent Plain","region":"south east","lat":51.3363,"lng":0.7217},{"name":"Ellesmere","lpa":"Shropshire","nca":"Shropshire, Cheshire & Staffordshire Plain","region":"midlands","lat":52.9423,"lng":-2.8729},{"name":"Cookridge","lpa":"Leeds","nca":"Nottinghamshire, Derbyshire and Yorkshire Coalfield","region":"the north","lat":53.8668,"lng":-1.6125}];
 
 ;
-/* Biofarm Habitat Bank Hub — real interactive maps (Leaflet + OpenStreetMap).
+/* Biofarm Habitat Bank Hub, real interactive maps (Leaflet + OpenStreetMap).
    Any element with class .leaflet-map is initialised.
    data-mode="all"  -> plots the whole portfolio and fits bounds.
    data-mode="single" data-bank="sleight" -> centres one bank + catchment.
@@ -60,7 +60,7 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
 
   // Figures from the registered brochures; coordinates are approximate site locations.
   var BANKS = [
-    { id:'sleight',  name:'Sleight Farm',     region:'Bath &amp; NE Somerset · West of England', lat:51.302, lng:-2.468, units:'374', url:'/habitat-banks-list/sleight-farm', served:45000, real:true, brochure:'/s/Sleight%20Farm_Biofarm_BNG.pdf' },
+    { id:'sleight',  name:'Sleight Farm',     region:'Bath &amp; NE Somerset · West of England', lat:51.302, lng:-2.468, units:'374', url:'/habitat-banks-lists/sleight-farm', served:45000, real:true, brochure:'/s/Biofarm-Habitat-Bank-Brochure-Sleight-Farm_FINAL.pdf' },
     { id:'lesnewth', name:'Lesnewth',         region:'North Cornwall',                          lat:50.688, lng:-4.630, units:'130', url:'#', served:34000, real:true },
     { id:'b03',      name:'Avon Meadows',     region:'Warwickshire · Severn &amp; Avon Vales',   lat:52.190, lng:-1.710, units:'110', url:'#', served:42000, real:true, brochure:'/s/Avon%20Meadows_Biofarm_BNG.pdf' },
     { id:'b04',      name:'Badger Bank Farm', region:'North Yorkshire · Magnesian Limestone',   lat:54.100, lng:-1.550, units:'232', url:'#', served:48000, real:true, brochure:'/s/Badger%20Bank%20Farm_Biofarm_BNG.pdf' },
@@ -113,7 +113,7 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
   }
 
   // Pipeline coverage: Biofarm's real coming-soon sites (from their public site map),
-  // shown as small stone markers — no brochure yet, clearly distinct from the green
+  // shown as small stone markers, no brochure yet, clearly distinct from the green
   // registered-bank pins. Clicking invites an interest enquiry.
   function pipePin() {
     return L.divIcon({ className:'', html:'<span class="ppin"></span>',
@@ -127,11 +127,11 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
     if (typeof PIPELINE_SITES === 'undefined') return;
     PIPELINE_SITES.forEach(function (p) {
       L.marker([p.lat, p.lng], { icon:pipePin(), zIndexOffset:-1000 }).addTo(map)
-        .bindPopup('<span style="font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:#857A5E;">In the pipeline</span>'
+        .bindPopup('<span style="font-size:.66rem;letter-spacing:.09em;font-weight:700;color:#857A5E;">In the pipeline</span>'
           +'<br><b>'+p.name+'</b>'
           +'<br>'+p.lpa+' &middot; '+p.nca
-          +'<br><span style="color:#8a8f83;">Coming soon &mdash; details &amp; brochure to follow.</span>'
-          +'<br><a href="/habitat-banks-list/'+soonSlug(p.name)+'">View site &amp; register interest &rarr;</a>');
+          +'<br><span style="color:#8a8f83;">Coming soon, details &amp; brochure to follow.</span>'
+          +'<br><a href="/habitat-banks-lists/'+soonSlug(p.name)+'">View site &amp; register interest &rarr;</a>');
       if (bounds) bounds.extend([p.lat, p.lng]);
     });
   }
