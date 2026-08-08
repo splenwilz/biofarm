@@ -1,0 +1,48 @@
+<!-- SITE-WIDE ATTRIBUTION CAPTURE (Settings > Advanced > Code Injection > HEADER).
+     REPLACES the current "UTM source attribute" snippet — backwards compatible:
+     keeps writing the same sessionStorage utm_* keys, and adds:
+       - click IDs (gclid/fbclid/msclkid), referrer, landing page
+       - bf_attr_last  (sessionStorage JSON): last-touch for this visit
+       - bf_attr_first (localStorage JSON):  first-touch ever, write-once
+     The form blocks read these and send them with each lead. -->
+<script>
+(function () {
+  var UTM = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+  var CLICK = ['gclid','fbclid','msclkid'];
+  var params = new URLSearchParams(window.location.search);
+
+  // legacy keys other scripts may already rely on (first-touch per session)
+  UTM.forEach(function (k) {
+    var v = params.get(k);
+    if (v && !sessionStorage.getItem(k)) sessionStorage.setItem(k, v);
+  });
+
+  function read(key, store) {
+    try { return JSON.parse(store.getItem(key)) || {}; } catch (e) { return {}; }
+  }
+
+  var touch = {};
+  UTM.concat(CLICK).forEach(function (k) {
+    var v = params.get(k);
+    if (v) touch[k] = v.slice(0, 255);
+  });
+  var external = document.referrer && document.referrer.indexOf(location.hostname) === -1;
+  if (external) touch.referrer = document.referrer.slice(0, 2048);
+  if (Object.keys(touch).length || !sessionStorage.getItem('bf_attr_last')) {
+    touch.landing_page = (location.pathname + location.search).slice(0, 2048);
+  }
+
+  try {
+    if (Object.keys(touch).length) {
+      // last-touch: newest campaign parameters win within the visit
+      var last = read('bf_attr_last', sessionStorage);
+      Object.keys(touch).forEach(function (k) { last[k] = touch[k]; });
+      sessionStorage.setItem('bf_attr_last', JSON.stringify(last));
+      // first-touch: written once, never overwritten
+      if (!localStorage.getItem('bf_attr_first')) {
+        localStorage.setItem('bf_attr_first', JSON.stringify(touch));
+      }
+    }
+  } catch (e) { /* storage blocked — attribution degrades gracefully */ }
+})();
+</script>
