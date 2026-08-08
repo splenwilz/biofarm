@@ -135,7 +135,13 @@ async def test_gives_up_after_retries_exhausted(pd):
 
 
 @respx.mock
-async def test_malformed_ratelimit_reset_falls_back_to_backoff():
+async def test_malformed_ratelimit_reset_falls_back_to_backoff(monkeypatch):
+    sleeps = []
+
+    async def fake_sleep(delay):
+        sleeps.append(delay)
+
+    monkeypatch.setattr("app.services.pipedrive.asyncio.sleep", fake_sleep)
     client = PipedriveClient(company_domain="biofarm", api_token="t", max_retries=1)
     route = respx.get(f"{BASE}/api/v2/persons/search").mock(
         side_effect=[
@@ -145,6 +151,7 @@ async def test_malformed_ratelimit_reset_falls_back_to_backoff():
     )
     assert await client.find_person_by_email("j@e.com") is None
     assert route.call_count == 2
+    assert sleeps == [0.5]  # exponential fallback for attempt 0, not the header
 
 
 @respx.mock

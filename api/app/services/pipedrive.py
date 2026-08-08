@@ -12,10 +12,12 @@ def _error_reason(resp: httpx.Response) -> str:
     # This string is persisted (lead.sync_error) and logged — keep it to
     # Pipedrive's short error message, never the raw response body.
     try:
-        error = resp.json().get("error")
+        body = resp.json()
     except ValueError:
-        error = None
-    return str(error)[:200] if error else "no error detail"
+        return "no error detail"
+    if isinstance(body, dict) and body.get("error"):
+        return str(body["error"])[:200]
+    return "no error detail"
 
 
 class PipedriveClient:

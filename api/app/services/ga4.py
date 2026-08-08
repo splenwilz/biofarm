@@ -33,12 +33,12 @@ async def send_server_event(
     }
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            await client.post(
+            resp = await client.post(
                 MP_ENDPOINT,
                 params={"measurement_id": measurement_id, "api_secret": api_secret},
                 json=payload,
             )
-        return True
+        return resp.is_success
     except Exception:
         # Analytics must never propagate into the background task.
         logger.warning("GA4 Measurement Protocol send failed", exc_info=True)

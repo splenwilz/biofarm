@@ -35,21 +35,48 @@
     try { external = new URL(document.referrer).hostname !== location.hostname; }
     catch (e) {}
   }
-  if (external) touch.referrer = document.referrer.slice(0, 2048);
+  if (external) {
+    // origin + path only: referrer query strings can carry PII (emails, tokens)
+    try {
+      var ru = new URL(document.referrer);
+      if (ru.protocol === 'http:' || ru.protocol === 'https:') {
+        touch.referrer = (ru.origin + ru.pathname).slice(0, 2048);
+      }
+    } catch (e) {
+      touch.referrer = document.referrer.split('?')[0].slice(0, 2048);
+    }
+  }
   if (Object.keys(touch).length || !sget('bf_attr_last')) {
-    touch.landing_page = (location.pathname + location.search).slice(0, 2048);
+    // landing page keeps only allowlisted campaign params, never the raw query
+    var keep = [];
+    UTM.concat(CLICK).forEach(function (k) {
+      var v = params.get(k);
+      if (v) keep.push(k + '=' + encodeURIComponent(v.slice(0, 255)));
+    });
+    touch.landing_page =
+      (location.pathname + (keep.length ? '?' + keep.join('&') : '')).slice(0, 2048);
   }
 
   try {
+    var last = read('bf_attr_last', sessionStorage);
+    var changed = false;
+    // seed from legacy utm_* keys (old snippet) so they're never shadowed by a
+    // landing-only bf_attr_last
+    UTM.forEach(function (k) {
+      if (!last[k]) {
+        var lv = sget(k);
+        if (lv) { last[k] = lv.slice(0, 255); changed = true; }
+      }
+    });
     if (Object.keys(touch).length) {
       // last-touch: newest campaign parameters win within the visit
-      var last = read('bf_attr_last', sessionStorage);
       Object.keys(touch).forEach(function (k) { last[k] = touch[k]; });
-      sessionStorage.setItem('bf_attr_last', JSON.stringify(last));
-      // first-touch: written once, never overwritten
-      if (!localStorage.getItem('bf_attr_first')) {
-        localStorage.setItem('bf_attr_first', JSON.stringify(touch));
-      }
+      changed = true;
+    }
+    if (changed) sessionStorage.setItem('bf_attr_last', JSON.stringify(last));
+    // first-touch: written once, never overwritten
+    if (Object.keys(touch).length && !localStorage.getItem('bf_attr_first')) {
+      localStorage.setItem('bf_attr_first', JSON.stringify(touch));
     }
   } catch (e) { /* storage blocked — attribution degrades gracefully */ }
 })();

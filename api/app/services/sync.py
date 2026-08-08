@@ -67,36 +67,42 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
         settings.pipedrive_company_domain,
         settings.pipedrive_api_token.get_secret_value(),
     )
+    # Resume from any previously recorded ids so a retried lead never
+    # re-creates records that already exist. Ids are assigned in memory here
+    # and committed once by process_lead, together with the outcome status —
+    # so a failed sync still persists whatever ids it got before failing.
     marketing_status = "subscribed" if lead.newsletter_opt_in else None
-    person_id = await client.find_person_by_email(lead.email)
+    person_id = lead.pipedrive_person_id
     if person_id is None:
-        person_id = await client.create_person(
-            name=lead.name,
-            email=lead.email,
-            phone=lead.phone,
-            marketing_status=marketing_status,
-        )
-    elif lead.phone or marketing_status:
-        await client.update_person(
-            person_id, phone=lead.phone, marketing_status=marketing_status
-        )
-    # Record each id as soon as it exists: if a later step fails, the failed
-    # row keeps the partial progress and a retry won't re-create records.
-    lead.pipedrive_person_id = person_id
+        person_id = await client.find_person_by_email(lead.email)
+        if person_id is None:
+            person_id = await client.create_person(
+                name=lead.name,
+                email=lead.email,
+                phone=lead.phone,
+                marketing_status=marketing_status,
+            )
+        elif lead.phone or marketing_status:
+            await client.update_person(
+                person_id, phone=lead.phone, marketing_status=marketing_status
+            )
+        lead.pipedrive_person_id = person_id
 
-    title = (
-        f"Website enquiry — {lead.name}"
-        if lead.form == "contact"
-        else f"Newsletter signup — {lead.name}"
-    )
-    lead_id = await client.create_lead(
-        title=title,
-        person_id=person_id,
-        owner_id=settings.pipedrive_owner_id,
-        label_ids=settings.pipedrive_lead_label_ids or None,
-        custom_fields=_lead_custom_fields(lead, settings),
-    )
-    lead.pipedrive_lead_id = lead_id
+    lead_id = lead.pipedrive_lead_id
+    if lead_id is None:
+        title = (
+            f"Website enquiry — {lead.name}"
+            if lead.form == "contact"
+            else f"Newsletter signup — {lead.name}"
+        )
+        lead_id = await client.create_lead(
+            title=title,
+            person_id=person_id,
+            owner_id=settings.pipedrive_owner_id,
+            label_ids=settings.pipedrive_lead_label_ids or None,
+            custom_fields=_lead_custom_fields(lead, settings),
+        )
+        lead.pipedrive_lead_id = lead_id
     await client.create_note(content=build_note_html(lead), lead_id=lead_id)
 
     lead.sync_status = "synced"

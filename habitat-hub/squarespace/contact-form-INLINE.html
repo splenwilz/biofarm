@@ -108,7 +108,7 @@
     try {
       ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
         var v = sessionStorage.getItem(k);
-        if (v) { out[k] = v; any = true; }
+        if (v) { out[k] = v.slice(0, 255); any = true; }
       });
     } catch (e) { /* storage blocked */ }
     return any ? out : null;
