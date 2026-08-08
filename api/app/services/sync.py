@@ -80,6 +80,9 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
         await client.update_person(
             person_id, phone=lead.phone, marketing_status=marketing_status
         )
+    # Record each id as soon as it exists: if a later step fails, the failed
+    # row keeps the partial progress and a retry won't re-create records.
+    lead.pipedrive_person_id = person_id
 
     title = (
         f"Website enquiry — {lead.name}"
@@ -93,10 +96,9 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
         label_ids=settings.pipedrive_lead_label_ids or None,
         custom_fields=_lead_custom_fields(lead, settings),
     )
+    lead.pipedrive_lead_id = lead_id
     await client.create_note(content=build_note_html(lead), lead_id=lead_id)
 
-    lead.pipedrive_person_id = person_id
-    lead.pipedrive_lead_id = lead_id
     lead.sync_status = "synced"
 
 

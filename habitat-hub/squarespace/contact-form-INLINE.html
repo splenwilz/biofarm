@@ -105,10 +105,12 @@
   }
   function legacyUTM() {
     var out = {}, any = false;
-    ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
-      var v = sessionStorage.getItem(k);
-      if (v) { out[k] = v; any = true; }
-    });
+    try {
+      ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
+        var v = sessionStorage.getItem(k);
+        if (v) { out[k] = v; any = true; }
+      });
+    } catch (e) { /* storage blocked */ }
     return any ? out : null;
   }
 
@@ -171,9 +173,10 @@
         gtag('event', 'generate_lead', { lead_source: 'website_contact_form' });
       }
       var wrap = document.getElementById('bfContact');
-      wrap.innerHTML = '<div class="bf-done" role="status"><h3>Thank you — message received.</h3>' +
+      wrap.innerHTML = '<div class="bf-done" role="status" tabindex="-1"><h3>Thank you — message received.</h3>' +
         '<p>We’ll pave the right path forward and get back to you shortly.</p></div>';
-      wrap.querySelector('.bf-done').focus && wrap.querySelector('.bf-done').focus();
+      var done = wrap.querySelector('.bf-done');
+      if (done) done.focus();
     }).catch(function (err) {
       clearTimeout(timer);
       btn.disabled = false;

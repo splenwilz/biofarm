@@ -49,3 +49,6 @@ databases:
     plan: basic-256mb
     databaseName: biofarm_leads
     user: biofarm
+    # No public access — the API reaches it over Render's private network.
+    # To psql from your machine, temporarily add your IP in the dashboard.
+    ipAllowList: []

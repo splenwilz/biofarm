@@ -33,8 +33,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if settings.auto_create_tables:
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
-        yield
-        await engine.dispose()
+        try:
+            yield
+        finally:
+            await engine.dispose()
 
     app = FastAPI(
         title="Biofarm Lead API",
@@ -61,9 +63,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.middleware("http")
     async def cap_body_size(request, call_next):
         # uvicorn/FastAPI don't limit body size; lead payloads are tiny.
-        length = request.headers.get("content-length")
-        if length and length.isdigit() and int(length) > MAX_BODY_BYTES:
-            return JSONResponse({"detail": "Payload too large"}, status_code=413)
+        # h11 enforces Content-Length framing, so requiring the header (411)
+        # also closes the chunked-encoding bypass without wrapping the stream.
+        if request.method == "POST":
+            length = request.headers.get("content-length")
+            if length is None or not length.isdigit():
+                return JSONResponse(
+                    {"detail": "Content-Length required"}, status_code=411
+                )
+            if int(length) > MAX_BODY_BYTES:
+                return JSONResponse({"detail": "Payload too large"}, status_code=413)
         return await call_next(request)
 
     app.include_router(leads_router)

@@ -14,15 +14,19 @@ import sys
 
 import httpx
 
+# attribution key -> (Pipedrive field label, field type). referrer and
+# landing_page can be up to 2048 chars, beyond varchar's 255 limit.
 FIELDS = {
-    "utm_source": "UTM Source",
-    "utm_medium": "UTM Medium",
-    "utm_campaign": "UTM Campaign",
-    "utm_term": "UTM Term",
-    "utm_content": "UTM Content",
-    "gclid": "Google Ads Click ID",
-    "referrer": "Referrer",
-    "landing_page": "Landing Page",
+    "utm_source": ("UTM Source", "varchar"),
+    "utm_medium": ("UTM Medium", "varchar"),
+    "utm_campaign": ("UTM Campaign", "varchar"),
+    "utm_term": ("UTM Term", "varchar"),
+    "utm_content": ("UTM Content", "varchar"),
+    "gclid": ("Google Ads Click ID", "varchar"),
+    "fbclid": ("Facebook Click ID", "varchar"),
+    "msclkid": ("Microsoft Click ID", "varchar"),
+    "referrer": ("Referrer", "text"),
+    "landing_page": ("Landing Page", "text"),
 }
 
 
@@ -43,14 +47,14 @@ def main() -> None:
                 existing[field["field_name"]] = field["field_code"]
 
         field_map: dict[str, str] = {}
-        for attr_key, label in FIELDS.items():
+        for attr_key, (label, field_type) in FIELDS.items():
             if label in existing:
                 field_map[attr_key] = existing[label]
                 print(f"exists  {label}: {existing[label]}")
                 continue
             resp = client.post(
                 f"{base}/api/v2/dealFields",
-                json={"field_name": label, "field_type": "varchar"},
+                json={"field_name": label, "field_type": field_type},
             )
             resp.raise_for_status()
             key = resp.json()["data"]["field_code"]

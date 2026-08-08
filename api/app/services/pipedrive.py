@@ -8,6 +8,16 @@ class PipedriveError(Exception):
     pass
 
 
+def _error_reason(resp: httpx.Response) -> str:
+    # This string is persisted (lead.sync_error) and logged — keep it to
+    # Pipedrive's short error message, never the raw response body.
+    try:
+        error = resp.json().get("error")
+    except ValueError:
+        error = None
+    return str(error)[:200] if error else "no error detail"
+
+
 class PipedriveClient:
     """Thin async client for the two Pipedrive API generations this service needs.
 
@@ -47,13 +57,18 @@ class PipedriveClient:
                 except httpx.HTTPError as exc:
                     raise PipedriveError(f"{method} {path}: {exc}") from exc
                 if resp.status_code == 429 and attempt < self._max_retries:
+                    delay = 0.5 * 2**attempt
                     reset = resp.headers.get("x-ratelimit-reset")
-                    delay = float(reset) if reset is not None else 0.5 * 2**attempt
+                    if reset:
+                        try:
+                            delay = float(reset)
+                        except ValueError:
+                            pass  # malformed header — keep the backoff delay
                     await asyncio.sleep(min(delay, 10))
                     continue
                 if resp.status_code >= 400:
                     raise PipedriveError(
-                        f"{method} {path} failed with {resp.status_code}: {resp.text[:500]}"
+                        f"{method} {path} failed with {resp.status_code}: {_error_reason(resp)}"
                     )
                 return resp.json()
         raise PipedriveError(f"{method} {path}: retries exhausted")  # pragma: no cover

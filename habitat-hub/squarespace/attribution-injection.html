@@ -11,24 +11,32 @@
   var CLICK = ['gclid','fbclid','msclkid'];
   var params = new URLSearchParams(window.location.search);
 
-  // legacy keys other scripts may already rely on (first-touch per session)
-  UTM.forEach(function (k) {
-    var v = params.get(k);
-    if (v && !sessionStorage.getItem(k)) sessionStorage.setItem(k, v);
-  });
-
+  // Storage can throw (Safari private mode, blocked cookies) — never abort.
+  function sget(key) {
+    try { return sessionStorage.getItem(key); } catch (e) { return null; }
+  }
   function read(key, store) {
     try { return JSON.parse(store.getItem(key)) || {}; } catch (e) { return {}; }
   }
+
+  // legacy keys other scripts may already rely on (first-touch per session)
+  UTM.forEach(function (k) {
+    var v = params.get(k);
+    if (v && !sget(k)) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+  });
 
   var touch = {};
   UTM.concat(CLICK).forEach(function (k) {
     var v = params.get(k);
     if (v) touch[k] = v.slice(0, 255);
   });
-  var external = document.referrer && document.referrer.indexOf(location.hostname) === -1;
+  var external = false;
+  if (document.referrer) {
+    try { external = new URL(document.referrer).hostname !== location.hostname; }
+    catch (e) {}
+  }
   if (external) touch.referrer = document.referrer.slice(0, 2048);
-  if (Object.keys(touch).length || !sessionStorage.getItem('bf_attr_last')) {
+  if (Object.keys(touch).length || !sget('bf_attr_last')) {
     touch.landing_page = (location.pathname + location.search).slice(0, 2048);
   }
 

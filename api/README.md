@@ -114,6 +114,9 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 - **5xx responses from Pipedrive are not retried** (only 429s are); they land
   in `sync_status='failed'` and are covered by the retry story above.
 - **`marketing_status`** silently requires the Campaigns add-on (see above).
+- **PII retention is indefinite.** `client_ip` and `user_agent` are stored for
+  spam review with no expiry; add a scheduled job to null them after a fixed
+  window (e.g. 30 days) and mention that window in the privacy policy.
 - If the Cookiebot default for `analytics_storage` is ever switched to
   denied-until-consent, visitors who decline will have no GA client_id — the
   lead and its UTM attribution still land in Postgres/Pipedrive; only the GA4

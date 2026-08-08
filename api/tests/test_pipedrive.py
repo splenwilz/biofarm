@@ -126,11 +126,25 @@ async def test_retries_on_429_then_succeeds(pd):
 
 @respx.mock
 async def test_gives_up_after_retries_exhausted(pd):
-    respx.get(f"{BASE}/api/v2/persons/search").mock(
+    route = respx.get(f"{BASE}/api/v2/persons/search").mock(
         return_value=httpx.Response(429, headers={"x-ratelimit-reset": "0"})
     )
     with pytest.raises(PipedriveError):
         await pd.find_person_by_email("j@e.com")
+    assert route.call_count == 3  # initial attempt + max_retries (2)
+
+
+@respx.mock
+async def test_malformed_ratelimit_reset_falls_back_to_backoff():
+    client = PipedriveClient(company_domain="biofarm", api_token="t", max_retries=1)
+    route = respx.get(f"{BASE}/api/v2/persons/search").mock(
+        side_effect=[
+            httpx.Response(429, headers={"x-ratelimit-reset": "soon"}),
+            httpx.Response(200, json={"success": True, "data": {"items": []}}),
+        ]
+    )
+    assert await client.find_person_by_email("j@e.com") is None
+    assert route.call_count == 2
 
 
 @respx.mock

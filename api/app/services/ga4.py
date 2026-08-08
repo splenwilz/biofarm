@@ -1,6 +1,9 @@
+import logging
 from typing import Any
 
 import httpx
+
+logger = logging.getLogger(__name__)
 
 MP_ENDPOINT = "https://www.google-analytics.com/mp/collect"
 
@@ -36,5 +39,7 @@ async def send_server_event(
                 json=payload,
             )
         return True
-    except httpx.HTTPError:
+    except Exception:
+        # Analytics must never propagate into the background task.
+        logger.warning("GA4 Measurement Protocol send failed", exc_info=True)
         return False

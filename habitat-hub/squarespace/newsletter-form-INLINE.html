@@ -79,10 +79,12 @@
   }
   function legacyUTM() {
     var out = {}, any = false;
-    ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
-      var v = sessionStorage.getItem(k);
-      if (v) { out[k] = v; any = true; }
-    });
+    try {
+      ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
+        var v = sessionStorage.getItem(k);
+        if (v) { out[k] = v; any = true; }
+      });
+    } catch (e) { /* storage blocked */ }
     return any ? out : null;
   }
 
@@ -132,9 +134,12 @@
       if (typeof gtag === 'function') {
         gtag('event', 'generate_lead', { lead_source: 'website_newsletter_form' });
       }
-      document.getElementById('bfNl').innerHTML =
-        '<div class="bf-done" role="status"><h4>You&rsquo;re planted on the list.</h4>' +
+      var wrap = document.getElementById('bfNl');
+      wrap.innerHTML =
+        '<div class="bf-done" role="status" tabindex="-1"><h4>You&rsquo;re planted on the list.</h4>' +
         '<p>Stories from the ground, straight to your inbox.</p></div>';
+      var done = wrap.querySelector('.bf-done');
+      if (done) done.focus();
     }).catch(function (err) {
       clearTimeout(timer);
       btn.disabled = false;
