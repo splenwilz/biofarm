@@ -74,9 +74,18 @@
       changed = true;
     }
     if (changed) sessionStorage.setItem('bf_attr_last', JSON.stringify(last));
-    // first-touch: written once, never overwritten
-    if (Object.keys(touch).length && !localStorage.getItem('bf_attr_first')) {
-      localStorage.setItem('bf_attr_first', JSON.stringify(touch));
+    // first-touch: written once, never overwritten; seed from legacy utm_*
+    // keys so a mid-session deploy doesn't lose the session's original source
+    if (!localStorage.getItem('bf_attr_first')) {
+      var first = {};
+      UTM.forEach(function (k) {
+        var lv = sget(k);
+        if (lv) first[k] = lv.slice(0, 255);
+      });
+      Object.keys(touch).forEach(function (k) { first[k] = touch[k]; });
+      if (Object.keys(first).length) {
+        localStorage.setItem('bf_attr_first', JSON.stringify(first));
+      }
     }
   } catch (e) { /* storage blocked — attribution degrades gracefully */ }
 })();

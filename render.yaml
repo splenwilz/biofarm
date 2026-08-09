@@ -12,9 +12,10 @@ services:
     buildCommand: pip install -r requirements.txt
     # Migrations run before the server binds; additive-only migrations keep the
     # brief old/new instance overlap of zero-downtime deploys safe.
-    # --proxy-headers + --forwarded-allow-ips: Render terminates TLS at its proxy;
-    # without these, request.client is the router IP for everyone and the per-IP
-    # rate limit becomes a single global bucket.
+    # --proxy-headers: Render terminates TLS at its proxy; this restores the
+    # https scheme. Client IPs for rate limiting come from the edge-set
+    # True-Client-IP header (see routes/leads.py), NOT from X-Forwarded-For,
+    # whose leftmost entry is client-forgeable.
     startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
     healthCheckPath: /healthz
     autoDeployTrigger: commit

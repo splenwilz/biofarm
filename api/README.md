@@ -49,6 +49,13 @@ region Frankfurt, health check `/healthz`, migrations run via
 3. After first deploy, note the service URL (`https://biofarm-api.onrender.com`)
    and put it in the form blocks' `API_BASE` constant. Optionally add a custom
    domain `api.biofarm.co.uk` (CNAME to the onrender.com host).
+4. **Verify the client-IP assumption** (Render doesn't officially document
+   that its edge overwrites a client-supplied `True-Client-IP`): submit a test
+   lead with `curl -H 'True-Client-IP: 203.0.113.99' ...` and check the stored
+   `client_ip` is your real IP, not `203.0.113.99`. If the forged value comes
+   through, per-IP rate limiting is spoofable — switch `client_ip()` in
+   `app/routes/leads.py` to parse the rightmost `X-Forwarded-For` entry
+   instead and re-verify.
 
 Plan notes: web Starter ($7/mo) avoids free-tier spin-down (~60 s cold starts
 would eat form submissions); Postgres `basic-256mb` (~$6/mo) because free

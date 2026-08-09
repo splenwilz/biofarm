@@ -44,13 +44,24 @@ def main() -> None:
         resp.raise_for_status()
         for field in resp.json().get("data") or []:
             if field.get("field_name"):
-                existing[field["field_name"]] = field["field_code"]
+                existing[field["field_name"]] = (
+                    field["field_code"],
+                    field.get("field_type"),
+                )
 
         field_map: dict[str, str] = {}
         for attr_key, (label, field_type) in FIELDS.items():
             if label in existing:
-                field_map[attr_key] = existing[label]
-                print(f"exists  {label}: {existing[label]}")
+                code, existing_type = existing[label]
+                if existing_type and existing_type != field_type:
+                    # e.g. Referrer created as varchar (255) but we need text
+                    print(
+                        f"SKIP    {label}: exists as {existing_type}, wanted "
+                        f"{field_type} — rename/delete it in Pipedrive and re-run"
+                    )
+                    continue
+                field_map[attr_key] = code
+                print(f"exists  {label}: {code}")
                 continue
             resp = client.post(
                 f"{base}/api/v2/dealFields",

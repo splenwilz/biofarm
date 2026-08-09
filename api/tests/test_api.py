@@ -157,6 +157,45 @@ async def test_cors_rejects_unknown_origin(client):
     assert "access-control-allow-origin" not in r.headers
 
 
+async def test_rate_limit_keys_on_true_client_ip(tmp_path):
+    # Render/Cloudflare set True-Client-IP at the edge; distinct clients behind
+    # the same proxy hop must get separate rate-limit buckets.
+    settings = make_settings(tmp_path, rate_limit="1/minute")
+    app = create_app(settings)
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            payload = {"name": "J", "email": "j@e.com"}
+            r1 = await ac.post(
+                "/v1/leads/newsletter", json=payload,
+                headers={"true-client-ip": "203.0.113.1"},
+            )
+            r2 = await ac.post(
+                "/v1/leads/newsletter", json=payload,
+                headers={"true-client-ip": "203.0.113.2"},
+            )
+            r3 = await ac.post(
+                "/v1/leads/newsletter", json=payload,
+                headers={"true-client-ip": "203.0.113.1"},
+            )
+            assert r1.status_code == 202
+            assert r2.status_code == 202  # different client, own bucket
+            assert r3.status_code == 429  # same client, bucket exhausted
+
+
+async def test_garbage_true_client_ip_falls_back_safely(client):
+    # A junk header value must not 500 the insert (varchar 64) or mint
+    # arbitrary rate-limit buckets — it falls back to the socket address.
+    r = await client.post(
+        "/v1/leads/newsletter",
+        json={"name": "J", "email": "j@e.com"},
+        headers={"true-client-ip": "x" * 200},
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.client_ip == "127.0.0.1"  # ASGITransport's socket address
+
+
 async def test_rate_limit_kicks_in(tmp_path):
     settings = make_settings(tmp_path, rate_limit="2/minute")
     app = create_app(settings)

@@ -1,3 +1,4 @@
+import ipaddress
 from typing import AsyncIterator
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
@@ -14,10 +15,24 @@ async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
         yield session
 
 
+def client_ip(request: Request) -> str:
+    # Render fronts services with Cloudflare, which sets True-Client-IP at the
+    # edge. X-Forwarded-For's leftmost entry is client-forgeable, so it is
+    # never used here. The header must parse as a real IP — a garbage value
+    # would overflow the varchar(64) column (500 -> lost lead) and mint
+    # unbounded rate-limiter buckets.
+    raw = request.headers.get("true-client-ip")
+    if raw:
+        try:
+            return str(ipaddress.ip_address(raw.strip()))
+        except ValueError:
+            pass
+    return request.client.host if request.client else "unknown"
+
+
 async def enforce_rate_limit(request: Request) -> None:
-    ip = request.client.host if request.client else "unknown"
     allowed = await request.app.state.rate_limiter.hit(
-        request.app.state.rate_limit_item, "leads", ip
+        request.app.state.rate_limit_item, "leads", client_ip(request)
     )
     if not allowed:
         raise HTTPException(status_code=429, detail="Too many requests")
@@ -36,7 +51,7 @@ async def _accept_lead(
     settings = request.app.state.settings
     verdict = evaluate_spam(submission, min_fill_seconds=settings.min_fill_seconds)
 
-    lead.client_ip = request.client.host if request.client else None
+    lead.client_ip = client_ip(request)
     user_agent = request.headers.get("user-agent")
     lead.user_agent = user_agent[:512] if user_agent else None
     lead.spam_flagged = verdict.is_spam
