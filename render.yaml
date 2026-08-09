@@ -19,13 +19,19 @@ services:
     startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
     healthCheckPath: /healthz
     autoDeployTrigger: commit
+    # Leads live in SQLite on a persistent disk (~$0.25/mo) rather than managed
+    # Postgres — right-sized for form volume; swap DATABASE_URL to a Postgres
+    # URL later if reporting outgrows it. Note: services with disks don't get
+    # zero-downtime deploys (brief restart blip is fine for this API).
+    disk:
+      name: leads-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.13.7
       - key: DATABASE_URL
-        fromDatabase:
-          name: biofarm-leads-db
-          property: connectionString
+        value: sqlite+aiosqlite:////var/data/leads.db
       - key: BIOFARM_ENVIRONMENT
         value: production
       - key: BIOFARM_AUTO_CREATE_TABLES
@@ -41,15 +47,3 @@ services:
       #   BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP     (JSON from scripts/setup_pipedrive_fields.py)
       #   BIOFARM_GA4_MEASUREMENT_ID           (G-3MS9TLLZRN)
       #   BIOFARM_GA4_API_SECRET               (GA4 Admin > Data streams > MP API secrets)
-
-databases:
-  - name: biofarm-leads-db
-    region: frankfurt
-    # Free Postgres now expires 30 days after creation (then a 14-day grace
-    # period before deletion) — not acceptable for the lead source of truth.
-    plan: basic-256mb
-    databaseName: biofarm_leads
-    user: biofarm
-    # No public access — the API reaches it over Render's private network.
-    # To psql from your machine, temporarily add your IP in the dashboard.
-    ipAllowList: []

@@ -3,6 +3,7 @@ import pytest
 import respx
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
+from sqlalchemy import text as sqltext
 
 from app.main import create_app
 from app.models import Lead
@@ -45,6 +46,12 @@ async def get_single_lead(client) -> Lead:
         leads = result.scalars().all()
         assert len(leads) == 1
         return leads[0]
+
+
+async def test_sqlite_engine_uses_wal_and_busy_timeout(client):
+    async with client.app.state.sessionmaker() as session:
+        assert (await session.execute(sqltext("PRAGMA journal_mode"))).scalar() == "wal"
+        assert (await session.execute(sqltext("PRAGMA busy_timeout"))).scalar() == 5000
 
 
 async def test_healthz(client):
@@ -216,11 +223,26 @@ async def test_oversized_body_rejected_413(client):
     assert r.status_code == 413
 
 
-async def test_production_refuses_sqlite(tmp_path):
+@pytest.mark.parametrize(
+    "bad_url",
+    [
+        "sqlite+aiosqlite:///./dev.db",  # the unset default (relative)
+        "sqlite+aiosqlite:///relative/leads.db",
+        "sqlite+aiosqlite:///:memory:",
+    ],
+)
+async def test_production_refuses_ephemeral_sqlite(tmp_path, bad_url):
     settings = make_settings(tmp_path, environment="production")
-    settings.database_url = f"sqlite+aiosqlite:///{tmp_path}/prod.db"
+    settings.database_url = bad_url
     with pytest.raises(RuntimeError, match="DATABASE_URL"):
         create_app(settings)
+
+
+async def test_production_allows_absolute_sqlite_on_disk(tmp_path):
+    # SQLite at an absolute path (Render's persistent disk) is supported;
+    # make_settings uses an absolute tmp path, mirroring /var/data/leads.db
+    settings = make_settings(tmp_path, environment="production")
+    assert create_app(settings) is not None
 
 
 @respx.mock
