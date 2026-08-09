@@ -1,0 +1,55 @@
+# Render Blueprint for the Biofarm lead-capture API (api/ subdirectory).
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: biofarm-api
+    runtime: python
+    rootDir: api
+    region: frankfurt # closest region to the UK
+    # Starter ($7/mo) keeps the service warm — free tier spins down after 15 min
+    # idle and cold-starts ~60s, which loses form submissions in practice.
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    # Migrations run before the server binds; additive-only migrations keep the
+    # brief old/new instance overlap of zero-downtime deploys safe.
+    # --proxy-headers: Render terminates TLS at its proxy; this restores the
+    # https scheme. Client IPs for rate limiting come from the edge-set
+    # True-Client-IP header (see routes/leads.py), NOT from X-Forwarded-For,
+    # whose leftmost entry is client-forgeable.
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.7
+      - key: DATABASE_URL
+        fromDatabase:
+          name: biofarm-leads-db
+          property: connectionString
+      - key: BIOFARM_ENVIRONMENT
+        value: production
+      - key: BIOFARM_AUTO_CREATE_TABLES
+        value: "false"
+      # Secrets: Render prompts for these in the dashboard on Blueprint creation.
+      - key: BIOFARM_PIPEDRIVE_COMPANY_DOMAIN
+        sync: false
+      - key: BIOFARM_PIPEDRIVE_API_TOKEN
+        sync: false
+      # Optional — set in the dashboard when ready:
+      #   BIOFARM_PIPEDRIVE_OWNER_ID           (int user id to own new leads)
+      #   BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS     (JSON array of label UUIDs)
+      #   BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP     (JSON from scripts/setup_pipedrive_fields.py)
+      #   BIOFARM_GA4_MEASUREMENT_ID           (G-3MS9TLLZRN)
+      #   BIOFARM_GA4_API_SECRET               (GA4 Admin > Data streams > MP API secrets)
+
+databases:
+  - name: biofarm-leads-db
+    region: frankfurt
+    # Free Postgres now expires 30 days after creation (then a 14-day grace
+    # period before deletion) — not acceptable for the lead source of truth.
+    plan: basic-256mb
+    databaseName: biofarm_leads
+    user: biofarm
+    # No public access — the API reaches it over Render's private network.
+    # To psql from your machine, temporarily add your IP in the dashboard.
+    ipAllowList: []

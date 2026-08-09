@@ -1,0 +1,34 @@
+[project]
+name = "biofarm-api"
+version = "0.1.0"
+description = "Biofarm lead-capture API: first-party forms -> Postgres -> Pipedrive, with GA4 attribution"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.141,<0.142",
+    "uvicorn[standard]>=0.52,<0.53",
+    "pydantic[email]>=2.13,<3",
+    "pydantic-settings>=2.15,<3",
+    "sqlalchemy[asyncio]>=2.0.51,<2.1",
+    "asyncpg>=0.31,<0.32",
+    "alembic>=1.19,<2",
+    "httpx>=0.28,<1.0",
+    "limits>=5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1,<10",
+    "pytest-asyncio>=1.4,<2",
+    "respx>=0.23,<0.24",
+    "aiosqlite>=0.20",
+    "greenlet>=3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.fastapi]
+entrypoint = "app.main:app"

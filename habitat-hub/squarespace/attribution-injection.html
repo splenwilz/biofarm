@@ -1,0 +1,92 @@
+<!-- SITE-WIDE ATTRIBUTION CAPTURE (Settings > Advanced > Code Injection > HEADER).
+     REPLACES the current "UTM source attribute" snippet — backwards compatible:
+     keeps writing the same sessionStorage utm_* keys, and adds:
+       - click IDs (gclid/fbclid/msclkid), referrer, landing page
+       - bf_attr_last  (sessionStorage JSON): last-touch for this visit
+       - bf_attr_first (localStorage JSON):  first-touch ever, write-once
+     The form blocks read these and send them with each lead. -->
+<script>
+(function () {
+  var UTM = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+  var CLICK = ['gclid','fbclid','msclkid'];
+  var params = new URLSearchParams(window.location.search);
+
+  // Storage can throw (Safari private mode, blocked cookies) — never abort.
+  function sget(key) {
+    try { return sessionStorage.getItem(key); } catch (e) { return null; }
+  }
+  function read(key, store) {
+    try { return JSON.parse(store.getItem(key)) || {}; } catch (e) { return {}; }
+  }
+
+  // legacy keys other scripts may already rely on (first-touch per session)
+  UTM.forEach(function (k) {
+    var v = params.get(k);
+    if (v && !sget(k)) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+  });
+
+  var touch = {};
+  UTM.concat(CLICK).forEach(function (k) {
+    var v = params.get(k);
+    if (v) touch[k] = v.slice(0, 255);
+  });
+  var external = false;
+  if (document.referrer) {
+    try { external = new URL(document.referrer).hostname !== location.hostname; }
+    catch (e) {}
+  }
+  if (external) {
+    // origin + path only: referrer query strings can carry PII (emails, tokens)
+    try {
+      var ru = new URL(document.referrer);
+      if (ru.protocol === 'http:' || ru.protocol === 'https:') {
+        touch.referrer = (ru.origin + ru.pathname).slice(0, 2048);
+      }
+    } catch (e) {
+      touch.referrer = document.referrer.split('?')[0].slice(0, 2048);
+    }
+  }
+  if (Object.keys(touch).length || !sget('bf_attr_last')) {
+    // landing page keeps only allowlisted campaign params, never the raw query
+    var keep = [];
+    UTM.concat(CLICK).forEach(function (k) {
+      var v = params.get(k);
+      if (v) keep.push(k + '=' + encodeURIComponent(v.slice(0, 255)));
+    });
+    touch.landing_page =
+      (location.pathname + (keep.length ? '?' + keep.join('&') : '')).slice(0, 2048);
+  }
+
+  try {
+    var last = read('bf_attr_last', sessionStorage);
+    var changed = false;
+    // seed from legacy utm_* keys (old snippet) so they're never shadowed by a
+    // landing-only bf_attr_last
+    UTM.forEach(function (k) {
+      if (!last[k]) {
+        var lv = sget(k);
+        if (lv) { last[k] = lv.slice(0, 255); changed = true; }
+      }
+    });
+    if (Object.keys(touch).length) {
+      // last-touch: newest campaign parameters win within the visit
+      Object.keys(touch).forEach(function (k) { last[k] = touch[k]; });
+      changed = true;
+    }
+    if (changed) sessionStorage.setItem('bf_attr_last', JSON.stringify(last));
+    // first-touch: written once, never overwritten; seed from legacy utm_*
+    // keys so a mid-session deploy doesn't lose the session's original source
+    if (!localStorage.getItem('bf_attr_first')) {
+      var first = {};
+      UTM.forEach(function (k) {
+        var lv = sget(k);
+        if (lv) first[k] = lv.slice(0, 255);
+      });
+      Object.keys(touch).forEach(function (k) { first[k] = touch[k]; });
+      if (Object.keys(first).length) {
+        localStorage.setItem('bf_attr_first', JSON.stringify(first));
+      }
+    }
+  } catch (e) { /* storage blocked — attribution degrades gracefully */ }
+})();
+</script>

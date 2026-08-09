@@ -1,0 +1,192 @@
+<!-- CONTACT FORM v1 — /contact, green section (replaces the main Pipedrive embed).
+     Paste into a Code Block where the "Get in touch" embed currently sits.
+     Posts to the biofarm-api backend (Postgres + Pipedrive + GA4 attribution).
+     SET API_BASE below after the Render service is live. -->
+<style>
+  @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
+  .bf-form{max-width:640px;margin:0 auto;color:#fff;}
+  .bf-form h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:2rem;letter-spacing:-.01em;margin:0 0 22px;color:#fff;}
+  .bf-form label,.bf-form legend{display:block;font-size:.95rem;margin:0 0 6px;color:#fff;}
+  .bf-form .req{color:#F5F6F1;}
+  .bf-field{margin:0 0 18px;}
+  .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 14px;}
+  .bf-form textarea{min-height:120px;resize:vertical;}
+  .bf-form input:focus,.bf-form textarea:focus{outline:none;border-color:#212121;box-shadow:0 0 0 3px rgba(255,255,255,.35);}
+  .bf-form fieldset{border:none;margin:0 0 18px;padding:0;}
+  .bf-chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .bf-chips label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:.92rem;padding:9px 16px;border-radius:20px;background:transparent;border:1px solid rgba(255,255,255,.55);color:#fff;cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
+  .bf-chips input{position:absolute;opacity:0;pointer-events:none;}
+  .bf-chips label:has(input:checked){background:#212121;border-color:#212121;color:#fff;}
+  .bf-chips label:has(input:focus-visible){box-shadow:0 0 0 3px rgba(255,255,255,.35);}
+  .bf-radios label{display:flex;align-items:center;gap:10px;margin:0 0 8px;cursor:pointer;}
+  .bf-radios input{accent-color:#212121;width:18px;height:18px;}
+  .bf-form .bf-btn{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;background:#212121;color:#fff;border:1.5px solid #212121;border-radius:25px;padding:14px 34px;cursor:pointer;transition:background-color .3s;}
+  .bf-form .bf-btn:hover{background:#3a3a3a;}
+  .bf-form .bf-btn[disabled]{opacity:.6;cursor:wait;}
+  .bf-note{font-size:.8rem;color:rgba(255,255,255,.75);margin-top:14px;}
+  .bf-status{margin-top:14px;font-size:.95rem;min-height:1.4em;}
+  .bf-status.err{color:#FFD9D9;}
+  .bf-done{text-align:center;padding:40px 0;}
+  .bf-done h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:2rem;color:#fff;margin:0 0 10px;}
+  /* honeypot: parked off-screen, invisible to humans, present for bots */
+  .bf-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
+</style>
+
+<div class="bf-form" id="bfContact">
+  <h3>Get in touch</h3>
+  <noscript><p style="color:#fff;">This form needs JavaScript. Please enable it, or contact us by email instead.</p></noscript>
+  <form id="bfContactForm" method="post" novalidate>
+    <div class="bf-field">
+      <label for="bfName">Name <span class="req">*</span></label>
+      <input type="text" id="bfName" name="name" required maxlength="200" autocomplete="name">
+    </div>
+    <div class="bf-field">
+      <label for="bfEmail">Email <span class="req">*</span></label>
+      <input type="email" id="bfEmail" name="email" required maxlength="320" autocomplete="email">
+    </div>
+    <div class="bf-field">
+      <label for="bfPhone">Phone (optional)</label>
+      <input type="tel" id="bfPhone" name="phone" maxlength="50" autocomplete="tel">
+    </div>
+    <fieldset>
+      <legend>What field are you in? <span class="req">*</span></legend>
+      <div class="bf-chips">
+        <label><input type="checkbox" name="fields" value="developer">I'm a developer</label>
+        <label><input type="checkbox" name="fields" value="landowner">I'm a landowner</label>
+        <label><input type="checkbox" name="fields" value="other">Other</label>
+      </div>
+    </fieldset>
+    <div class="bf-field">
+      <label for="bfMessage">Your Message (optional)</label>
+      <textarea id="bfMessage" name="message" maxlength="5000"></textarea>
+    </div>
+    <fieldset class="bf-radios">
+      <legend>Please plant me on the newsletter list &mdash; I accept the <a href="/privacy-policy" style="color:#fff;">Privacy Policy</a> <span class="req">*</span></legend>
+      <label><input type="radio" name="newsletter" value="yes" required>Yes please</label>
+      <label><input type="radio" name="newsletter" value="no">No thank you</label>
+    </fieldset>
+    <div class="bf-hp" aria-hidden="true">
+      <label for="bfWebsite">Website</label>
+      <input type="text" id="bfWebsite" name="website" tabindex="-1" autocomplete="off">
+    </div>
+    <button type="submit" class="bf-btn" id="bfSubmit">Submit</button>
+    <p class="bf-status" id="bfStatus" role="status" aria-live="polite"></p>
+    <p class="bf-note">Required fields are marked with *. We never ask for sensitive information through this form.</p>
+  </form>
+</div>
+
+<script>
+(function () {
+  var API_BASE = 'https://biofarm-api.onrender.com'; // <-- set to the live Render URL (or https://api.biofarm.co.uk)
+  var GA_ID = 'G-3MS9TLLZRN';
+
+  var form = document.getElementById('bfContactForm');
+  var statusEl = document.getElementById('bfStatus');
+  var btn = document.getElementById('bfSubmit');
+  var startedAt = null;
+
+  // wake a sleeping backend while the visitor is still typing
+  try { fetch(API_BASE + '/healthz').catch(function () {}); } catch (e) {}
+
+  form.addEventListener('focusin', function () {
+    if (!startedAt) startedAt = Date.now();
+  }, { once: true });
+
+  // harvest GA ids early — gtag('get') is async
+  var gaIds = {};
+  if (typeof gtag === 'function') {
+    try {
+      gtag('get', GA_ID, 'client_id', function (v) { gaIds.client_id = v; });
+      gtag('get', GA_ID, 'session_id', function (v) { gaIds.session_id = String(v); });
+    } catch (e) {}
+  }
+
+  function readJSON(store, key) {
+    try { return JSON.parse(store.getItem(key)) || null; } catch (e) { return null; }
+  }
+  function legacyUTM() {
+    var out = {}, any = false;
+    try {
+      ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
+        var v = sessionStorage.getItem(k);
+        if (v) { out[k] = v.slice(0, 255); any = true; }
+      });
+    } catch (e) { /* storage blocked */ }
+    return any ? out : null;
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    statusEl.className = 'bf-status';
+    statusEl.textContent = '';
+
+    var fields = Array.prototype.map.call(
+      form.querySelectorAll('input[name=fields]:checked'), function (el) { return el.value; });
+    var newsletter = form.querySelector('input[name=newsletter]:checked');
+
+    if (!form.name.value.trim() || !form.email.value.trim() || !/.+@.+\..+/.test(form.email.value)) {
+      statusEl.className = 'bf-status err';
+      statusEl.textContent = 'Please add your name and a valid email address.';
+      return;
+    }
+    if (!fields.length) {
+      statusEl.className = 'bf-status err';
+      statusEl.textContent = 'Please tell us what field you are in.';
+      return;
+    }
+    if (!newsletter) {
+      statusEl.className = 'bf-status err';
+      statusEl.textContent = 'Please choose a newsletter preference.';
+      return;
+    }
+
+    var payload = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      phone: form.phone.value.trim() || null,
+      fields: fields,
+      message: form.message.value.trim() || null,
+      newsletter_opt_in: newsletter.value === 'yes',
+      website: form.website.value, // honeypot
+      fill_ms: startedAt ? Date.now() - startedAt : null,
+      page: location.pathname,
+      attribution: readJSON(sessionStorage, 'bf_attr_last') || legacyUTM(),
+      first_touch: readJSON(localStorage, 'bf_attr_first'),
+      ga_client_id: gaIds.client_id || null,
+      ga_session_id: gaIds.session_id || null
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 30000);
+
+    fetch(API_BASE + '/v1/leads/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    }).then(function (resp) {
+      clearTimeout(timer);
+      if (resp.status === 429) throw new Error('rate');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      if (typeof gtag === 'function') {
+        gtag('event', 'generate_lead', { lead_source: 'website_contact_form' });
+      }
+      var wrap = document.getElementById('bfContact');
+      wrap.innerHTML = '<div class="bf-done" role="status" tabindex="-1"><h3>Thank you — message received.</h3>' +
+        '<p>We’ll pave the right path forward and get back to you shortly.</p></div>';
+      var done = wrap.querySelector('.bf-done');
+      if (done) done.focus();
+    }).catch(function (err) {
+      clearTimeout(timer);
+      btn.disabled = false;
+      btn.textContent = 'Submit';
+      statusEl.className = 'bf-status err';
+      statusEl.textContent = err && err.message === 'rate'
+        ? 'A few too many attempts — please wait a minute and try again.'
+        : 'Something went wrong sending your message — please try again, or email us directly at hello@biofarm.co.uk.';
+    });
+  });
+})();
+</script>
