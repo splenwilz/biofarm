@@ -1,16 +1,18 @@
 # Biofarm Lead-Capture API
 
 FastAPI service that receives submissions from the first-party forms on
-biofarm.co.uk, stores every lead (with full marketing attribution) in Postgres,
-and syncs them to Pipedrive. Replaces the old Pipedrive web-form iframe embeds,
+biofarm.co.uk, stores every lead (with full marketing attribution) in its own
+database, and syncs them to Pipedrive. Replaces the old Pipedrive web-form iframe embeds,
 which blocked GA4 conversion tracking and lost UTM/gclid lead-source data.
 
 ## How a submission flows
 
 1. `POST /v1/leads/contact` or `POST /v1/leads/newsletter` (JSON, CORS-locked to biofarm.co.uk).
 2. Validation (Pydantic) → spam checks (honeypot + minimum fill time + per-IP rate limit).
-3. The lead is committed to Postgres **first** — the DB is the source of truth;
-   a Pipedrive outage can never lose a lead. Response: `202 {"status":"accepted","id":...}`.
+3. The lead is committed to the database **first** — the DB is the source of
+   truth (SQLite on a persistent disk in production, swappable for Postgres via
+   `DATABASE_URL`); a Pipedrive outage can never lose a lead.
+   Response: `202 {"status":"accepted","id":...}`.
 4. A background task then:
    - finds-or-creates the Person in Pipedrive (API v2), setting `marketing_status=subscribed` on newsletter opt-in;
    - creates a Lead (API v1 — leads have no v2) with attribution custom fields;
@@ -61,10 +63,13 @@ Plan notes: web Starter ($7/mo) avoids free-tier spin-down (~60 s cold starts
 would eat form submissions). Leads are stored in **SQLite on a 1 GB persistent
 disk** (~$0.25/mo) mounted at `/var/data` — right-sized for form volume, and
 the code is dialect-portable (same SQLAlchemy models/migrations), so moving to
-managed Postgres later is just changing `DATABASE_URL`. Two disk caveats:
-deploys have a brief restart blip (services with disks skip zero-downtime
-deploys), and there are no automated backups — download `/var/data/leads.db`
-occasionally (see below) or upgrade to Postgres when the data matters enough.
+managed Postgres later is just changing `DATABASE_URL`. Disk caveats: deploys
+have a brief restart blip (services with disks skip zero-downtime deploys), and
+disk durability = Render's **daily disk snapshots** (at least 7 days retained)
+— snapshots restore the *whole disk* to the snapshot time, so up to a day of
+leads can be lost and single files can't be cherry-picked. Take a logical
+backup of `/var/data/leads.db` occasionally too (see Querying leads), or
+upgrade to Postgres when the data matters enough.
 
 ### Pipedrive setup (one-off)
 
@@ -131,7 +136,7 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
   window (e.g. 30 days) and mention that window in the privacy policy.
 - If the Cookiebot default for `analytics_storage` is ever switched to
   denied-until-consent, visitors who decline will have no GA client_id — the
-  lead and its UTM attribution still land in Postgres/Pipedrive; only the GA4
+  lead and its UTM attribution still land in the database/Pipedrive; only the GA4
   session join is lost.
 
 ## Querying leads
@@ -150,5 +155,13 @@ for row in db.execute('''SELECT created_at, form, name, email,
 "
 ```
 
-To back up or analyse locally, download the file from the shell tab or run
-`render ssh biofarm-api -- cat /var/data/leads.db > leads-backup.db`.
+To back up, first make a *consistent* copy (copying the live file mid-write can
+tear it), then download that copy:
+
+```bash
+rm -f /var/data/leads-backup.db  # VACUUM INTO refuses to overwrite
+python3 -c "import sqlite3; sqlite3.connect('/var/data/leads.db').execute(\"VACUUM INTO '/var/data/leads-backup.db'\")"
+```
+
+then fetch `/var/data/leads-backup.db` via the dashboard shell or
+`render ssh biofarm-api -- cat /var/data/leads-backup.db > leads-backup.db`.
