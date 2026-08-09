@@ -13,6 +13,7 @@ dependencies = [
     "alembic>=1.19,<2",
     "httpx>=0.28,<1.0",
     "limits>=5",
+    "aiosqlite>=0.20",
 ]
 
 [dependency-groups]
@@ -20,7 +21,6 @@ dev = [
     "pytest>=9.1,<10",
     "pytest-asyncio>=1.4,<2",
     "respx>=0.23,<0.24",
-    "aiosqlite>=0.20",
     "greenlet>=3",
 ]
 
