@@ -18,11 +18,13 @@ MAX_BODY_BYTES = 64 * 1024
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
-    if settings.environment == "production" and settings.database_url.startswith("sqlite"):
+    default_db_url = Settings.model_fields["database_url"].default
+    if settings.environment == "production" and settings.database_url == default_db_url:
         # A missing/misnamed DATABASE_URL must fail the deploy, not silently
-        # write leads to the instance's ephemeral disk.
+        # write leads to the instance's ephemeral filesystem. An explicit
+        # sqlite URL on the persistent disk (/var/data) is a supported setup.
         raise RuntimeError(
-            "DATABASE_URL is not set: refusing to run production on SQLite"
+            "DATABASE_URL is not set: refusing to run production on the dev database"
         )
 
     @asynccontextmanager

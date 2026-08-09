@@ -58,8 +58,13 @@ region Frankfurt, health check `/healthz`, migrations run via
    instead and re-verify.
 
 Plan notes: web Starter ($7/mo) avoids free-tier spin-down (~60 s cold starts
-would eat form submissions); Postgres `basic-256mb` (~$6/mo) because free
-Postgres now expires after 30 days.
+would eat form submissions). Leads are stored in **SQLite on a 1 GB persistent
+disk** (~$0.25/mo) mounted at `/var/data` — right-sized for form volume, and
+the code is dialect-portable (same SQLAlchemy models/migrations), so moving to
+managed Postgres later is just changing `DATABASE_URL`. Two disk caveats:
+deploys have a brief restart blip (services with disks skip zero-downtime
+deploys), and there are no automated backups — download `/var/data/leads.db`
+occasionally (see below) or upgrade to Postgres when the data matters enough.
 
 ### Pipedrive setup (one-off)
 
@@ -88,7 +93,7 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `DATABASE_URL` | on Render | injected via Blueprint `fromDatabase` |
+| `DATABASE_URL` | on Render | `sqlite+aiosqlite:////var/data/leads.db` (set by Blueprint); any Postgres URL also works |
 | `BIOFARM_PIPEDRIVE_COMPANY_DOMAIN` | yes | `{domain}.pipedrive.com` |
 | `BIOFARM_PIPEDRIVE_API_TOKEN` | yes | secret; sent as `x-api-token` header |
 | `BIOFARM_PIPEDRIVE_OWNER_ID` | no | Pipedrive user ID to own new leads |
@@ -131,14 +136,19 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 
 ## Querying leads
 
-Render dashboard → biofarm-leads-db → Connect → psql:
+Render dashboard → biofarm-api → Shell (or `render ssh`), then:
 
-```sql
-SELECT created_at, form, name, email,
-       attribution->>'utm_source' AS source,
-       attribution->>'utm_campaign' AS campaign,
-       sync_status
-FROM leads
-WHERE spam_flagged = false
-ORDER BY created_at DESC;
+```bash
+python3 -c "
+import sqlite3, json
+db = sqlite3.connect('/var/data/leads.db')
+for row in db.execute('''SELECT created_at, form, name, email,
+    json_extract(attribution, '\$.utm_source'),
+    json_extract(attribution, '\$.utm_campaign'), sync_status
+    FROM leads WHERE spam_flagged = 0 ORDER BY created_at DESC LIMIT 50'''):
+    print(row)
+"
 ```
+
+To back up or analyse locally, download the file from the shell tab or run
+`render ssh biofarm-api -- cat /var/data/leads.db > leads-backup.db`.

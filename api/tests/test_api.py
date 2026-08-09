@@ -216,11 +216,17 @@ async def test_oversized_body_rejected_413(client):
     assert r.status_code == 413
 
 
-async def test_production_refuses_sqlite(tmp_path):
+async def test_production_refuses_default_dev_database(tmp_path):
     settings = make_settings(tmp_path, environment="production")
-    settings.database_url = f"sqlite+aiosqlite:///{tmp_path}/prod.db"
+    settings.database_url = "sqlite+aiosqlite:///./dev.db"  # the unset default
     with pytest.raises(RuntimeError, match="DATABASE_URL"):
         create_app(settings)
+
+
+async def test_production_allows_explicit_sqlite_on_disk(tmp_path):
+    # SQLite on Render's persistent disk is a supported production setup
+    settings = make_settings(tmp_path, environment="production")
+    assert create_app(settings) is not None
 
 
 @respx.mock
