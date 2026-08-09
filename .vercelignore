@@ -1,4 +1,9 @@
 # Internal source assets — keep these out of the public deploy
+# api/ is the FastAPI backend (deployed on Render, not Vercel) — a repo-root
+# "api" directory is Vercel's serverless-functions convention, so without this
+# line Vercel tries to bundle the Python app as a function and fails on size.
+api/
+render.yaml
 BIOFARM_BRAND_GUIDELINES/
 **/*.docx
 **/*.pdf
