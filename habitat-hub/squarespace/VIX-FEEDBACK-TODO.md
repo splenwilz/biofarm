@@ -23,7 +23,7 @@ Received 2026-08-06 (email to God'swill, cc Chris + Chris). Overall verdict: **"
 - [~] **Old brochure in Resources + bottom CTA** — still pointed at `Sleight-Farm_Biofarm_BNG.pdf`. Swapped to FINAL in `12-resources.html` + `15-cta.html`.
 - [~] **Dead `#` links in Resources** — Ecology report + BGS registration went nowhere. Now `/contact` "On request" (kept as capability signals). **TODO:** swap for real ecology PDF + public BGS register URL (ref BGS-281124001).
 - [~] **Visible dev note leaked live** — "Placeholder resources, wire to the real documents." removed from `12-resources.html`.
-- [~] **Em dash + caps + broken URL in map popups** — `&mdash;`→comma, removed `text-transform:uppercase` eyebrow, fixed `/habitat-banks-list/`→`/habitat-banks-lists/` in `04-map.html` (+ synced `map-block-sleight-INLINE.html`).
+- [~] **Em dash + caps + broken URL in map popups** — `&mdash;`→comma, removed `text-transform:uppercase` eyebrow, fixed `/habitat-banks-list/`→`/habitat-banks-lists/` in `sleight/04-map.html`.
 - [x] **Lean copy card on hub** — shows decorated as "Sleight Farm (lean preview)" with a Lean preview pill, links to the copy; NOT counted, no map pin (count stays 5, pins stay 5). Verified live.
 - [ ] **Non-registered imagery** — no photos exist for coming-soon sites; needs a creative solution (illustration / brand pattern / map graphic). *(Tied to Cookridge — on hold.)*
 - [~] **Illustrations + parallax** — **Parallax DONE** (hero parallax + reveal-on-scroll in the injection; reduced-motion safe). **Illustrations: interim motif BUILT** — the seeds are baked into the homepage hero JPG (no clean asset), so I hand-drew a tintable SVG **dandelion-seed motif** (`bf-dandelion-motif.html`), verified. **Hub accent BUILT** (`hub-hero-illustration.html`) — subtle seed drift for the hub hero top-right (previewed, looks good); add as a Code Block + position on the grid. Still to wire into **coming-soon hero (the missing-photo solution)** when Cookridge is off hold. Swap for the designer's exact export later (same slots).
@@ -53,9 +53,17 @@ Received 2026-08-06 (email to God'swill, cc Chris + Chris). Overall verdict: **"
 - [~] **Simplify / make low-maintenance** — LEAN v2 speced (`sleight/00-LEAN-vs-FULL.md`): the lean version = same page **minus `09-timeline` + `10-species`** (the only ongoing-evidence sections). Deploy as a **duplicate post** (`…/sleight-farm-lean`) with those 2 blocks deleted, so **Vix compares Full vs Lean** and picks a direction (then apply to the other 4 banks). *(Awaiting Vix's choice.)*
 - [~] **More enquiry shortcuts** — added a **mid-page CTA** ("Enquire about these units") under the units section, so it's now hero (top) + units (middle) + CTA (bottom). Can add a **sticky enquiry bar / floating button** across all bank pages via the injection if you want it always-visible — say the word.
 
-## Cookridge / coming-soon — /habitat-banks-lists/cookridge  ⏸ ON HOLD (until next week)
+## Cookridge / coming-soon — /habitat-banks-lists/cookridge  ▶ UNBLOCKED (Chris/COO reply 11 Aug)
 
-- [ ] Paused — Vix to discuss with Chris what info exists for non-registered sites. Do not progress coming-soon until then.
+- [~] **Max 1-2 photos** — DONE in template. Chris: "early views of the site" too optimistic, most sites won't look like much + limited stock. Removed the 5-photo "From the land" gallery; hero = photo #1, "What to expect" = optional photo #2; if none, delete the img → illustration fallback (never a stand-in photo).
+- [~] **Add "Where it is, and where it can help"** — DONE in template. Chris: map/catchment doesn't change pre→post registration, so show it now. Added the location section; site MAP goes in as a separate Code Block once coordinates are confirmed.
+- [ ] **Photo sourcing decision (Chris's Plans A-D)** — A: landowner imagery (cropped on-brand); B: placeholder imagery; C: brief the ecology team to shoot on site visits; D: local photography students. *My steer: brand illustration as the immediate default (not fake photos) + A where available + C as the ongoing pipeline to replace over time. Chris to pick.*
+
+## Map data accuracy (Chris/COO, 11 Aug)
+
+- [x] **Pins fixed from Biofarm's own BNG Site Map** — the map already has each site's **postcode + BGS ref**. Pulled them, geocoded (postcodes.io), and updated all 5 registered pins in `finder`, `map-block-hub`, `map-block-sleight`, `04-map` (were 1–10 km off; Badger worst at 9.6 km). **Re-paste those 4 blocks.** Postcode-centre accuracy — Chris to confirm / nudge any onto the exact parcel. See `DATA-VERIFICATION-SHEET.md`.
+- [ ] **BGS refs now available** for all 5 (Sleight BGS-281124001, Rycote BGS-150725001, Lesnewth BGS-221025001, Avon BGS-171125001, Badger BGS-060526001) — can populate the Resources "BGS registration" line (currently "on request").
+- [ ] **Pre-registered pins** — postcodes for coming-soon sites also in the map (Cookridge LS16 7SY, etc.); use when those go live.
 
 ---
 

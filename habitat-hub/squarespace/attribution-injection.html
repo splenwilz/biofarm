@@ -1,5 +1,5 @@
 <!-- SITE-WIDE ATTRIBUTION CAPTURE (Settings > Advanced > Code Injection > HEADER).
-     REPLACES the current "UTM source attribute" snippet — backwards compatible:
+     REPLACES the current "UTM source attribute" snippet - backwards compatible:
      keeps writing the same sessionStorage utm_* keys, and adds:
        - click IDs (gclid/fbclid/msclkid), referrer, landing page
        - bf_attr_last  (sessionStorage JSON): last-touch for this visit
@@ -11,7 +11,7 @@
   var CLICK = ['gclid','fbclid','msclkid'];
   var params = new URLSearchParams(window.location.search);
 
-  // Storage can throw (Safari private mode, blocked cookies) — never abort.
+  // Storage can throw (Safari private mode, blocked cookies) - never abort.
   function sget(key) {
     try { return sessionStorage.getItem(key); } catch (e) { return null; }
   }
@@ -87,6 +87,6 @@
         localStorage.setItem('bf_attr_first', JSON.stringify(first));
       }
     }
-  } catch (e) { /* storage blocked — attribution degrades gracefully */ }
+  } catch (e) { /* storage blocked - attribution degrades gracefully */ }
 })();
 </script>

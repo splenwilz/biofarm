@@ -8,15 +8,31 @@
        • Region .......... The North            (hero eyebrow)
        • Host LPA ........ Leeds                 (keyfact + copy)
        • NCA ............. Nottinghamshire, Derbyshire & Yorkshire Coalfield
-       • Photos .......... swap the data-todo <img> src's for real site images
+
+     PHOTOS — keep it to a MAXIMUM of 1-2 images (per Chris, 11 Aug):
+       most pre-registered sites won't look like much yet and photo stock is
+       limited. Priority order for what fills them:
+         A. landowner-supplied imagery, cropped on-brand
+         B. an ecology-team photo from a site visit
+         C. if none yet: DELETE the <img> and the hero falls back to the
+            brand illustration (dandelion motif) — never a fake/stand-in photo.
+       The hero image is photo #1; the optional "What to expect" image is #2.
+       Do not add a gallery — a wall of weak photos reads worse than none.
+
+     LOCATION + MAP — the site's location and catchment DON'T change from
+       pre-registration to registration, so show them now. Add the site's map
+       as its own Code Block right after the location section below, using the
+       same map component as the registered banks (needs confirmed coordinates,
+       see DATA-VERIFICATION-SHEET.md).
+
      The native post title auto-hides (the hero carries the name); the author
      profile is hidden by the injection.
      =================================================================== -->
 <div class="bf-bank">
 
-  <!-- HERO (in development) -->
+  <!-- HERO (in development). Photo #1 — or DELETE the <img> for the illustration fallback. -->
   <section class="bf-hero">
-    <img class="bf-hero__img" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo="replace with a real Cookridge site photo" alt="The Cookridge habitat bank site near Leeds" />
+    <img class="bf-hero__img" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo="replace with a real Cookridge site photo, or delete for the illustration fallback" alt="The Cookridge habitat bank site near Leeds" />
     <div class="bf-hero__inner">
       <p class="bf-eyebrow">Habitat Bank · In development · The North</p>
       <h1 class="bf-hero__title">Cookridge</h1>
@@ -33,7 +49,8 @@
     </div>
   </section>
 
-  <!-- WHAT TO EXPECT -->
+  <!-- WHAT TO EXPECT. Photo #2 is OPTIONAL — if no real photo, delete the image
+       <div> and the text spans full width (do not use a stand-in photo). -->
   <section class="bf-band">
     <div class="bf-split">
       <div>
@@ -45,22 +62,19 @@
           <span class="bf-chip">Species-rich grassland</span><span class="bf-chip">Priority habitats</span><span class="bf-chip">30-year stewardship</span>
         </div>
       </div>
-      <div><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo="early photo from the Cookridge land" alt="Early view of the Cookridge site" /></div>
+      <div><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo="optional second photo, or delete this whole <div>" alt="Early view of the Cookridge site" /></div>
     </div>
   </section>
 
-  <!-- FROM THE LAND (early images) -->
-  <section class="bf-band bf-band--cream">
-    <p class="bf-eyebrow">From the land</p>
-    <h2>Early views of the site</h2>
-    <div class="bf-gallery">
-      <img class="g-lg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo="real Cookridge photo" alt="Wide view of the Cookridge site" />
-      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo alt="Cookridge site detail" />
-      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo alt="Cookridge site detail" />
-      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo alt="Cookridge site detail" />
-      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg" data-todo alt="Cookridge site detail" />
-    </div>
-    <p class="bf-note" style="margin-top:12px;">Early imagery from the site, more to follow as the bank develops.</p>
+  <!-- WHERE IT IS, AND WHERE IT CAN HELP (location + catchment).
+       The catchment is meaningful even pre-registration. Add the site's MAP as a
+       separate Code Block directly after this section (same component as the
+       registered banks; needs confirmed coordinates). -->
+  <section class="bf-band">
+    <p class="bf-eyebrow">Location &amp; areas served</p>
+    <h2>Where it is, and where it can help</h2>
+    <p class="measure">Cookridge sits near Leeds, within the Nottinghamshire, Derbyshire &amp; Yorkshire Coalfield National Character Area. Its location and trading area are set now and won&rsquo;t change once the bank is registered, so you can plan around it today. The <strong>solid area</strong> on the map is the local zone, the host LPA and National Character Area, where units apply at <strong>full value</strong> under the biodiversity gain spatial risk multiplier. The <strong>hatched area</strong> shows neighbouring LPAs and NCAs, where units remain eligible at an adjusted rate (0.75&times;). Beyond that, we deliver nationally.</p>
+    <!-- ↓ ADD THE SITE MAP CODE BLOCK HERE (see DATA-VERIFICATION-SHEET.md for coordinates) -->
   </section>
 
   <!-- REGISTER INTEREST CTA -->

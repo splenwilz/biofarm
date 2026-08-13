@@ -9,7 +9,7 @@ class PipedriveError(Exception):
 
 
 def _error_reason(resp: httpx.Response) -> str:
-    # This string is persisted (lead.sync_error) and logged — keep it to
+    # This string is persisted (lead.sync_error) and logged - keep it to
     # Pipedrive's short error message, never the raw response body.
     try:
         body = resp.json()
@@ -24,7 +24,7 @@ class PipedriveClient:
     """Thin async client for the two Pipedrive API generations this service needs.
 
     Persons use API v2 (v1 persons endpoints are sunset); Leads and Notes exist
-    only in v1. Auth via the x-api-token header — never the query string.
+    only in v1. Auth via the x-api-token header - never the query string.
     """
 
     def __init__(
@@ -65,7 +65,7 @@ class PipedriveClient:
                         try:
                             delay = float(reset)
                         except ValueError:
-                            pass  # malformed header — keep the backoff delay
+                            pass  # malformed header - keep the backoff delay
                     await asyncio.sleep(min(delay, 10))
                     continue
                 if resp.status_code >= 400:
