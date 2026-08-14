@@ -30,7 +30,7 @@ class LeadSubmissionBase(BaseModel):
     website: Annotated[
         str, StringConstraints(strip_whitespace=False, max_length=2048)
     ] = ""
-    # Milliseconds between first focus and submit, computed client-side —
+    # Milliseconds between first focus and submit, computed client-side -
     # elapsed time is immune to client/server clock skew.
     fill_ms: float | None = Field(default=None, ge=0)
     page: str | None = Field(default=None, max_length=512)

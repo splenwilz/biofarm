@@ -192,7 +192,7 @@ async def test_rate_limit_keys_on_true_client_ip(tmp_path):
 
 async def test_garbage_true_client_ip_falls_back_safely(client):
     # A junk header value must not 500 the insert (varchar 64) or mint
-    # arbitrary rate-limit buckets — it falls back to the socket address.
+    # arbitrary rate-limit buckets - it falls back to the socket address.
     r = await client.post(
         "/v1/leads/newsletter",
         json={"name": "J", "email": "j@e.com"},

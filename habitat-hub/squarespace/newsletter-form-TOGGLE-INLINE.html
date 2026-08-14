@@ -1,6 +1,23 @@
-<!-- NEWSLETTER SIGNUP v1 - /contact dark photo section ("Sign up to hear stories
-     from the ground"); replaces the second, smaller Pipedrive embed.
-     Paste into a Code Block. Posts to https://biofarm-api.onrender.com. -->
+<!-- NEWSLETTER SIGNUP TOGGLE - /contact dark photo section.
+     Replaces the code inside the existing Pipedrive embed block. Default:
+     visitors see the Pipedrive embed exactly as today. Add ?form=new to the
+     URL (https://www.biofarm.co.uk/contact?form=new) to preview the new
+     first-party form instead; remove the parameter and the embed is back.
+     When ready to switch permanently, paste newsletter-form-INLINE.html. -->
+<div id="bfNlPdSlot"></div>
+<script>
+(function () {
+  if (new URLSearchParams(location.search).get('form') === 'new') return; // preview mode: skip the embed entirely
+  var slot = document.getElementById('bfNlPdSlot');
+  var d = document.createElement('div');
+  d.className = 'pipedriveWebForms';
+  d.setAttribute('data-pd-webforms', 'https://webforms.pipedrive.com/f/bXB8kiAaKayRiYweFIOdpcgYOh1sjnQWCEig455HPVhwCzSw6U3JcgT8ddfJzInGdZ');
+  slot.appendChild(d);
+  var s = document.createElement('script');
+  s.src = 'https://webforms.pipedrive.com/f/loader';
+  slot.appendChild(s);
+})();
+</script>
 <style>
   @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
   .bf-nl{max-width:560px;margin:0 auto;color:#fff;}
@@ -21,7 +38,7 @@
   .bf-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
 </style>
 
-<div class="bf-nl" id="bfNl">
+<div class="bf-nl" id="bfNl" hidden>
   <noscript><p style="color:#fff;">This form needs JavaScript. Please enable it, or contact us by email instead.</p></noscript>
   <form id="bfNlForm" method="post" novalidate>
     <div class="bf-field">
@@ -53,6 +70,8 @@
 
 <script>
 (function () {
+  if (new URLSearchParams(location.search).get('form') !== 'new') return; // embed mode: form stays hidden
+  document.getElementById('bfNl').hidden = false;
   var API_BASE = 'https://biofarm-api.onrender.com';
   var GA_ID = 'G-3MS9TLLZRN';
 

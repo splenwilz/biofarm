@@ -20,7 +20,7 @@ async def send_server_event(
     """Send a GA4 Measurement Protocol event. Best-effort: analytics must never
     break lead capture, so failures return False rather than raising.
 
-    Without the browser's client_id the event can't join a session — skip it.
+    Without the browser's client_id the event can't join a session - skip it.
     """
     if not client_id:
         return False

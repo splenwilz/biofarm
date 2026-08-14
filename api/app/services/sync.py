@@ -69,7 +69,7 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
     )
     # Resume from any previously recorded ids so a retried lead never
     # re-creates records that already exist. Ids are assigned in memory here
-    # and committed once by process_lead, together with the outcome status —
+    # and committed once by process_lead, together with the outcome status -
     # so a failed sync still persists whatever ids it got before failing.
     marketing_status = "subscribed" if lead.newsletter_opt_in else None
     person_id = lead.pipedrive_person_id
@@ -91,9 +91,9 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
     lead_id = lead.pipedrive_lead_id
     if lead_id is None:
         title = (
-            f"Website enquiry — {lead.name}"
+            f"Website enquiry - {lead.name}"
             if lead.form == "contact"
-            else f"Newsletter signup — {lead.name}"
+            else f"Newsletter signup - {lead.name}"
         )
         lead_id = await client.create_lead(
             title=title,
@@ -113,7 +113,7 @@ async def process_lead(
 ) -> None:
     """Background task: push the stored lead to Pipedrive and GA4.
 
-    The lead row is already committed — any failure here is recorded on the row,
+    The lead row is already committed - any failure here is recorded on the row,
     never surfaced to the site visitor.
     """
     async with sessionmaker() as session:
@@ -133,7 +133,7 @@ async def process_lead(
                 await session.commit()
             except Exception:
                 # Outcome not recorded: the row stays 'pending' although
-                # Pipedrive records may exist — a retry sweep must dedupe by
+                # Pipedrive records may exist - a retry sweep must dedupe by
                 # searching Pipedrive before re-creating.
                 logger.exception(
                     "Failed to record sync outcome for lead %s", lead.id

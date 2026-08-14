@@ -24,7 +24,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # SQLite in production is supported only as an absolute file path (the
         # persistent disk). The relative dev default (unset DATABASE_URL),
         # any other relative path, and :memory: would silently lose leads on
-        # every restart/deploy — fail the boot instead.
+        # every restart/deploy - fail the boot instead.
         db_path = make_url(settings.database_url).database or ""
         if not db_path.startswith("/"):
             raise RuntimeError(

@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     @field_validator("database_url", mode="after")
     @classmethod
     def _use_async_driver(cls, v: str) -> str:
-        # Render hands out postgres:// or postgresql:// — SQLAlchemy async needs the asyncpg dialect.
+        # Render hands out postgres:// or postgresql:// - SQLAlchemy async needs the asyncpg dialect.
         if v.startswith("postgres://"):
             return "postgresql+asyncpg://" + v.removeprefix("postgres://")
         if v.startswith("postgresql://"):

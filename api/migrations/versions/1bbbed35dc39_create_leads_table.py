@@ -43,7 +43,7 @@ def upgrade() -> None:
     sa.Column('sync_error', sa.Text(), nullable=True),
     sa.Column('pipedrive_person_id', sa.Integer(), nullable=True),
     sa.Column('pipedrive_lead_id', sa.String(length=64), nullable=True),
-    # CURRENT_TIMESTAMP is standard SQL — works on both Postgres and SQLite
+    # CURRENT_TIMESTAMP is standard SQL - works on both Postgres and SQLite
     # (autogenerate froze Postgres's now(), which SQLite cannot evaluate)
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.PrimaryKeyConstraint('id')

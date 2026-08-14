@@ -6,7 +6,7 @@ services:
     runtime: python
     rootDir: api
     region: frankfurt # closest region to the UK
-    # Starter ($7/mo) keeps the service warm — free tier spins down after 15 min
+    # Starter ($7/mo) keeps the service warm - free tier spins down after 15 min
     # idle and cold-starts ~60s, which loses form submissions in practice.
     plan: starter
     buildCommand: pip install -r requirements.txt
@@ -20,7 +20,7 @@ services:
     healthCheckPath: /healthz
     autoDeployTrigger: commit
     # Leads live in SQLite on a persistent disk (~$0.25/mo) rather than managed
-    # Postgres — right-sized for form volume; swap DATABASE_URL to a Postgres
+    # Postgres - right-sized for form volume; swap DATABASE_URL to a Postgres
     # URL later if reporting outgrows it. Note: services with disks don't get
     # zero-downtime deploys (brief restart blip is fine for this API).
     disk:
@@ -41,7 +41,7 @@ services:
         sync: false
       - key: BIOFARM_PIPEDRIVE_API_TOKEN
         sync: false
-      # Optional — set in the dashboard when ready:
+      # Optional - set in the dashboard when ready:
       #   BIOFARM_PIPEDRIVE_OWNER_ID           (int user id to own new leads)
       #   BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS     (JSON array of label UUIDs)
       #   BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP     (JSON from scripts/setup_pipedrive_fields.py)

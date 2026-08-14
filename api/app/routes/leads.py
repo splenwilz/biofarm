@@ -18,7 +18,7 @@ async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
 def client_ip(request: Request) -> str:
     # Render fronts services with Cloudflare, which sets True-Client-IP at the
     # edge. X-Forwarded-For's leftmost entry is client-forgeable, so it is
-    # never used here. The header must parse as a real IP — a garbage value
+    # never used here. The header must parse as a real IP - a garbage value
     # would overflow the varchar(64) column (500 -> lost lead) and mint
     # unbounded rate-limiter buckets.
     raw = request.headers.get("true-client-ip")
