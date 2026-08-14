@@ -33,6 +33,6 @@ def test_whitespace_only_honeypot_is_still_spam():
 
 
 def test_missing_timer_is_not_spam():
-    # JS may be blocked or fail — absence of the timer must not punish real users
+    # JS may be blocked or fail - absence of the timer must not punish real users
     v = evaluate_spam(make(), min_fill_seconds=3.0)
     assert not v.is_spam

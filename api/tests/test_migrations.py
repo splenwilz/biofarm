@@ -8,7 +8,7 @@ ALEMBIC_INI = Path(__file__).parents[1] / "alembic.ini"
 
 
 def test_migrated_sqlite_schema_accepts_inserts(tmp_path, monkeypatch):
-    """Production runs the alembic schema, not create_all — this catches
+    """Production runs the alembic schema, not create_all - this catches
     Postgres-only DDL frozen into migrations (e.g. DEFAULT now())."""
     db_path = tmp_path / "mig.db"
     monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{db_path}")

@@ -87,13 +87,13 @@ async def test_create_lead_v1_with_root_level_custom_fields(pd):
         )
     )
     lead_id = await pd.create_lead(
-        title="Website enquiry — Jane",
+        title="Website enquiry - Jane",
         person_id=42,
         custom_fields={"40charhash": "newsletter"},
     )
     assert lead_id == "adf21080-0e10-11eb-879b-05d71fb426ec"
     body = json.loads(route.calls.last.request.content)
-    assert body["title"] == "Website enquiry — Jane"
+    assert body["title"] == "Website enquiry - Jane"
     assert body["person_id"] == 42
     # leads are v1: custom field keys sit at the ROOT of the body, not nested
     assert body["40charhash"] == "newsletter"

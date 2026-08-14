@@ -57,7 +57,7 @@ def main() -> None:
                     # e.g. Referrer created as varchar (255) but we need text
                     print(
                         f"SKIP    {label}: exists as {existing_type}, wanted "
-                        f"{field_type} — rename/delete it in Pipedrive and re-run"
+                        f"{field_type} - rename/delete it in Pipedrive and re-run"
                     )
                     continue
                 field_map[attr_key] = code

@@ -1,10 +1,27 @@
-<!-- CONTACT FORM v1 - /contact, green section (replaces the main Pipedrive embed).
-     Paste into a Code Block where the "Get in touch" embed currently sits.
-     Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
+<!-- CONTACT FORM TOGGLE - /contact, green section.
+     Replaces the code inside the existing Pipedrive embed block. Default:
+     visitors see the Pipedrive embed exactly as today. Add ?form=new to the
+     URL (https://www.biofarm.co.uk/contact?form=new) to preview the new
+     first-party form instead; remove the parameter and the embed is back.
+     When ready to switch permanently, paste contact-form-INLINE.html. -->
+<div id="bfPdSlot"></div>
+<script>
+(function () {
+  if (new URLSearchParams(location.search).get('form') === 'new') return; // preview mode: skip the embed entirely
+  var slot = document.getElementById('bfPdSlot');
+  var d = document.createElement('div');
+  d.className = 'pipedriveWebForms';
+  d.setAttribute('data-pd-webforms', 'https://webforms.pipedrive.com/f/6Nc0UIRKyFh5WCZWHeAoPMOAybnpTGvuiSneYf8ugdgRTHdNGrwN59Ak9ZW2dMYid5');
+  slot.appendChild(d);
+  var s = document.createElement('script');
+  s.src = 'https://webforms.pipedrive.com/f/loader';
+  slot.appendChild(s);
+})();
+</script>
 <style>
   @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
   .bf-form{max-width:560px;margin:0 auto;color:#212121;}
-  .bf-form h3{margin:0 0 22px;color:#212121;} /* typography inherited from the site theme */
+  .bf-form h3{font-size:25px;margin:0 0 22px;color:#212121;} /* font from site theme, size pinned */
   .bf-form label,.bf-form legend{display:block;font-size:.95rem;margin:0 0 6px;color:#212121;}
   .bf-form .req{color:#212121;}
   .bf-field{margin:0 0 18px;}
@@ -26,12 +43,12 @@
   .bf-status{margin-top:14px;font-size:.95rem;min-height:1.4em;}
   .bf-status.err{color:#4A1414;}
   .bf-done{text-align:center;padding:40px 0;}
-  .bf-done h3{color:#212121;margin:0 0 10px;}
+  .bf-done h3{font-size:25px;color:#212121;margin:0 0 10px;}
   /* honeypot: parked off-screen, invisible to humans, present for bots */
   .bf-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
 </style>
 
-<div class="bf-form" id="bfContact">
+<div class="bf-form" id="bfContact" hidden>
   <h3>Get in touch</h3>
   <noscript><p style="color:#212121;">This form needs JavaScript. Please enable it, or contact us by email instead.</p></noscript>
   <form id="bfContactForm" method="post" novalidate>
@@ -76,6 +93,8 @@
 
 <script>
 (function () {
+  if (new URLSearchParams(location.search).get('form') !== 'new') return; // embed mode: form stays hidden
+  document.getElementById('bfContact').hidden = false;
   var API_BASE = 'https://biofarm-api.onrender.com';
   var GA_ID = 'G-3MS9TLLZRN';
 

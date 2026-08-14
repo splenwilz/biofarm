@@ -9,13 +9,13 @@ which blocked GA4 conversion tracking and lost UTM/gclid lead-source data.
 
 1. `POST /v1/leads/contact` or `POST /v1/leads/newsletter` (JSON, CORS-locked to biofarm.co.uk).
 2. Validation (Pydantic) → spam checks (honeypot + minimum fill time + per-IP rate limit).
-3. The lead is committed to the database **first** — the DB is the source of
+3. The lead is committed to the database **first** - the DB is the source of
    truth (SQLite on a persistent disk in production, swappable for Postgres via
    `DATABASE_URL`); a Pipedrive outage can never lose a lead.
    Response: `202 {"status":"accepted","id":...}`.
 4. A background task then:
    - finds-or-creates the Person in Pipedrive (API v2), setting `marketing_status=subscribed` on newsletter opt-in;
-   - creates a Lead (API v1 — leads have no v2) with attribution custom fields;
+   - creates a Lead (API v1 - leads have no v2) with attribution custom fields;
    - pins a Note with the message + attribution breakdown;
    - optionally fires a GA4 Measurement Protocol event (`generate_lead_server`).
 5. Sync outcome is recorded on the row: `synced | failed | skipped_spam | disabled`.
@@ -55,18 +55,18 @@ region Frankfurt, health check `/healthz`, migrations run via
    that its edge overwrites a client-supplied `True-Client-IP`): submit a test
    lead with `curl -H 'True-Client-IP: 203.0.113.99' ...` and check the stored
    `client_ip` is your real IP, not `203.0.113.99`. If the forged value comes
-   through, per-IP rate limiting is spoofable — switch `client_ip()` in
+   through, per-IP rate limiting is spoofable - switch `client_ip()` in
    `app/routes/leads.py` to parse the rightmost `X-Forwarded-For` entry
    instead and re-verify.
 
 Plan notes: web Starter ($7/mo) avoids free-tier spin-down (~60 s cold starts
 would eat form submissions). Leads are stored in **SQLite on a 1 GB persistent
-disk** (~$0.25/mo) mounted at `/var/data` — right-sized for form volume, and
+disk** (~$0.25/mo) mounted at `/var/data` - right-sized for form volume, and
 the code is dialect-portable (same SQLAlchemy models/migrations), so moving to
 managed Postgres later is just changing `DATABASE_URL`. Disk caveats: deploys
 have a brief restart blip (services with disks skip zero-downtime deploys), and
 disk durability = Render's **daily disk snapshots** (at least 7 days retained)
-— snapshots restore the *whole disk* to the snapshot time, so up to a day of
+- snapshots restore the *whole disk* to the snapshot time, so up to a day of
 leads can be lost and single files can't be cherry-picked. Take a logical
 backup of `/var/data/leads.db` occasionally too (see Querying leads), or
 upgrade to Postgres when the data matters enough.
@@ -80,7 +80,7 @@ PIPEDRIVE_COMPANY_DOMAIN=biofarm PIPEDRIVE_API_TOKEN=xxx \
 
 Creates the UTM/attribution custom fields (leads inherit deal fields) and
 prints the `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` value to set on the service.
-Without it, attribution still lands in the pinned note and our DB — the map
+Without it, attribution still lands in the pinned note and our DB - the map
 just makes it filterable in Pipedrive.
 
 `marketing_status` is only honoured if the Pipedrive account has the
@@ -120,7 +120,7 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 - **Rate limiting is in-memory, per instance.** Correct for a single Render
   instance; switch the `limits` storage to Redis before scaling horizontally.
   Client IPs come from `X-Forwarded-For` (uvicorn `--proxy-headers`); a
-  determined client can forge that header to dodge the per-IP limit — the
+  determined client can forge that header to dodge the per-IP limit - the
   honeypot/fill-time checks are the deeper layer.
 - **Spam protection is honeypot + fill-time + rate limit.** The old Pipedrive
   embed had reCAPTCHA. If junk gets through, add Cloudflare Turnstile: one
@@ -135,7 +135,7 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
   spam review with no expiry; add a scheduled job to null them after a fixed
   window (e.g. 30 days) and mention that window in the privacy policy.
 - If the Cookiebot default for `analytics_storage` is ever switched to
-  denied-until-consent, visitors who decline will have no GA client_id — the
+  denied-until-consent, visitors who decline will have no GA client_id - the
   lead and its UTM attribution still land in the database/Pipedrive; only the GA4
   session join is lost.
 

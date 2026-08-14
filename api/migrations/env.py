@@ -23,7 +23,7 @@ from app import models  # noqa: F401  (registers tables on Base.metadata)
 target_metadata = Base.metadata
 
 # Single source of truth for the DB URL: app settings (env DATABASE_URL on Render).
-# configparser treats % as interpolation syntax — escape it (passwords may contain %).
+# configparser treats % as interpolation syntax - escape it (passwords may contain %).
 config.set_main_option("sqlalchemy.url", Settings().database_url.replace("%", "%%"))
 
 
