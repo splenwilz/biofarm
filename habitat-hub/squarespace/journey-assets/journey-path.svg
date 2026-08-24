@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 120" preserveAspectRatio="none">
+  <!-- Off-site journey dotted path: development -> habitat bank.
+       Green #71977A, round dots. Stretch to any width (preserveAspectRatio="none");
+       vector-effect keeps the dots the same size however it is scaled. -->
+  <path d="M0,95 C120,30 220,105 320,55 C420,10 500,70 600,45"
+        fill="none" stroke="#71977A" stroke-width="3"
+        stroke-dasharray="2.5 11" stroke-linecap="round"
+        vector-effect="non-scaling-stroke"/>
+</svg>
