@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — /biodiversity-units (Web Copy v3, section 2.4 — approved CMS copy, complete)
+
+  Third sibling of biodiversity-net-gain.html / biodiversity-metric.html — same measured
+  design grammar. This page is the commercial one: hero = restored habitat (no development
+  imagery, per the doc), the "every unit comes from a Biofarm Habitat Bank" message carried
+  by the immersive set-piece, the five-step process as the horizontal journey.
+
+  SQUARESPACE PAGE SETTINGS
+  URL slug:         /biodiversity-units
+  SEO title:        Biodiversity Units | Secure off site Biodiversity Units | Biofarm
+  SEO description:  Secure off site biodiversity units from Biofarm Habitat Banks. Fair pricing,
+                    local delivery and long term stewardship to support residential, commercial
+                    and infrastructure developments.
+  OG title:         Secure Biodiversity Units | Biofarm
+  OG description:   Secure off site biodiversity units from Biofarm Habitat Banks with fair
+                    pricing, local delivery and long term stewardship.
+  Schema:           WebPage + FAQPage + BreadcrumbList — JSON-LD at the bottom
+                    (paste into Page Settings → Advanced → Header Code Injection).
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Biodiversity Units | Secure off site Biodiversity Units | Biofarm</title>
+<meta name="description" content="Secure off site biodiversity units from Biofarm Habitat Banks. Fair pricing, local delivery and long term stewardship to support residential, commercial and infrastructure developments." />
+<link rel="canonical" href="https://www.biofarm.co.uk/biodiversity-units" />
+<meta property="og:title" content="Secure Biodiversity Units | Biofarm" />
+<meta property="og:description" content="Secure off site biodiversity units from Biofarm Habitat Banks with fair pricing, local delivery and long term stewardship." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.biofarm.co.uk/biodiversity-units" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  @font-face{font-family:'RATI_v2';
+    src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+        url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight:300;font-display:swap;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#F5F6F1;color:#111;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:clip;}
+
+  /* ================= header (prototype — live page inherits the real nav) ================= */
+  .hdr{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s;}
+  .hdr.scrolled{background:rgba(245,246,241,.97);}
+  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px clamp(24px,3.2vw,48px);}
+  .hdr .logo img{height:30px;display:block;}
+  .hdr .logo img.dk{display:none;}
+  .hdr ul{list-style:none;display:flex;align-items:center;gap:32px;margin:0;padding:0;}
+  .hdr ul a{text-decoration:none;color:#111;font-size:14px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;}
+  .hdr ul a.pill{background:#111;color:#F5F6F1;border-radius:25px;padding:13px 26px;font-family:'RATI_v2',Georgia,serif;font-size:17px;letter-spacing:.01em;text-transform:none;white-space:nowrap;}
+  /* over the dark hero the nav runs light; solid cream after scrolling */
+  .hdr.on-dark:not(.scrolled) ul a{color:#F5F6F1;}
+  .hdr.on-dark:not(.scrolled) ul a.pill{background:#F5F6F1;color:#111;}
+  .hdr.on-dark:not(.scrolled) .logo img.lt{display:none;}
+  .hdr.on-dark:not(.scrolled) .logo img.dk{display:block;}
+  @media(max-width:940px){.hdr ul li:not(:last-child){display:none;}}
+
+  /* ================= shared ================= */
+  .s{box-sizing:border-box;}
+  .s *,.s *::before,.s *::after{box-sizing:border-box;}
+  .s .wrap{max-width:1512px;margin-inline:auto;padding-inline:clamp(24px,7vw,105px);}
+  .s h1,.s h2,.s h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;margin:0;}
+  .s h1{font-size:clamp(3rem,6.5vw,6.19rem);line-height:1.04;letter-spacing:-.01em;}
+  .s h2{font-size:clamp(2rem,3vw,2.75rem);line-height:1.14;}
+  .s h3{font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.28;}
+  .s .lead{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.3rem,1.75vw,1.63rem);line-height:1.42;margin:0 0 1.1em;}
+  .s p{margin:0 0 1.2em;}
+  .s .statement{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.3;margin:1.6em 0 0;}
+  .s a.tlink{display:inline-block;font-size:14px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:inherit;text-decoration:none;transition:opacity .2s;}
+  .s a.tlink:hover{opacity:.55;}
+  .s a.pill{display:inline-block;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;text-decoration:none;border-radius:25px;padding:15px 30px;background:#111;color:#F5F6F1;transition:background .3s;white-space:nowrap;}
+  .s a.pill:hover{background:#333;}
+  .s .ctas{display:flex;flex-wrap:wrap;align-items:center;gap:34px;margin-top:44px;}
+  .s a.ilink{color:inherit;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;}
+  .s .two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);}
+  @media(max-width:900px){.s .two{grid-template-columns:1fr;}}
+
+  .collage{position:relative;}
+  .collage img{display:block;object-fit:cover;width:100%;}
+  .collage .base{width:86%;margin-left:14%;aspect-ratio:4/4.4;}
+  .collage .over{position:absolute;left:0;bottom:-9%;width:46%;aspect-ratio:4/4.6;box-shadow:0 0 0 6px var(--edge,#fff);}
+  .collage.flip .base{margin-left:0;margin-right:14%;}
+  .collage.flip .over{left:auto;right:0;}
+  @media(max-width:900px){.collage{margin-bottom:9%;}}
+
+  .rows{border-top:1px solid rgba(17,17,17,.55);}
+  .row{border-bottom:1px solid rgba(17,17,17,.55);padding:30px 0 34px;}
+  .row h3{font-size:clamp(1.35rem,1.9vw,1.78rem);margin:0 0 .55em;}
+  .row p{margin:0;max-width:56ch;}
+  .row .num{font-family:'RATI_v2',Georgia,serif;font-size:15px;display:block;margin-bottom:10px;letter-spacing:.06em;}
+  /* hairline rows on light ground */
+  .rows.lt{border-top-color:rgba(17,17,17,.16);}
+  .rows.lt .row{border-bottom-color:rgba(17,17,17,.16);}
+
+  .angle{display:block;width:100%;height:clamp(44px,6vw,92px);line-height:0;margin-top:-1px;margin-bottom:-1px;position:relative;z-index:1;}
+  .angle svg{width:100%;height:100%;display:block;}
+
+  /* ================= sections ================= */
+  /* hero — light, habitat collage right */
+  .hero{min-height:100vh;display:flex;align-items:center;}
+  .hero .wrap{width:100%;padding-top:130px;padding-bottom:70px;}
+  .hero .two{align-items:center;grid-template-columns:1.05fr .95fr;}
+  .hero h1{font-size:clamp(2.7rem,5.6vw,5.3rem);margin-bottom:.4em;max-width:12ch;}
+  .hero h3{max-width:22ch;margin-bottom:1.4em;}
+  .hero .intro p{max-width:52ch;}
+  .hero .unit{font-family:'RATI_v2',Georgia,serif;font-size:clamp(1.3rem,1.75vw,1.63rem);line-height:1.4;margin:1.4em 0 .8em;}
+  .hero .collage{--edge:#F5F6F1;}
+
+  /* why the right units matter + location — one green spread */
+  .why{background:#71977A;color:#111;padding-block:clamp(90px,13vh,150px);}
+  .why .two{grid-template-columns:1fr 1fr;align-items:start;}
+  .why h2{max-width:14ch;}
+  .why .lead{margin-top:1.4em;max-width:30ch;}
+  .why .loc{border-top:1px solid rgba(17,17,17,.55);padding-top:30px;}
+  .why .loc h3{font-size:clamp(1.35rem,1.9vw,1.78rem);margin-bottom:.8em;}
+  .why .loc p{max-width:52ch;}
+  .why .tlink{border-bottom:1px solid rgba(17,17,17,.5);padding-bottom:6px;}
+
+  /* how Biofarm creates units — immersive set-piece */
+  .creates{position:relative;color:#F5F6F1;isolation:isolate;overflow:hidden;text-align:center;padding-block:clamp(130px,20vh,240px);}
+  .creates .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;}
+  .creates::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,12,9,.78),rgba(9,12,9,.58) 45%,rgba(9,12,9,.84));}
+  .creates h2{color:#F5F6F1;max-width:18ch;margin:0 auto .5em;font-size:clamp(2.3rem,4.2vw,3.9rem);line-height:1.1;}
+  .creates .lead{color:rgba(245,246,241,.94);max-width:34ch;margin-inline:auto;}
+  .creates .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);text-align:left;align-items:start;max-width:1240px;margin:clamp(56px,8vh,96px) auto 0;}
+  .creates p{color:rgba(245,246,241,.92);}
+  .creates .statement{margin-top:0;color:#F5F6F1;}
+  .creates .tlink{color:#F5F6F1;border-bottom:1px solid rgba(245,246,241,.6);padding-bottom:6px;}
+  @media(max-width:900px){.creates .cols{grid-template-columns:1fr;}}
+
+  /* planning confidence — light split */
+  .early{padding-block:clamp(110px,16vh,190px);}
+  .early .two{align-items:start;}
+  .early h2{max-width:14ch;}
+  .early .lead{max-width:32ch;}
+
+  /* how to secure — tall photo left, large-type numbered steps right (white) */
+  .secure{background:#fff;padding-block:clamp(110px,16vh,190px);}
+  .secure .two{grid-template-columns:.85fr 1.15fr;align-items:center;}
+  .secure .photo{width:100%;aspect-ratio:3/3.9;object-fit:cover;display:block;}
+  .secure h2{max-width:14ch;margin-bottom:clamp(36px,5vh,56px);}
+  .secure .steps{list-style:none;margin:0;padding:0;border-top:1px solid rgba(17,17,17,.16);}
+  .secure .steps li{display:grid;grid-template-columns:56px 1fr;gap:16px;align-items:baseline;border-bottom:1px solid rgba(17,17,17,.16);padding:22px 0 24px;}
+  .secure .steps .num{font-family:'RATI_v2',Georgia,serif;font-size:15px;letter-spacing:.06em;color:#4c5048;}
+  .secure .steps h3{font-size:clamp(1.4rem,2vw,1.9rem);line-height:1.25;margin:0;max-width:22ch;}
+  @media(max-width:900px){.secure .photo{aspect-ratio:4/3;}}
+
+  /* fair pricing — white split */
+  .fair{padding-block:clamp(110px,16vh,190px);}
+  .fair .two{align-items:start;}
+  .fair h2{max-width:12ch;}
+  .fair .statement{max-width:20ch;}
+
+  /* FAQ — light */
+  .faq{background:#fff;padding-block:clamp(110px,15vh,180px);}
+  .faq .two{grid-template-columns:.8fr 1.2fr;align-items:start;}
+  .faq h2{max-width:12ch;}
+  .faq .side p{max-width:36ch;}
+  .faq details{border-bottom:1px solid rgba(17,17,17,.35);}
+  .faq details:first-of-type{border-top:1px solid rgba(17,17,17,.35);}
+  .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:26px;padding:27px 0;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.3rem,1.8vw,1.7rem);line-height:1.3;}
+  .faq summary::-webkit-details-marker{display:none;}
+  .faq summary .plus{position:relative;flex:none;width:15px;height:15px;top:2px;}
+  .faq summary .plus::before,.faq summary .plus::after{content:"";position:absolute;background:#111;transition:transform .25s;}
+  .faq summary .plus::before{left:0;right:0;top:7px;height:1px;}
+  .faq summary .plus::after{top:0;bottom:0;left:7px;width:1px;}
+  .faq details[open] summary .plus::after{transform:rotate(90deg);}
+  .faq .a{padding:0 0 32px;max-width:58ch;}
+
+  /* closing — green angled */
+  .closing{background:#71977A;color:#111;padding-block:clamp(100px,14vh,170px);}
+  .closing .two{grid-template-columns:1.15fr .85fr;align-items:center;}
+  .closing .lead{font-size:clamp(1.6rem,2.5vw,2.3rem);line-height:1.3;max-width:26ch;margin:0;}
+  .closing .ctas{margin-top:0;}
+
+  .black-note{background:#111;color:rgba(245,246,241,.75);font-size:13px;letter-spacing:.04em;padding:30px clamp(24px,7vw,105px);text-align:center;}
+  .black-note a{color:#F5F6F1;}
+
+  /* ================= mobile (last so it wins) ================= */
+  @media(max-width:900px){
+    .s .two{grid-template-columns:1fr;gap:40px;}
+    .hero{min-height:0;}
+    .hero h1{max-width:none;}
+    .hero .wrap{padding-top:112px;padding-bottom:56px;}
+    .collage{margin:12px 0 11%;}
+    .collage .base{aspect-ratio:4/3.4;}
+    .s .statement{margin-top:1.2em;}
+    .s .ctas{margin-top:32px;gap:26px;}
+    .closing .ctas{margin-top:8px;}
+  }
+  @media(max-width:520px){
+    .hdr .nav{padding:14px 18px;gap:14px;}
+    .hdr .logo img{height:24px;}
+    .hdr ul{gap:14px;}
+    .hdr ul a.pill{font-size:15px;padding:11px 18px;}
+    .s .wrap{padding-inline:22px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <nav class="nav" aria-label="Primary">
+    <a class="logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home">
+      <img class="lt" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
+      <img class="dk" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/09b8344b-8b40-4f71-9a64-152e1ed34fa7/Asset+16LOGO.png?format=1500w" alt="Biofarm" />
+    </a>
+    <ul>
+      <li><a href="https://www.biofarm.co.uk/developers">Partners</a></li>
+      <li><a href="https://www.biofarm.co.uk/habitat-banks">Habitat Banks</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
+      <li><a href="https://www.biofarm.co.uk/contact">Contact</a></li>
+      <li><a class="pill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ HERO (light, restored-habitat collage) ============ -->
+  <section class="s hero">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <h1>Secure off site biodiversity&nbsp;units</h1>
+          <h3>Secure the right biodiversity units, in the right place.</h3>
+          <div class="intro">
+            <p>When your development requires off site Biodiversity Net Gain, success is not simply about securing biodiversity units. It is about securing the right units, in the right location, with confidence they will support your planning strategy.</p>
+          </div>
+          <p class="unit">Every biodiversity unit starts with a Biofarm&nbsp;habitat.</p>
+          <div class="intro">
+            <p>We work with landowners to create habitats that generate biodiversity units, then manage every habitat bank for at least 30 years.</p>
+          </div>
+          <div class="ctas">
+            <a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
+            <a class="tlink" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a>
+          </div>
+        </div>
+        <div class="collage">
+          <img class="base" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756558934440-S53T4BEBNC2BOKV81G3J/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-2614.jpg?format=1500w" alt="Woodland canopy at a Biofarm habitat bank" />
+          <img class="over" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756561098277-2B227FIDENEPGJZDHBTB/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-2274.jpg?format=750w" alt="Land manager at work on a Biofarm habitat bank" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY THE RIGHT UNITS MATTER + WHY LOCATION MATTERS (green, angled) ============ -->
+  <div class="s angle" style="background:#F5F6F1;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
+  <section class="s why">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <h2>Why the right biodiversity units matter</h2>
+          <p class="lead">Developers do not simply need biodiversity units. They need biodiversity units that are locally relevant, support planning requirements and create lasting ecological&nbsp;value.</p>
+        </div>
+        <div class="loc">
+          <h3>Why location matters</h3>
+          <p>Location plays an important role in Biodiversity Net Gain.</p>
+          <p>The <a class="ilink" href="https://www.biofarm.co.uk/biodiversity-metric">statutory biodiversity metric</a> applies a Spatial Risk Multiplier where biodiversity is delivered further from a development.</p>
+          <p>Choosing a locally appropriate <a class="ilink" href="https://www.biofarm.co.uk/habitat-banks">Biofarm Habitat Bank</a> can help reduce additional unit requirements while supporting better outcomes for nature.</p>
+          <div class="ctas" style="margin-top:30px;"><a class="tlink" href="https://www.biofarm.co.uk/biodiversity-metric">Understand the Biodiversity Metric</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW BIOFARM CREATES UNITS (immersive set-piece) ============ -->
+  <section class="s creates">
+    <img class="bg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1754640171589-U6GYJWOXP4J8WW0WK3OT/2025_07_21_DACRE_Biofarm_Sleight_Farm-1727.jpg?format=2500w" alt="Restored species-rich grassland at Sleight Farm habitat bank" />
+    <div class="wrap">
+      <h2>How Biofarm creates biodiversity&nbsp;units</h2>
+      <p class="lead">Every Biofarm biodiversity unit begins with land that has the potential to become something&nbsp;more.</p>
+      <div class="cols">
+        <div>
+          <p>We identify suitable land, restore habitats and manage every habitat bank ourselves for at least 30 years.</p>
+          <p>Behind every biodiversity unit is a real place. One that will continue to grow, evolve and support wildlife for decades to come.</p>
+        </div>
+        <div>
+          <p class="statement">Every biodiversity unit we provide comes from a Biofarm Habitat&nbsp;Bank.</p>
+          <div class="ctas" style="margin-top:38px;"><a class="tlink" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLANNING CONFIDENCE STARTS EARLY (light) ============ -->
+  <section class="s early">
+    <div class="wrap">
+      <div class="two">
+        <h2>Planning confidence starts early</h2>
+        <div>
+          <p class="lead">The earlier we understand your project, the more opportunity there is to identify locally appropriate habitat banks, provide certainty around availability and pricing, and reduce planning risk.</p>
+          <p>Early engagement gives you more choice, greater certainty and more time to integrate Biodiversity Net Gain into your planning strategy.</p>
+          <div class="ctas" style="margin-top:30px;"><a class="tlink" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW TO SECURE UNITS (white, photo + large-type steps) ============ -->
+  <section class="s secure">
+    <div class="wrap">
+      <div class="two">
+        <img class="photo" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756560129670-HN7ZFJM1QYXQMTX1MX3A/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-1889.jpg?format=1500w" alt="Ponies grazing species-rich grassland at Sleight Farm habitat bank" />
+        <div>
+          <h2>How to secure biodiversity units</h2>
+          <ol class="steps">
+            <li><span class="num">01</span><h3>Talk to Biofarm early.</h3></li>
+            <li><span class="num">02</span><h3>Understand your Biodiversity Net Gain requirements.</h3></li>
+            <li><span class="num">03</span><h3>Identify the right Biofarm Habitat Bank.</h3></li>
+            <li><span class="num">04</span><h3>Secure your biodiversity units.</h3></li>
+            <li><span class="num">05</span><h3>We create, manage, monitor and report for the long term.</h3></li>
+          </ol>
+          <div class="ctas" style="margin-top:40px;"><a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAIR PRICING (white) ============ -->
+  <section class="s fair">
+    <div class="wrap">
+      <div class="two">
+        <h2>Fair pricing. Long term value.</h2>
+        <div>
+          <p class="lead">We believe in fair, transparent pricing and practical advice.</p>
+          <p>We are here to help you secure the right biodiversity units for your development, not simply the first units available.</p>
+          <p class="statement">Every biodiversity unit starts with a real&nbsp;place.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ (light) ============ -->
+  <section class="s faq">
+    <div class="wrap">
+      <div class="two">
+        <div class="side">
+          <h2>Frequently asked questions</h2>
+          <p style="margin-top:1.6em;">Can&rsquo;t find what you&rsquo;re looking for? <a class="ilink" href="https://www.biofarm.co.uk/contact">Talk to our team</a>.</p>
+        </div>
+        <div>
+          <details>
+            <summary>When is off site Biodiversity Net Gain the right choice?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a">
+              <p>Every development is different, and the most appropriate Biodiversity Net Gain strategy will depend on the type of development, the characteristics of the site and the applicable regulatory requirements.</p>
+              <p>Biofarm works with developers to identify the most appropriate route to achieving Biodiversity Net Gain. Depending on the project, this may include on-site habitat creation or enhancement, off-site biodiversity units, or a combination of both.</p>
+              <p>Where off-site delivery is the right solution, Biofarm provides high-quality biodiversity units through our professionally managed habitat banks, helping developers meet their obligations efficiently and with confidence.</p>
+            </div>
+          </details>
+          <details>
+            <summary>What is the difference between biodiversity units and statutory biodiversity credits?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a">
+              <p>Biodiversity units are created through habitat banks such as those developed and managed by Biofarm.</p>
+              <p>Statutory biodiversity credits are provided by Government and are intended as a last resort where suitable market units are not available.</p>
+            </div>
+          </details>
+          <details>
+            <summary>What is the difference between biodiversity units and carbon credits?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a">
+              <p>Although both support environmental outcomes, they serve different purposes.</p>
+              <p>Biodiversity units are used to measure and deliver Biodiversity Net Gain and help developments meet planning requirements.</p>
+              <p>Carbon credits measure the reduction or removal of greenhouse gas emissions and are used to help organisations manage their carbon footprint.</p>
+              <p>While the same habitat may provide both biodiversity and carbon benefits, they are different products, measured in different ways and created for different purposes.</p>
+              <p>Every biodiversity unit Biofarm provides comes from a real habitat that we create, restore and manage for at least 30 years.</p>
+            </div>
+          </details>
+          <details>
+            <summary>What is the Spatial Risk Multiplier?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>The Spatial Risk Multiplier recognises that biodiversity delivered closer to a development generally provides greater ecological value than biodiversity delivered further away.</p></div>
+          </details>
+          <details>
+            <summary>Why does location matter?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>Choosing a locally appropriate Biofarm Habitat Bank can help reduce planning risk, avoid unnecessary additional unit requirements and support better outcomes for nature.</p></div>
+          </details>
+          <details>
+            <summary>How much do biodiversity units cost?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a">
+              <p>Costs depend on habitat type, location and the number of units required.</p>
+              <p>We provide fair, transparent pricing and clear advice from the outset.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLOSING (green, angled) ============ -->
+  <div class="s angle" style="background:#fff;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
+  <section class="s closing">
+    <div class="wrap">
+      <div class="two">
+        <p class="lead">Whether you are delivering a residential development, commercial scheme or infrastructure project, we will help you secure the right off site biodiversity units from a Biofarm Habitat&nbsp;Bank.</p>
+        <div class="ctas">
+          <a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
+          <a class="tlink" href="https://www.biofarm.co.uk/biodiversity-net-gain">Learn about Biodiversity Net Gain</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="black-note">
+  Prototype for <a href="https://www.biofarm.co.uk/">biofarm.co.uk</a>/biodiversity-units &mdash; the live page inherits the real site header &amp; footer.
+</footer>
+
+<script>
+  (function(){
+    var h=document.getElementById('hdr');
+    addEventListener('scroll',function(){h.classList.toggle('scrolled',scrollY>40);},{passive:true});
+  })();
+</script>
+
+<!-- ============ JSON-LD — paste into Squarespace Page Settings → Advanced → Header Code Injection ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "WebPage", "@id": "https://www.biofarm.co.uk/biodiversity-units", "url": "https://www.biofarm.co.uk/biodiversity-units",
+      "name": "Biodiversity Units | Secure off site Biodiversity Units | Biofarm",
+      "description": "Secure off site biodiversity units from Biofarm Habitat Banks. Fair pricing, local delivery and long term stewardship to support residential, commercial and infrastructure developments." },
+    { "@type": "BreadcrumbList", "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.biofarm.co.uk/" },
+        { "@type": "ListItem", "position": 2, "name": "Biodiversity Units", "item": "https://www.biofarm.co.uk/biodiversity-units" } ] },
+    { "@type": "FAQPage", "mainEntity": [
+        { "@type": "Question", "name": "When is off site Biodiversity Net Gain the right choice?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Every development is different, and the most appropriate Biodiversity Net Gain strategy will depend on the type of development, the characteristics of the site and the applicable regulatory requirements. Biofarm works with developers to identify the most appropriate route to achieving Biodiversity Net Gain. Depending on the project, this may include on-site habitat creation or enhancement, off-site biodiversity units, or a combination of both. Where off-site delivery is the right solution, Biofarm provides high-quality biodiversity units through our professionally managed habitat banks, helping developers meet their obligations efficiently and with confidence." } },
+        { "@type": "Question", "name": "What is the difference between biodiversity units and statutory biodiversity credits?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Biodiversity units are created through habitat banks such as those developed and managed by Biofarm. Statutory biodiversity credits are provided by Government and are intended as a last resort where suitable market units are not available." } },
+        { "@type": "Question", "name": "What is the difference between biodiversity units and carbon credits?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Although both support environmental outcomes, they serve different purposes. Biodiversity units are used to measure and deliver Biodiversity Net Gain and help developments meet planning requirements. Carbon credits measure the reduction or removal of greenhouse gas emissions and are used to help organisations manage their carbon footprint. While the same habitat may provide both biodiversity and carbon benefits, they are different products, measured in different ways and created for different purposes. Every biodiversity unit Biofarm provides comes from a real habitat that we create, restore and manage for at least 30 years." } },
+        { "@type": "Question", "name": "What is the Spatial Risk Multiplier?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The Spatial Risk Multiplier recognises that biodiversity delivered closer to a development generally provides greater ecological value than biodiversity delivered further away." } },
+        { "@type": "Question", "name": "Why does location matter?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Choosing a locally appropriate Biofarm Habitat Bank can help reduce planning risk, avoid unnecessary additional unit requirements and support better outcomes for nature." } },
+        { "@type": "Question", "name": "How much do biodiversity units cost?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Costs depend on habitat type, location and the number of units required. We provide fair, transparent pricing and clear advice from the outset." } } ] }
+  ]
+}
+</script>
+
+</body>
+</html>

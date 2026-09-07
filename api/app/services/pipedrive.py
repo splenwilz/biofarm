@@ -72,7 +72,13 @@ class PipedriveClient:
                     raise PipedriveError(
                         f"{method} {path} failed with {resp.status_code}: {_error_reason(resp)}"
                     )
-                return resp.json()
+                try:
+                    return resp.json()
+                except ValueError as exc:
+                    # 2xx with an empty/non-JSON body (proxy or CDN hiccup)
+                    raise PipedriveError(
+                        f"{method} {path}: invalid JSON in {resp.status_code} response"
+                    ) from exc
         raise PipedriveError(f"{method} {path}: retries exhausted")  # pragma: no cover
 
     async def find_person_by_email(self, email: str) -> int | None:
@@ -93,6 +99,7 @@ class PipedriveClient:
         email: str,
         phone: str | None = None,
         marketing_status: str | None = None,
+        custom_fields: dict[str, Any] | None = None,
     ) -> int:
         body: dict[str, Any] = {
             "name": name,
@@ -102,6 +109,9 @@ class PipedriveClient:
             body["phones"] = [{"value": phone, "primary": True, "label": "work"}]
         if marketing_status:
             body["marketing_status"] = marketing_status
+        # v2 persons take custom fields NESTED (unlike v1 leads, root-level)
+        if custom_fields:
+            body["custom_fields"] = custom_fields
         data = await self._request("POST", "/api/v2/persons", json=body)
         return data["data"]["id"]
 

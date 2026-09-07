@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — HOMEPAGE REFRESH (Web Copy v3, section 1)
+
+  A refresh of the LIVE homepage: the doc says retain the existing hero photography and
+  visual identity, the client logos and the testimonials. This prototype keeps the live
+  identity elements (watercolour-illustration hero canvas, build|nature split photos,
+  the "No wild claims" marquee) and carries the new copy, plus the two new components the
+  doc asks for: "How Biofarm works" as a four-stage component and "Explore" as four cards
+  linking to the new pages. See homepage-change-sheet.md for the per-section edit list.
+
+  SQUARESPACE PAGE SETTINGS
+  URL:              /
+  SEO title:        Biofarm | Biodiversity Net Gain and Habitat Banks
+  SEO description:  Biofarm creates and manages habitat banks that help developers deliver
+                    Biodiversity Net Gain while restoring nature across England.
+  OG title:         Biofarm | We're in the business of nature
+  OG description:   We bring together developers, landowners and nature to create habitats
+                    that support development and restore biodiversity.
+  Schema:           Organization + WebSite + WebPage + BreadcrumbList (no FAQPage — per doc).
+
+  RETAINED (placeholders here, keep the live blocks): client logo strip, testimonials
+  (lead with a developer testimonial, then a landowner one).
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Biofarm | Biodiversity Net Gain and Habitat Banks</title>
+<meta name="description" content="Biofarm creates and manages habitat banks that help developers deliver Biodiversity Net Gain while restoring nature across England." />
+<link rel="canonical" href="https://www.biofarm.co.uk/" />
+<meta property="og:title" content="Biofarm | We’re in the business of nature" />
+<meta property="og:description" content="We bring together developers, landowners and nature to create habitats that support development and restore biodiversity." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.biofarm.co.uk/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  @font-face{font-family:'RATI_v2';
+    src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+        url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight:300;font-display:swap;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#F5F6F1;color:#111;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:clip;}
+
+  /* ================= header (prototype — live page inherits the real nav) ================= */
+  .hdr{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s;}
+  .hdr.scrolled{background:rgba(245,246,241,.97);}
+  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px clamp(24px,3.2vw,48px);}
+  .hdr .logo img{height:30px;display:block;}
+  .hdr .logo img.dk{display:none;}
+  .hdr ul{list-style:none;display:flex;align-items:center;gap:32px;margin:0;padding:0;}
+  .hdr ul a{text-decoration:none;color:#111;font-size:14px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;}
+  .hdr ul a.pill{background:#111;color:#F5F6F1;border-radius:25px;padding:13px 26px;font-family:'RATI_v2',Georgia,serif;font-size:17px;letter-spacing:.01em;text-transform:none;white-space:nowrap;}
+  /* over the dark hero the nav runs light; solid cream after scrolling */
+  .hdr.on-dark:not(.scrolled) ul a{color:#F5F6F1;}
+  .hdr.on-dark:not(.scrolled) ul a.pill{background:#F5F6F1;color:#111;}
+  .hdr.on-dark:not(.scrolled) .logo img.lt{display:none;}
+  .hdr.on-dark:not(.scrolled) .logo img.dk{display:block;}
+  @media(max-width:940px){.hdr ul li:not(:last-child){display:none;}}
+
+  /* ================= shared ================= */
+  .s{box-sizing:border-box;}
+  .s *,.s *::before,.s *::after{box-sizing:border-box;}
+  .s .wrap{max-width:1512px;margin-inline:auto;padding-inline:clamp(24px,7vw,105px);}
+  .s h1,.s h2,.s h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;margin:0;}
+  .s h1{font-size:clamp(3rem,6.5vw,6.19rem);line-height:1.04;letter-spacing:-.01em;}
+  .s h2{font-size:clamp(2rem,3vw,2.75rem);line-height:1.14;}
+  .s h3{font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.28;}
+  .s .lead{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.3rem,1.75vw,1.63rem);line-height:1.42;margin:0 0 1.1em;}
+  .s p{margin:0 0 1.2em;}
+  .s .statement{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.3;margin:1.6em 0 0;}
+  .s a.tlink{display:inline-block;font-size:14px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:inherit;text-decoration:none;transition:opacity .2s;}
+  .s a.tlink:hover{opacity:.55;}
+  .s a.pill{display:inline-block;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;text-decoration:none;border-radius:25px;padding:15px 30px;background:#111;color:#F5F6F1;transition:background .3s;white-space:nowrap;}
+  .s a.pill:hover{background:#333;}
+  .s .ctas{display:flex;flex-wrap:wrap;align-items:center;gap:34px;margin-top:44px;}
+  .s a.ilink{color:inherit;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;}
+  .s .two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);}
+  @media(max-width:900px){.s .two{grid-template-columns:1fr;}}
+
+  .collage{position:relative;}
+  .collage img{display:block;object-fit:cover;width:100%;}
+  .collage .base{width:86%;margin-left:14%;aspect-ratio:4/4.4;}
+  .collage .over{position:absolute;left:0;bottom:-9%;width:46%;aspect-ratio:4/4.6;box-shadow:0 0 0 6px var(--edge,#fff);}
+  .collage.flip .base{margin-left:0;margin-right:14%;}
+  .collage.flip .over{left:auto;right:0;}
+  @media(max-width:900px){.collage{margin-bottom:9%;}}
+
+  .rows{border-top:1px solid rgba(17,17,17,.55);}
+  .row{border-bottom:1px solid rgba(17,17,17,.55);padding:30px 0 34px;}
+  .row h3{font-size:clamp(1.35rem,1.9vw,1.78rem);margin:0 0 .55em;}
+  .row p{margin:0;max-width:56ch;}
+  .row .num{font-family:'RATI_v2',Georgia,serif;font-size:15px;display:block;margin-bottom:10px;letter-spacing:.06em;}
+  /* hairline rows on light ground */
+  .rows.lt{border-top-color:rgba(17,17,17,.16);}
+  .rows.lt .row{border-bottom-color:rgba(17,17,17,.16);}
+
+  .angle{display:block;width:100%;height:clamp(44px,6vw,92px);line-height:0;margin-top:-1px;margin-bottom:-1px;position:relative;z-index:1;}
+  .angle svg{width:100%;height:100%;display:block;}
+
+  /* ================= sections ================= */
+  /* hero — the site's illustration canvas, rebuilt from the individual watercolours so it
+     never crops: sprites pinned to the corners, the statement centred in the clear middle */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;text-align:center;overflow:hidden;}
+  .hero .wrap{width:100%;padding-top:150px;padding-bottom:110px;position:relative;z-index:1;}
+  .hero h1{max-width:12ch;margin:0 auto .45em;}
+  .hero .lead{font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.3;max-width:24ch;margin:0 auto;}
+  .hero .intro p{max-width:56ch;margin-inline:auto;font-size:16px;color:#2b2e29;}
+  .hero .unit{font-family:'RATI_v2',Georgia,serif;font-size:clamp(1.3rem,1.75vw,1.63rem);line-height:1.4;margin:1.6em auto 0;}
+  .hero .ctas{justify-content:center;margin-top:52px;}
+  .introsec{padding-block:clamp(90px,13vh,150px);}
+  .introsec .two{align-items:start;}
+  .introsec .statement{max-width:16ch;}
+  .hero .sp{position:absolute;pointer-events:none;user-select:none;z-index:0;}
+  .hero .fern{width:clamp(180px,24vw,420px);left:-2vw;top:11vh;transform:rotate(-8deg);}
+  .hero .bee{width:clamp(110px,13vw,230px);right:4vw;top:12vh;}
+  .hero .crane{width:clamp(140px,17vw,300px);left:3vw;bottom:5vh;}
+  .hero .cattle{width:clamp(190px,24vw,430px);right:-1vw;bottom:4vh;}
+  .hero .lapwing{width:clamp(70px,8vw,140px);left:26vw;bottom:9vh;}
+  @media(max-width:1100px){.hero .lapwing{display:none;}}
+
+  /* creating better places — split with the build|nature photo pair (retained identity) */
+  .better{background:#fff;padding-block:clamp(110px,16vh,190px) 0;}
+  .better .two{align-items:start;}
+  .better h2{max-width:14ch;}
+  .better .statement{max-width:22ch;}
+  .better .split{display:grid;grid-template-columns:1fr 1fr;height:clamp(300px,52vh,560px);margin-top:clamp(64px,9vh,110px);}
+  .better .split img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* you build we restore — two audience columns */
+  .audiences{padding-block:clamp(110px,16vh,190px);}
+  .audiences h2{max-width:12ch;}
+  .audiences .lead{max-width:34ch;margin-top:1.2em;color:#4c5048;}
+  .audiences .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);margin-top:clamp(56px,8vh,90px);}
+  .audiences .col{border-top:1px solid rgba(17,17,17,.35);padding-top:30px;}
+  .audiences .col h3{margin-bottom:.5em;}
+  .audiences .col .lead{color:#111;margin-top:0;max-width:26ch;}
+  @media(max-width:900px){.audiences .cols{grid-template-columns:1fr;}}
+
+  /* how Biofarm works — four-stage journey (doc: simple four stage visual component) */
+  .works{background:#fff;padding-block:clamp(110px,15vh,180px);}
+  .works h2{max-width:14ch;}
+  .works .lead{max-width:30ch;margin-top:1.2em;}
+  .works .journey{list-style:none;margin:clamp(56px,8vh,96px) 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(28px,3.4vw,56px);position:relative;}
+  .works .journey::before{content:"";position:absolute;left:0;right:0;top:7px;height:1px;background:rgba(17,17,17,.22);}
+  .works .journey li{position:relative;padding-top:38px;}
+  .works .journey li::before{content:"";position:absolute;left:0;top:0;width:15px;height:15px;border-radius:50%;background:#fff;border:1px solid #111;}
+  .works .journey li:first-child::before{background:#111;}
+  .works .journey .n{font-family:'RATI_v2',Georgia,serif;font-size:clamp(2.6rem,4vw,3.8rem);line-height:1;display:block;margin-bottom:22px;}
+  .works .journey h3{font-size:clamp(1.25rem,1.7vw,1.55rem);line-height:1.28;margin:0 0 .6em;max-width:16ch;}
+  .works .journey p{margin:0;color:#4c5048;max-width:30ch;}
+  @media(max-width:1000px){.works .journey{grid-template-columns:1fr 1fr;row-gap:56px;}.works .journey::before{display:none;}}
+  @media(max-width:560px){.works .journey{grid-template-columns:1fr;}}
+
+  /* no wild claims — the marquee (retained identity) + copy */
+  .wild{padding-block:clamp(90px,13vh,150px) clamp(110px,16vh,190px);overflow:hidden;}
+  .wild .marquee{white-space:nowrap;overflow:hidden;margin-bottom:clamp(64px,9vh,110px);}
+  .wild .track{display:inline-block;animation:bfm 40s linear infinite;}
+  .wild .track span{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(3.4rem,7vw,6.6rem);letter-spacing:-.012em;padding-right:1.2em;}
+  @keyframes bfm{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .wild .two{align-items:start;}
+  .wild .statement{max-width:14ch;}
+
+  /* explore — four cards to the new pages */
+  .explore{background:#71977A;color:#111;padding-block:clamp(90px,13vh,150px);}
+  .explore h2{max-width:12ch;}
+  .explore .lead{max-width:34ch;margin-top:1.2em;}
+  .explore .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(24px,3vw,48px);margin-top:clamp(56px,8vh,90px);}
+  .explore .card{border-top:1px solid rgba(17,17,17,.55);padding-top:26px;}
+  .explore .card h3{font-size:clamp(1.3rem,1.8vw,1.7rem);margin-bottom:.6em;}
+  .explore .card p{max-width:26ch;}
+  .explore .card .tlink{border-bottom:1px solid rgba(17,17,17,.5);padding-bottom:6px;}
+  @media(max-width:1000px){.explore .cards{grid-template-columns:1fr 1fr;}}
+  @media(max-width:560px){.explore .cards{grid-template-columns:1fr;}}
+
+  /* national by nature — immersive */
+  .national{position:relative;color:#F5F6F1;isolation:isolate;overflow:hidden;text-align:center;padding-block:clamp(130px,20vh,240px);}
+  .national .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;}
+  .national::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,12,9,.78),rgba(9,12,9,.58) 45%,rgba(9,12,9,.84));}
+  .national h1{color:#F5F6F1;max-width:14ch;margin:0 auto .5em;}
+  .national .lead{color:rgba(245,246,241,.94);max-width:30ch;margin-inline:auto;}
+  .national p{color:rgba(245,246,241,.92);max-width:52ch;margin-inline:auto;}
+  .national .tlink{color:#F5F6F1;border-bottom:1px solid rgba(245,246,241,.6);padding-bottom:6px;}
+  .national .ctas{justify-content:center;}
+
+  /* trusted — retained logo strip */
+  .trusted{background:#fff;padding-block:clamp(90px,12vh,140px);text-align:center;}
+  .trusted h2{max-width:22ch;margin:0 auto clamp(40px,6vh,64px);}
+  .trusted img{width:min(1100px,92%);display:block;margin-inline:auto;}
+  .trusted .note{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#4c5048;margin-top:28px;}
+
+  /* clients say — retained testimonials placeholder */
+  .say{padding-block:clamp(100px,14vh,170px);}
+  .say h2{max-width:14ch;}
+  .say .quotes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);margin-top:clamp(48px,7vh,80px);}
+  .say .q{border-top:1px solid rgba(17,17,17,.35);padding-top:28px;}
+  .say .q .lead{max-width:30ch;}
+  .say .q .who{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#4c5048;margin:0;}
+  @media(max-width:900px){.say .quotes{grid-template-columns:1fr;}}
+
+  /* team — light split */
+  .team{background:#fff;padding-block:clamp(110px,16vh,190px);}
+  .team .two{align-items:center;}
+  .team h2{max-width:14ch;}
+
+  .closing{background:#71977A;color:#111;padding-block:clamp(100px,14vh,170px);}
+  .closing .two{grid-template-columns:1fr 1fr;align-items:center;}
+  .closing h2{font-size:clamp(2.3rem,4vw,3.7rem);line-height:1.1;max-width:14ch;}
+  .closing .lead{max-width:32ch;}
+
+  .black-note{background:#111;color:rgba(245,246,241,.75);font-size:13px;letter-spacing:.04em;padding:30px clamp(24px,7vw,105px);text-align:center;}
+  .black-note a{color:#F5F6F1;}
+
+  /* ================= mobile (last so it wins) ================= */
+  @media(max-width:900px){
+    .s .two{grid-template-columns:1fr;gap:40px;}
+    .hero{min-height:0;}
+    .hero .wrap{padding-top:130px;padding-bottom:110px;}
+    .hero .fern{width:150px;left:-30px;top:70px;}
+    .hero .bee{width:90px;right:10px;top:84px;}
+    .hero .crane{display:none;}
+    .hero .cattle{width:170px;right:-20px;bottom:-6px;}
+    .better .split{height:auto;grid-template-columns:1fr;}
+    .better .split img{aspect-ratio:4/3;}
+    .s .statement{margin-top:1.2em;}
+    .s .ctas{margin-top:32px;gap:26px;}
+  }
+  @media(max-width:520px){
+    .hdr .nav{padding:14px 18px;gap:14px;}
+    .hdr .logo img{height:24px;}
+    .hdr ul{gap:14px;}
+    .hdr ul a.pill{font-size:15px;padding:11px 18px;}
+    .s .wrap{padding-inline:22px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <nav class="nav" aria-label="Primary">
+    <a class="logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home">
+      <img class="lt" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
+      <img class="dk" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/09b8344b-8b40-4f71-9a64-152e1ed34fa7/Asset+16LOGO.png?format=1500w" alt="Biofarm" />
+    </a>
+    <ul>
+      <li><a href="https://www.biofarm.co.uk/developers">Partners</a></li>
+      <li><a href="https://www.biofarm.co.uk/habitat-banks">Habitat Banks</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
+      <li><a href="https://www.biofarm.co.uk/contact">Contact</a></li>
+      <li><a class="pill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ HERO — live illustration canvas RETAINED, copy REWRITTEN ============ -->
+  <section class="s hero">
+    <img class="sp fern" src="assets/illustrations/fern.png" alt="" aria-hidden="true" />
+    <img class="sp bee" src="assets/illustrations/bee.png" alt="" aria-hidden="true" />
+    <img class="sp crane" src="assets/illustrations/crane.png" alt="" aria-hidden="true" />
+    <img class="sp cattle" src="assets/illustrations/cattle.png" alt="" aria-hidden="true" />
+    <img class="sp lapwing" src="assets/illustrations/lapwing.png" alt="" aria-hidden="true" />
+    <div class="wrap">
+      <h1>We&rsquo;re in the business of&nbsp;nature.</h1>
+      <p class="lead">Nature is changing. Development is changing. The way we care for land is changing&nbsp;too.</p>
+      <div class="ctas">
+        <a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
+        <a class="tlink" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INTRO — the rest of the hero copy, as a short editorial pair ============ -->
+  <section class="s introsec">
+    <div class="wrap">
+      <div class="two">
+        <p class="statement" style="margin-top:0;">Every biodiversity unit starts with a Biofarm&nbsp;habitat.</p>
+        <div>
+          <p class="lead">At Biofarm, we&rsquo;re creating a future where development, land and nature work better together.</p>
+          <p>Working with developers and landowners across England, we create habitats that support residential developments, commercial schemes and infrastructure projects, while restoring biodiversity and creating places where nature can thrive.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CREATING BETTER PLACES TOGETHER — copy REWRITTEN, split photos RETAINED ============ -->
+  <section class="s better">
+    <div class="wrap">
+      <div class="two">
+        <h2>Creating better places together.</h2>
+        <div>
+          <p class="lead">The best places don&rsquo;t happen by chance. They happen when people work together with nature.</p>
+          <p>From new homes and workplaces to the infrastructure that connects our communities, development shapes the places where we live and work.</p>
+          <p>Landowners shape the landscapes that surround them.</p>
+          <p>At Biofarm, we bring those ambitions together by creating habitats that support responsible development, strengthen biodiversity and leave a lasting legacy for future generations.</p>
+          <p class="statement">Because better places benefit&nbsp;everyone.</p>
+        </div>
+      </div>
+    </div>
+    <div class="split">
+      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/71efa63d-de73-40e2-8575-71821e2093d1/Biofarm+BNG+construction+homes?format=1500w" alt="New homes under construction" />
+      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1754640171589-U6GYJWOXP4J8WW0WK3OT/2025_07_21_DACRE_Biofarm_Sleight_Farm-1727.jpg?format=1500w" alt="Species-rich grassland at Sleight Farm habitat bank" />
+    </div>
+  </section>
+
+  <!-- ============ YOU BUILD. WE RESTORE. — two audiences ============ -->
+  <section class="s audiences">
+    <div class="wrap">
+      <h2>You build. We&nbsp;restore.</h2>
+      <p class="lead">Whether you&rsquo;re delivering a development or exploring the future of your land, we&rsquo;re here to help.</p>
+      <div class="cols">
+        <div class="col">
+          <h3>For Developers</h3>
+          <p class="lead">Deliver Biodiversity Net Gain with confidence.</p>
+          <p>From early planning advice through to securing off site biodiversity units from our own habitat banks, we&rsquo;ll help you find the right habitat, in the right place.</p>
+          <div class="ctas" style="margin-top:26px;"><a class="tlink" href="https://www.biofarm.co.uk/developers">Explore Developers</a></div>
+        </div>
+        <div class="col">
+          <h3>For Landowners</h3>
+          <p class="lead">Unlock the potential of your land.</p>
+          <p>Partner with Biofarm to create habitats that support nature, generate long term value and leave a lasting legacy.</p>
+          <div class="ctas" style="margin-top:26px;"><a class="tlink" href="https://www.biofarm.co.uk/landowners">Explore Landowners</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW BIOFARM WORKS — NEW four-stage component ============ -->
+  <section class="s works">
+    <div class="wrap">
+      <h2>How Biofarm works.</h2>
+      <p class="lead">Every biodiversity unit starts with a real place. Every project begins with a partnership.</p>
+      <ol class="journey">
+        <li><span class="n">01</span><h3>We find the land.</h3><p>Working alongside landowners, we identify places with the potential to become something more.</p></li>
+        <li><span class="n">02</span><h3>We create habitats.</h3><p>Our ecologists restore wetlands, woodlands, species rich grasslands and other priority habitats that generate measurable biodiversity gains.</p></li>
+        <li><span class="n">03</span><h3>We support development.</h3><p>Those habitats generate biodiversity units that help developers deliver Biodiversity Net Gain while creating lasting benefits for nature.</p></li>
+        <li><span class="n">04</span><h3>We look after what we create.</h3><p>Every Biofarm habitat is managed, monitored and reported on for at least 30 years because lasting biodiversity depends on lasting stewardship.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ NO WILD CLAIMS — marquee RETAINED, copy NEW ============ -->
+  <section class="s wild">
+    <div class="marquee" aria-label="No wild claims. Just wilder places."><div class="track" aria-hidden="true"><span>No wild claims. Just wilder places.</span><span>No wild claims. Just wilder places.</span></div></div>
+    <div class="wrap">
+      <div class="two">
+        <p class="statement" style="margin-top:0;">This is not simply about meeting planning requirements.</p>
+        <div>
+          <p class="lead">It&rsquo;s about creating places where wildlife can recover, landscapes can flourish and future generations can experience more nature, not less.</p>
+          <p>Working alongside developers, landowners and local communities, we&rsquo;re restoring habitats that deliver lasting value for people and nature alike.</p>
+          <p>It&rsquo;s why we do what we do.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPLORE — NEW four cards to the new pages ============ -->
+  <div class="s angle" style="background:#F5F6F1;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
+  <section class="s explore">
+    <div class="wrap">
+      <h2>Explore</h2>
+      <p class="lead">Whether you&rsquo;re looking for practical guidance or planning your next project, we&rsquo;re here to help.</p>
+      <div class="cards">
+        <div class="card"><h3>Biodiversity Net Gain</h3><p>Understand how Biodiversity Net Gain works and what it means for your development.</p><a class="tlink" href="https://www.biofarm.co.uk/biodiversity-net-gain">Learn more</a></div>
+        <div class="card"><h3>Biodiversity Units</h3><p>Learn how Biofarm creates off site biodiversity units through our own habitat banks.</p><a class="tlink" href="https://www.biofarm.co.uk/biodiversity-units">Learn more</a></div>
+        <div class="card"><h3>Biodiversity Metric</h3><p>Understand how Biodiversity Net Gain is measured and what it means for your project.</p><a class="tlink" href="https://www.biofarm.co.uk/biodiversity-metric">Learn more</a></div>
+        <div class="card"><h3>Habitat Banks</h3><p>Explore our growing network of Biofarm Habitat Banks across England.</p><a class="tlink" href="https://www.biofarm.co.uk/habitat-banks">Explore Habitat Banks</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NATIONAL BY NATURE — immersive ============ -->
+  <section class="s national">
+    <img class="bg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/552de74f-fc23-4454-8143-8406408499f8/2025_07_21_DACRE_Biofarm_Sleight_Farm-1639.jpg?format=2500w" alt="Golden meadow running back to woodland at Sleight Farm habitat bank" />
+    <div class="wrap">
+      <h1>National by nature. Local by&nbsp;design.</h1>
+      <p class="lead">Nature is local. That&rsquo;s why every Biofarm Habitat Bank is created with place in&nbsp;mind.</p>
+      <p>By restoring habitats close to the developments they support, we&rsquo;re helping developers reduce planning risk, minimise the impact of the Spatial Risk Multiplier and create meaningful biodiversity where it matters most.</p>
+      <p>As our network grows, so does the opportunity to create better outcomes for development, nature and local communities.</p>
+      <div class="ctas"><a class="tlink" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a></div>
+    </div>
+  </section>
+
+  <!-- ============ TRUSTED — RETAIN existing client logos ============ -->
+  <section class="s trusted">
+    <div class="wrap">
+      <h2>Trusted by developers. Valued by&nbsp;landowners.</h2>
+      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/2858e556-b6d6-4700-a5c7-427f1bcfc53d/LOGOS7.jpg?format=1500w" alt="Client logos" />
+      <p class="note">Retain the existing client logo strip</p>
+    </div>
+  </section>
+
+  <!-- ============ WHAT OUR CLIENTS SAY — RETAIN existing testimonials (developer first, then landowner) ============ -->
+  <section class="s say">
+    <div class="wrap">
+      <h2>What our clients say.</h2>
+      <div class="quotes">
+        <div class="q"><p class="lead">&ldquo;[Existing developer testimonial &mdash; retain from the live page]&rdquo;</p><p class="who">Developer</p></div>
+        <div class="q"><p class="lead">&ldquo;[Existing landowner testimonial &mdash; retain from the live page]&rdquo;</p><p class="who">Landowner</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MEET THE TEAM ============ -->
+  <section class="s team">
+    <div class="wrap">
+      <div class="two">
+        <h2>Meet the team behind&nbsp;Biofarm.</h2>
+        <div>
+          <p class="lead">Behind every habitat is a team of ecologists, land specialists and project managers committed to creating better places for people and nature.</p>
+          <div class="ctas" style="margin-top:26px;"><a class="tlink" href="https://www.biofarm.co.uk/about">Meet the team</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLOSING ============ -->
+  <div class="s angle" style="background:#fff;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
+  <section class="s closing">
+    <div class="wrap">
+      <div class="two">
+        <h2>Let&rsquo;s create something that&nbsp;lasts.</h2>
+        <div>
+          <p class="lead">Whether you&rsquo;re planning a residential development, commercial scheme, infrastructure project or exploring the future of your land, we&rsquo;d love to hear about your plans.</p>
+          <p>Together, we can create habitats that unlock opportunity, strengthen landscapes and leave a lasting legacy for nature.</p>
+          <div class="ctas" style="margin-top:34px;"><a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="black-note">
+  Prototype for the <a href="https://www.biofarm.co.uk/">biofarm.co.uk</a> homepage refresh &mdash; the live page inherits the real site header &amp; footer.
+</footer>
+
+<script>
+  (function(){
+    var h=document.getElementById('hdr');
+    addEventListener('scroll',function(){h.classList.toggle('scrolled',scrollY>40);},{passive:true});
+  })();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "Organization", "@id": "https://www.biofarm.co.uk/#org", "name": "Biofarm", "url": "https://www.biofarm.co.uk/",
+      "logo": "https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png",
+      "sameAs": ["https://www.linkedin.com/company/biofarmuk/"] },
+    { "@type": "WebSite", "@id": "https://www.biofarm.co.uk/#website", "url": "https://www.biofarm.co.uk/", "name": "Biofarm", "publisher": { "@id": "https://www.biofarm.co.uk/#org" } },
+    { "@type": "WebPage", "@id": "https://www.biofarm.co.uk/", "url": "https://www.biofarm.co.uk/", "name": "Biofarm | Biodiversity Net Gain and Habitat Banks",
+      "description": "Biofarm creates and manages habitat banks that help developers deliver Biodiversity Net Gain while restoring nature across England.", "isPartOf": { "@id": "https://www.biofarm.co.uk/#website" } },
+    { "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.biofarm.co.uk/" } ] }
+  ]
+}
+</script>
+
+</body>
+</html>

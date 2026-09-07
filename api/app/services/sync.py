@@ -48,6 +48,22 @@ def build_note_html(lead: Lead) -> str:
     return "".join(parts)
 
 
+def _person_custom_fields(lead: Lead, settings: Settings) -> dict | None:
+    """Map the form's field choices onto the required 'Client Type' person
+    field (set type - takes a list of option ids). Create-only: existing
+    persons keep whatever the team has curated."""
+    if not settings.pipedrive_client_type_field or not lead.fields:
+        return None
+    option_ids = [
+        settings.pipedrive_client_type_map[f]
+        for f in lead.fields
+        if f in settings.pipedrive_client_type_map
+    ]
+    if not option_ids:
+        return None
+    return {settings.pipedrive_client_type_field: option_ids}
+
+
 def _lead_custom_fields(lead: Lead, settings: Settings) -> dict[str, str]:
     merged: dict[str, str] = {}
     # first touch fills gaps, last touch wins
@@ -81,6 +97,7 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
                 email=lead.email,
                 phone=lead.phone,
                 marketing_status=marketing_status,
+                custom_fields=_person_custom_fields(lead, settings),
             )
         elif lead.phone or marketing_status:
             await client.update_person(
@@ -95,11 +112,17 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
             if lead.form == "contact"
             else f"Newsletter signup - {lead.name}"
         )
+        label_ids = list(
+            dict.fromkeys(
+                settings.pipedrive_lead_label_ids
+                + settings.pipedrive_form_label_map.get(lead.form, [])
+            )
+        )
         lead_id = await client.create_lead(
             title=title,
             person_id=person_id,
             owner_id=settings.pipedrive_owner_id,
-            label_ids=settings.pipedrive_lead_label_ids or None,
+            label_ids=label_ids or None,
             custom_fields=_lead_custom_fields(lead, settings),
         )
         lead.pipedrive_lead_id = lead_id

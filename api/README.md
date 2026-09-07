@@ -102,8 +102,11 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `BIOFARM_PIPEDRIVE_COMPANY_DOMAIN` | yes | `{domain}.pipedrive.com` |
 | `BIOFARM_PIPEDRIVE_API_TOKEN` | yes | secret; sent as `x-api-token` header |
 | `BIOFARM_PIPEDRIVE_OWNER_ID` | no | Pipedrive user ID to own new leads |
-| `BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS` | no | JSON array of lead label UUIDs |
+| `BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS` | no | JSON array of lead label UUIDs, applied to every lead |
+| `BIOFARM_PIPEDRIVE_FORM_LABEL_MAP` | no | JSON: form -> extra label UUIDs, e.g. `{"newsletter": ["uuid"]}` |
 | `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` | no | JSON from the bootstrap script |
+| `BIOFARM_PIPEDRIVE_CLIENT_TYPE_FIELD` | no | "Client Type" person-field hash; set on newly created persons only |
+| `BIOFARM_PIPEDRIVE_CLIENT_TYPE_MAP` | no | JSON: form value -> option id, e.g. `{"developer": 531}` |
 | `BIOFARM_GA4_MEASUREMENT_ID` | no | `G-3MS9TLLZRN` |
 | `BIOFARM_GA4_API_SECRET` | no | secret |
 | `BIOFARM_AUTO_CREATE_TABLES` | prod: `false` | Alembic owns the schema in prod |

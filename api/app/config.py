@@ -28,9 +28,16 @@ class Settings(BaseSettings):
     pipedrive_company_domain: str = ""
     pipedrive_api_token: SecretStr = SecretStr("")
     pipedrive_owner_id: int | None = None
+    # labels applied to every API-created lead (e.g. "Website")
     pipedrive_lead_label_ids: list[str] = []
+    # extra labels per form, e.g. {"newsletter": ["<Newsletter label uuid>"]}
+    pipedrive_form_label_map: dict[str, list[str]] = {}
     # attribution key -> 40-char Pipedrive deal-field hash (leads inherit deal fields)
     pipedrive_lead_field_map: dict[str, str] = {}
+    # "Client Type" person field (set type): field hash + form value -> option id.
+    # Only applied when creating a NEW person - never overwrites existing contacts.
+    pipedrive_client_type_field: str | None = None
+    pipedrive_client_type_map: dict[str, int] = {}
 
     ga4_measurement_id: str | None = None
     ga4_api_secret: SecretStr | None = None

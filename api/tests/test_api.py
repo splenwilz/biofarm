@@ -1,3 +1,5 @@
+import json
+
 import httpx
 import pytest
 import respx
@@ -26,18 +28,24 @@ CONTACT_PAYLOAD = {
 
 
 def mock_pipedrive_happy_path():
-    respx.get(f"{BASE}/api/v2/persons/search").mock(
-        return_value=httpx.Response(200, json={"success": True, "data": {"items": []}})
-    )
-    respx.post(f"{BASE}/api/v2/persons").mock(
-        return_value=httpx.Response(201, json={"success": True, "data": {"id": 7}})
-    )
-    respx.post(f"{BASE}/api/v1/leads").mock(
-        return_value=httpx.Response(201, json={"success": True, "data": {"id": "lead-uuid-1"}})
-    )
-    respx.post(f"{BASE}/api/v1/notes").mock(
-        return_value=httpx.Response(201, json={"success": True, "data": {"id": 5}})
-    )
+    """Mock the full sync flow. Returns the routes: re-registering a pattern
+    via respx.post(...) RESETS its mock, so tests must use these handles."""
+    return {
+        "search": respx.get(f"{BASE}/api/v2/persons/search").mock(
+            return_value=httpx.Response(200, json={"success": True, "data": {"items": []}})
+        ),
+        "person": respx.post(f"{BASE}/api/v2/persons").mock(
+            return_value=httpx.Response(201, json={"success": True, "data": {"id": 7}})
+        ),
+        "lead": respx.post(f"{BASE}/api/v1/leads").mock(
+            return_value=httpx.Response(
+                201, json={"success": True, "data": {"id": "lead-uuid-1"}}
+            )
+        ),
+        "note": respx.post(f"{BASE}/api/v1/notes").mock(
+            return_value=httpx.Response(201, json={"success": True, "data": {"id": 5}})
+        ),
+    }
 
 
 async def get_single_lead(client) -> Lead:
@@ -243,6 +251,54 @@ async def test_production_allows_absolute_sqlite_on_disk(tmp_path):
     # make_settings uses an absolute tmp path, mirroring /var/data/leads.db
     settings = make_settings(tmp_path, environment="production")
     assert create_app(settings) is not None
+
+
+@respx.mock
+async def test_labels_applied_globally_and_per_form(tmp_path):
+    settings = make_settings(
+        tmp_path,
+        pipedrive_lead_label_ids=["website-uuid"],
+        pipedrive_form_label_map={"newsletter": ["newsletter-uuid"]},
+    )
+    app = create_app(settings)
+    routes = mock_pipedrive_happy_path()
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            ac.app = app
+            r = await ac.post(
+                "/v1/leads/newsletter",
+                json={"name": "J", "email": "j@e.com", "field": "developer"},
+            )
+            assert r.status_code == 202
+            lead = await get_single_lead(ac)
+            assert lead.sync_status == "synced"
+
+    body = json.loads(routes["lead"].calls.last.request.content)
+    assert body["label_ids"] == ["website-uuid", "newsletter-uuid"]
+
+
+@respx.mock
+async def test_client_type_mapped_onto_new_person(tmp_path):
+    settings = make_settings(
+        tmp_path,
+        pipedrive_client_type_field="clienttypehash",
+        pipedrive_client_type_map={"developer": 531, "landowner": 530, "other": 1122},
+    )
+    app = create_app(settings)
+    routes = mock_pipedrive_happy_path()
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            ac.app = app
+            payload = dict(CONTACT_PAYLOAD, fields=["developer", "other"])
+            r = await ac.post("/v1/leads/contact", json=payload)
+            assert r.status_code == 202
+            lead = await get_single_lead(ac)
+            assert lead.sync_status == "synced"
+
+    body = json.loads(routes["person"].calls.last.request.content)
+    assert body["custom_fields"] == {"clienttypehash": [531, 1122]}
 
 
 @respx.mock

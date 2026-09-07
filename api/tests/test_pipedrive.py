@@ -58,6 +58,21 @@ async def test_create_person_payload_shape(pd):
 
 
 @respx.mock
+async def test_create_person_custom_fields_are_nested(pd):
+    route = respx.post(f"{BASE}/api/v2/persons").mock(
+        return_value=httpx.Response(201, json={"success": True, "data": {"id": 9}})
+    )
+    await pd.create_person(
+        name="Jane",
+        email="jane@example.com",
+        custom_fields={"clienttypehash": [531, 530]},
+    )
+    body = json.loads(route.calls.last.request.content)
+    # v2 persons: custom fields nested under custom_fields (unlike v1 leads)
+    assert body["custom_fields"] == {"clienttypehash": [531, 530]}
+
+
+@respx.mock
 async def test_create_person_omits_optional_fields(pd):
     route = respx.post(f"{BASE}/api/v2/persons").mock(
         return_value=httpx.Response(201, json={"success": True, "data": {"id": 8}})
@@ -152,6 +167,17 @@ async def test_malformed_ratelimit_reset_falls_back_to_backoff(monkeypatch):
     assert await client.find_person_by_email("j@e.com") is None
     assert route.call_count == 2
     assert sleeps == [0.5]  # exponential fallback for attempt 0, not the header
+
+
+@respx.mock
+async def test_non_json_2xx_raises_pipedrive_error(pd):
+    # a proxy/CDN hiccup returning 200 with an empty body must surface as
+    # PipedriveError (clean sync_error), not a raw JSONDecodeError
+    respx.get(f"{BASE}/api/v2/persons/search").mock(
+        return_value=httpx.Response(200, content=b"")
+    )
+    with pytest.raises(PipedriveError, match="invalid JSON"):
+        await pd.find_person_by_email("j@e.com")
 
 
 @respx.mock

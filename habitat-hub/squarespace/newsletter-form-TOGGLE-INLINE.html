@@ -151,6 +151,15 @@
       clearTimeout(timer);
       if (resp.status === 429) throw new Error('rate');
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      // Same dataLayer event the old Pipedrive iframe listener pushed - keeps
+      // the existing GTM conversion tags (Google Ads, LinkedIn, Microsoft UET,
+      // GA4) firing after the embed is gone. Triggers match on formId.
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'pipedrive_form_submit',
+        formId: 'bXB8kiAaKayRiYweFIOdpcgYOh1sjnQWCEig455HPVhwCzSw6U3JcgT8ddfJzInGdZ',
+        formUUID: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
+      });
       if (typeof gtag === 'function') {
         gtag('event', 'generate_lead', { lead_source: 'website_newsletter_form' });
       }

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — /biodiversity-metric (Web Copy v3, section 2.3 — approved CMS copy, complete)
+
+  Sibling of web/biodiversity-net-gain.html — same measured design grammar
+  (RATI 99/44/35 + 26px leads, Inter 17, cream/white/green/black rhythm, angled
+  dividers, hairline rows, immersive photo set-pieces). This page's set-pieces:
+  the immersive rolling-hills HERO and the black "Biofarm Insight"
+  band; "How Biofarm helps" is a four-step horizontal journey; "Time matters too" is the green callout, per the copy doc's developer notes.
+
+  SQUARESPACE PAGE SETTINGS
+  URL slug:         /biodiversity-metric
+  SEO title:        The Biodiversity Metric Explained | Biofarm
+  SEO description:  Understand how the Biodiversity Metric measures Biodiversity Net Gain
+                    and how Biofarm helps developers secure the right habitat in the right place.
+  OG title:         Understanding the Biodiversity Metric | Biofarm
+  OG description:   Learn how the Biodiversity Metric measures biodiversity, why location
+                    matters and how Biofarm helps developers deliver Biodiversity Net Gain.
+  Schema:           WebPage + FAQPage + BreadcrumbList — JSON-LD at the bottom
+                    (paste into Page Settings → Advanced → Header Code Injection).
+
+  NOTES
+  - Developer note asks the hero to show an ecologist and developer reviewing habitat
+    on site — no such frame exists in the current CDN set, so the canopy carries the
+    hero and the planning-team photo appears in "How much biodiversity...". Swap when
+    the shot exists (one img src).
+  - The glossary from the editorial review is treated as a future enhancement (per doc).
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Biodiversity Metric Explained | Biofarm</title>
+<meta name="description" content="Understand how the Biodiversity Metric measures Biodiversity Net Gain and how Biofarm helps developers secure the right habitat in the right place." />
+<link rel="canonical" href="https://www.biofarm.co.uk/biodiversity-metric" />
+<meta property="og:title" content="Understanding the Biodiversity Metric | Biofarm" />
+<meta property="og:description" content="Learn how the Biodiversity Metric measures biodiversity, why location matters and how Biofarm helps developers deliver Biodiversity Net Gain." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.biofarm.co.uk/biodiversity-metric" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  @font-face{font-family:'RATI_v2';
+    src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+        url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight:300;font-display:swap;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#F5F6F1;color:#111;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:clip;}
+
+  /* ================= header (prototype — live page inherits the real nav) ================= */
+  .hdr{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s;}
+  .hdr.scrolled{background:rgba(245,246,241,.97);}
+  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px clamp(24px,3.2vw,48px);}
+  .hdr .logo img{height:30px;display:block;}
+  .hdr .logo img.dk{display:none;}
+  .hdr ul{list-style:none;display:flex;align-items:center;gap:32px;margin:0;padding:0;}
+  .hdr ul a{text-decoration:none;color:#111;font-size:14px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;}
+  .hdr ul a.pill{background:#111;color:#F5F6F1;border-radius:25px;padding:13px 26px;font-family:'RATI_v2',Georgia,serif;font-size:17px;letter-spacing:.01em;text-transform:none;white-space:nowrap;}
+  /* over the dark hero the nav runs light; solid cream after scrolling */
+  .hdr.on-dark:not(.scrolled) ul a{color:#F5F6F1;}
+  .hdr.on-dark:not(.scrolled) ul a.pill{background:#F5F6F1;color:#111;}
+  .hdr.on-dark:not(.scrolled) .logo img.lt{display:none;}
+  .hdr.on-dark:not(.scrolled) .logo img.dk{display:block;}
+  @media(max-width:940px){.hdr ul li:not(:last-child){display:none;}}
+
+  /* ================= shared ================= */
+  .s{box-sizing:border-box;}
+  .s *,.s *::before,.s *::after{box-sizing:border-box;}
+  .s .wrap{max-width:1512px;margin-inline:auto;padding-inline:clamp(24px,7vw,105px);}
+  .s h1,.s h2,.s h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;margin:0;}
+  .s h1{font-size:clamp(3rem,6.5vw,6.19rem);line-height:1.04;letter-spacing:-.01em;}
+  .s h2{font-size:clamp(2rem,3vw,2.75rem);line-height:1.14;}
+  .s h3{font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.28;}
+  .s .lead{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.3rem,1.75vw,1.63rem);line-height:1.42;margin:0 0 1.1em;}
+  .s p{margin:0 0 1.2em;}
+  .s .statement{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.3;margin:1.6em 0 0;}
+  .s a.tlink{display:inline-block;font-size:14px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:inherit;text-decoration:none;transition:opacity .2s;}
+  .s a.tlink:hover{opacity:.55;}
+  .s a.pill{display:inline-block;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;text-decoration:none;border-radius:25px;padding:15px 30px;background:#111;color:#F5F6F1;transition:background .3s;white-space:nowrap;}
+  .s a.pill:hover{background:#333;}
+  .s .ctas{display:flex;flex-wrap:wrap;align-items:center;gap:34px;margin-top:44px;}
+  .s a.ilink{color:inherit;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;}
+  .s .two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);}
+  @media(max-width:900px){.s .two{grid-template-columns:1fr;}}
+
+  .collage{position:relative;}
+  .collage img{display:block;object-fit:cover;width:100%;}
+  .collage .base{width:86%;margin-left:14%;aspect-ratio:4/4.4;}
+  .collage .over{position:absolute;left:0;bottom:-9%;width:46%;aspect-ratio:4/4.6;box-shadow:0 0 0 6px var(--edge,#fff);}
+  .collage.flip .base{margin-left:0;margin-right:14%;}
+  .collage.flip .over{left:auto;right:0;}
+  @media(max-width:900px){.collage{margin-bottom:9%;}}
+
+  .rows{border-top:1px solid rgba(17,17,17,.55);}
+  .row{border-bottom:1px solid rgba(17,17,17,.55);padding:30px 0 34px;}
+  .row h3{font-size:clamp(1.35rem,1.9vw,1.78rem);margin:0 0 .55em;}
+  .row p{margin:0;max-width:56ch;}
+  .row .num{font-family:'RATI_v2',Georgia,serif;font-size:15px;display:block;margin-bottom:10px;letter-spacing:.06em;}
+  /* hairline rows on light ground */
+  .rows.lt{border-top-color:rgba(17,17,17,.16);}
+  .rows.lt .row{border-bottom-color:rgba(17,17,17,.16);}
+
+  .angle{display:block;width:100%;height:clamp(44px,6vw,92px);line-height:0;margin-top:-1px;margin-bottom:-1px;position:relative;z-index:1;}
+  .angle svg{width:100%;height:100%;display:block;}
+
+  /* ================= sections ================= */
+  /* immersive hero — the canopy */
+  .mhero{position:relative;color:#F5F6F1;isolation:isolate;overflow:hidden;min-height:100vh;display:flex;align-items:center;text-align:center;}
+  .mhero .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;}
+  .mhero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,12,9,.74),rgba(9,12,9,.55) 45%,rgba(9,12,9,.8));}
+  .mhero .wrap{width:100%;padding-top:130px;padding-bottom:80px;}
+  .mhero h1{color:#F5F6F1;max-width:14ch;margin:0 auto .3em;}
+  .mhero h3{color:rgba(245,246,241,.94);max-width:24ch;margin:0 auto 1.2em;}
+  .mhero .lead{color:rgba(245,246,241,.92);max-width:52ch;margin-inline:auto;}
+  .mhero .ctas{justify-content:center;}
+  .mhero a.pill{background:#F5F6F1;color:#111;}
+  .mhero a.pill:hover{background:#fff;}
+  .mhero a.tlink{color:#F5F6F1;border-bottom:1px solid rgba(245,246,241,.6);padding-bottom:6px;}
+
+  /* factors — the assessment inputs, as paired hairline rows on cream */
+  .factors{padding-block:clamp(100px,14vh,170px);}
+  .factors h2{max-width:16ch;}
+  .factors .two{grid-template-columns:.9fr 1.1fr;align-items:end;}
+  .factors .two .lead{margin:0;max-width:34ch;}
+  .factors .frows{display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(40px,6vw,110px);align-items:start;margin-top:clamp(44px,6vh,72px);}
+  .factors .rows .row{padding:22px 0 24px;}
+  .factors .rows .row h3{font-size:clamp(1.2rem,1.6vw,1.45rem);margin-bottom:.35em;}
+  .factors .rows .row p{color:#4c5048;}
+  @media(max-width:900px){.factors .frows{grid-template-columns:1fr;row-gap:0;}
+    .factors .frows .rows+.rows{border-top:0;}}
+
+  /* how much — white split with the planning-team collage */
+  .howmuch{background:#fff;padding-block:clamp(110px,16vh,190px);}
+  .howmuch .two{align-items:center;grid-template-columns:1.05fr .95fr;}
+  .howmuch h2{margin-bottom:.9em;max-width:18ch;}
+  .howmuch .collage{--edge:#fff;}
+
+  /* what is — light, type-led */
+  .whatis{padding-block:clamp(110px,16vh,190px);}
+  .whatis .two{align-items:start;}
+  .whatis h2{max-width:14ch;}
+  .whatis .statement{max-width:24ch;}
+
+  /* influences — green, angled, five rows */
+  .influences{background:#71977A;color:#111;padding-block:clamp(90px,13vh,150px);}
+  .influences .two{grid-template-columns:.9fr 1.1fr;align-items:start;}
+  .influences h2{max-width:15ch;}
+  .influences .intro{margin-top:1.6em;max-width:34ch;}
+
+  /* insight — typographic statement with drawn green stroke */
+  .insight{background:#F5F6F1;color:#111;text-align:center;padding-block:clamp(100px,14vh,170px);}
+  .insight .rule{position:relative;height:1px;background:rgba(17,17,17,.22);max-width:640px;margin:0 auto 3.2rem;}
+  .insight .kicker{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#F5F6F1;padding:0 22px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#4c5048;white-space:nowrap;font-family:'Inter',sans-serif;}
+  .insight h2{font-size:clamp(2rem,3.5vw,3.2rem);line-height:1.3;max-width:26ch;margin-inline:auto;color:#111;text-wrap:balance;}
+  .insight .mark{position:relative;white-space:nowrap;}
+  .insight .mark svg{position:absolute;left:-1%;bottom:-.22em;width:102%;height:.34em;overflow:visible;}
+  .insight .mark path{stroke:#71977A;stroke-width:7;fill:none;stroke-linecap:round;opacity:.9;}
+  @media(max-width:560px){.insight .mark{white-space:normal;border-bottom:3px solid #71977A;}.insight .mark svg{display:none;}}
+
+  /* location + SRM — white editorial split */
+  .locmet{background:#fff;padding-block:clamp(110px,16vh,190px);}
+  .locmet .two{align-items:start;}
+  .locmet h2{margin-bottom:.9em;max-width:14ch;}
+  .locmet .srm{border-top:1px solid rgba(17,17,17,.16);padding-top:34px;}
+  .locmet .srm h3{font-size:clamp(1.35rem,1.9vw,1.78rem);margin-bottom:.6em;}
+  .locmet .statement{max-width:20ch;}
+
+  /* time matters too — green angled callout */
+  .timec{background:#71977A;color:#111;padding-block:clamp(90px,13vh,150px);}
+  .timec .two{align-items:start;grid-template-columns:.9fr 1.1fr;}
+  .timec h2{max-width:12ch;}
+  .timec .lead{max-width:30ch;}
+  .timec .yrs{font-family:'RATI_v2',Georgia,serif;font-size:clamp(3.6rem,6vw,5.6rem);line-height:1;display:block;margin-bottom:18px;}
+  .timec .yrscap{font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin:0 0 2rem;}
+
+  /* how Biofarm helps — four-step journey across the width */
+  .helps{padding-block:clamp(110px,15vh,180px);}
+  .helps h2{max-width:14ch;}
+  .helps .lead{max-width:36ch;margin-top:1.4em;color:#4c5048;}
+  .helps .journey{list-style:none;margin:clamp(56px,8vh,96px) 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(28px,3.4vw,56px);position:relative;}
+  .helps .journey::before{content:"";position:absolute;left:0;right:0;top:7px;height:1px;background:rgba(17,17,17,.22);}
+  .helps .journey li{position:relative;padding-top:38px;}
+  .helps .journey li::before{content:"";position:absolute;left:0;top:0;width:15px;height:15px;border-radius:50%;background:#F5F6F1;border:1px solid #111;}
+  .helps .journey li:first-child::before{background:#111;}
+  .helps .journey .n{font-family:'RATI_v2',Georgia,serif;font-size:clamp(2.6rem,4vw,3.8rem);line-height:1;display:block;margin-bottom:22px;}
+  .helps .journey h3{font-size:clamp(1.25rem,1.7vw,1.55rem);line-height:1.28;margin:0 0 .6em;max-width:16ch;}
+  .helps .journey p{margin:0;color:#4c5048;max-width:30ch;}
+  @media(max-width:1000px){.helps .journey{grid-template-columns:1fr 1fr;row-gap:56px;}.helps .journey::before{display:none;}}
+  @media(max-width:560px){.helps .journey{grid-template-columns:1fr;}}
+
+  /* FAQ */
+  .faq{background:#fff;padding-block:clamp(110px,15vh,180px);}
+  .faq .two{grid-template-columns:.8fr 1.2fr;align-items:start;}
+  .faq h2{max-width:12ch;}
+  .faq .side p{max-width:36ch;}
+  .faq details{border-bottom:1px solid rgba(17,17,17,.35);}
+  .faq details:first-of-type{border-top:1px solid rgba(17,17,17,.35);}
+  .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:26px;padding:27px 0;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.3rem,1.8vw,1.7rem);line-height:1.3;}
+  .faq summary::-webkit-details-marker{display:none;}
+  .faq summary .plus{position:relative;flex:none;width:15px;height:15px;top:2px;}
+  .faq summary .plus::before,.faq summary .plus::after{content:"";position:absolute;background:#111;transition:transform .25s;}
+  .faq summary .plus::before{left:0;right:0;top:7px;height:1px;}
+  .faq summary .plus::after{top:0;bottom:0;left:7px;width:1px;}
+  .faq details[open] summary .plus::after{transform:rotate(90deg);}
+  .faq .a{padding:0 0 32px;max-width:58ch;}
+
+  /* closing — green angled */
+  .closing{background:#71977A;color:#111;padding-block:clamp(100px,14vh,170px);}
+  .closing .two{grid-template-columns:1fr 1fr;align-items:center;}
+  .closing h2{font-size:clamp(2.3rem,4vw,3.7rem);line-height:1.1;max-width:16ch;}
+  .closing .lead{max-width:32ch;}
+  .closing .statement{font-size:clamp(1.35rem,1.9vw,1.78rem);}
+
+  .black-note{background:#111;color:rgba(245,246,241,.75);font-size:13px;letter-spacing:.04em;padding:30px clamp(24px,7vw,105px);text-align:center;}
+  .black-note a{color:#F5F6F1;}
+
+  /* ================= mobile (last so it wins) ================= */
+  @media(max-width:900px){
+    .s .two{grid-template-columns:1fr;gap:40px;}
+    .mhero{min-height:0;}
+    .mhero .wrap{padding-top:120px;padding-bottom:64px;}
+    .collage{margin:12px 0 11%;}
+    .collage .base{aspect-ratio:4/3.4;}
+    .s .statement{margin-top:1.2em;}
+    .s .ctas{margin-top:32px;gap:26px;}
+  }
+  @media(max-width:520px){
+    .hdr .nav{padding:14px 18px;gap:14px;}
+    .hdr .logo img{height:24px;}
+    .hdr ul{gap:14px;}
+    .hdr ul a.pill{font-size:15px;padding:11px 18px;}
+    .s .wrap{padding-inline:22px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr on-dark" id="hdr">
+  <nav class="nav" aria-label="Primary">
+    <a class="logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home">
+      <img class="lt" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
+      <img class="dk" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/09b8344b-8b40-4f71-9a64-152e1ed34fa7/Asset+16LOGO.png?format=1500w" alt="Biofarm" />
+    </a>
+    <ul>
+      <li><a href="https://www.biofarm.co.uk/developers">Partners</a></li>
+      <li><a href="https://www.biofarm.co.uk/habitat-banks">Habitat Banks</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
+      <li><a href="https://www.biofarm.co.uk/contact">Contact</a></li>
+      <li><a class="pill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ HERO (immersive canopy) ============ -->
+  <section class="s mhero">
+    <img class="bg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756560530359-Y0G0MRPQAVSXQUKT30XB/low-res-stephen-arnold-ygi0RcsuR6U-unsplash.jpg?format=2500w" alt="Rolling hills and hedgerows in the English countryside" />
+    <div class="wrap">
+      <h1>The Biodiversity Metric</h1>
+      <h3>Understanding what it means for your development.</h3>
+      <p class="lead">The statutory biodiversity metric assesses biodiversity value using a range of ecological and spatial factors. While the methodology may evolve over time, its core purpose remains the same: to deliver measurable, lasting gains for&nbsp;nature.</p>
+      <div class="ctas">
+        <a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
+        <a class="tlink" href="https://www.biofarm.co.uk/biodiversity-net-gain">Learn about Biodiversity Net Gain</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE ASSESSMENT FACTORS (light) ============ -->
+  <section class="s factors">
+    <div class="wrap">
+      <div class="two">
+        <h2>What the assessment considers</h2>
+        <p class="lead" style="align-self:end;">Some of the factors considered in the assessment include:</p>
+      </div>
+      <div class="frows">
+        <div class="rows lt">
+          <div class="row"><h3>Habitat type</h3><p>The distinct habitat present on a site.</p></div>
+          <div class="row"><h3>Habitat condition</h3><p>The quality and ecological health of the habitat.</p></div>
+          <div class="row"><h3>Habitat size</h3><p>The area or length of habitat being assessed.</p></div>
+          <div class="row"><h3>Strategic significance</h3><p>Whether the habitat contributes to local nature recovery priorities.</p></div>
+        </div>
+        <div class="rows lt">
+          <div class="row"><h3>Location</h3><p>Where habitats are created or enhanced, and their relationship to existing ecological networks.</p></div>
+          <div class="row"><h3>Time to target condition</h3><p>How long it is expected to take a habitat to reach its intended ecological value.</p></div>
+          <div class="row"><h3>Difficulty of creation or enhancement</h3><p>The level of risk and complexity involved in delivering the habitat successfully.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW MUCH (white, collage) ============ -->
+  <section class="s howmuch">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <h2>How much biodiversity needs to be created for my development?</h2>
+          <p class="lead">Understanding the Biodiversity Metric early helps you make better planning decisions, identify the right opportunities and avoid unnecessary costs later in the process.</p>
+          <p>At Biofarm, we help developers understand what the Biodiversity Metric means for their project, then create and manage the habitats that deliver it.</p>
+          <div class="ctas" style="margin-top:30px;"><a class="tlink" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+        </div>
+        <div class="collage">
+          <img class="base" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756559511052-KRDOFJHK3DFB2RSIW3EN/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-1435.jpg?format=1500w" alt="Hay meadow at a Biofarm habitat bank" />
+          <img class="over" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/ded09a1f-db41-4a62-8ba2-ddfb989b1ffc/Biofarm+biodiversity+net+gain+construction+workers+planning?format=750w" alt="Development team reviewing plans on site" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHAT IS THE METRIC (light) ============ -->
+  <section class="s whatis">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <h2>What is the Biodiversity Metric?</h2>
+        </div>
+        <div>
+          <p class="lead">The Biodiversity Metric is the standard approach used in England to measure biodiversity before and after development.</p>
+          <p>It compares the biodiversity value of existing habitats with the value that will remain or be created once a development is complete.</p>
+          <p>The difference determines whether Biodiversity Net Gain has been achieved and how many <a class="ilink" href="https://www.biofarm.co.uk/biodiversity-units">biodiversity units</a> are required.</p>
+          <p class="statement">It is more than a calculation. It helps ensure the places we build today continue to support nature for generations to&nbsp;come.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHAT INFLUENCES (green, angled) ============ -->
+  <div class="s angle" style="background:#F5F6F1;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
+  <section class="s influences">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <h2>What influences the Biodiversity Metric?</h2>
+          <p class="intro">Every site is different. The Biodiversity Metric considers several factors when calculating biodiversity value.</p>
+        </div>
+        <div class="rows">
+          <div class="row"><h3>Habitat type</h3><p>Some habitats naturally support more biodiversity than others. Broadleaved woodland, species rich grassland and wetlands all carry different ecological value.</p></div>
+          <div class="row"><h3>Habitat condition</h3><p>Healthy habitats are worth more than degraded habitats. Protecting and restoring existing habitats can therefore play an important role in Biodiversity Net Gain.</p></div>
+          <div class="row"><h3>Habitat size</h3><p>The size of a habitat influences the biodiversity value it can support. Larger, connected habitats generally provide greater ecological benefits.</p></div>
+          <div class="row"><h3>Strategic significance</h3><p>Habitats that support local priorities, including Local Nature Recovery Strategies, may carry greater value within the Biodiversity Metric. This encourages biodiversity to be created where it will have the greatest impact.</p></div>
+          <div class="row"><h3>Time</h3><p>Habitats take time to establish. Some can be created relatively quickly. Others take decades to reach their target condition. The Biodiversity Metric reflects this through the Temporal Risk Multiplier.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="s angle" style="background:#111;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 100,0 100,8 50,0 0,8" fill="#71977A"/></svg></div>
+
+  <!-- ============ BIOFARM INSIGHT (statement with drawn green stroke) ============ -->
+  <section class="s insight">
+    <div class="wrap">
+      <div class="rule"><span class="kicker">Biofarm insight</span></div>
+      <h2>The Biodiversity Metric is about more than numbers. It helps guide where habitats should be created, how they should be managed and how development can leave nature in a <span class="mark">better state than before.<svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path d="M4 15 C 55 7, 110 21, 165 12 S 255 9, 296 14"/></svg></span></h2>
+    </div>
+  </section>
+
+  <!-- ============ WHY LOCATION MATTERS + SRM (white) ============ -->
+  <section class="s locmet">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <h2>Why location matters</h2>
+          <p class="lead">One of the most misunderstood parts of the Biodiversity Metric is location.</p>
+          <p>Biodiversity is generally more valuable when it is delivered close to the development it supports. The Biodiversity Metric recognises this through the <strong style="font-weight:500;">Spatial Risk Multiplier</strong>.</p>
+          <p>Where biodiversity is created further away, additional biodiversity units may be required.</p>
+          <p>That is why Biofarm is building a growing network of <a class="ilink" href="https://www.biofarm.co.uk/habitat-banks">habitat banks</a> across England. Creating habitats closer to developments helps support planning, reduce unnecessary costs and strengthen local nature recovery.</p>
+        </div>
+        <div>
+          <div class="srm">
+            <h3>What is the Spatial Risk Multiplier?</h3>
+            <p>The Spatial Risk Multiplier encourages biodiversity to be delivered as close as possible to the development it supports.</p>
+            <p>Choosing a locally appropriate <a class="ilink" href="https://www.biofarm.co.uk/habitat-banks">Biofarm Habitat Bank</a> can help reduce additional biodiversity unit requirements while creating better outcomes for nature.</p>
+          </div>
+          <p class="statement">Planning confidence starts with the right habitat, in the right&nbsp;place.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TIME MATTERS TOO (green, angled) ============ -->
+  <div class="s angle" style="background:#fff;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
+  <section class="s timec">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <h2>Time matters too</h2>
+          <p class="lead" style="margin-top:1.6em;">Habitats do not appear overnight. Woodlands mature over decades. Wetlands take time to establish. Species rich grasslands need careful management.</p>
+        </div>
+        <div>
+          <span class="yrs">30+ years</span>
+          <p class="yrscap">Every Biofarm Habitat Bank is managed for at least 30 years</p>
+          <p>The Biodiversity Metric recognises this through the Temporal Risk Multiplier, which reflects the time needed for habitats to reach their target condition.</p>
+          <p>Every Biofarm Habitat Bank is managed for at least 30 years, giving developers confidence that habitats will continue to improve long after planning permission has been granted.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="s angle" style="background:#F5F6F1;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 100,0 100,8 50,0 0,8" fill="#71977A"/></svg></div>
+
+  <!-- ============ HOW BIOFARM HELPS (light, four-step journey) ============ -->
+  <section class="s helps">
+    <div class="wrap">
+      <h2>How Biofarm helps</h2>
+      <ol class="journey">
+        <li><span class="n">01</span><h3>Understand your Biodiversity Metric</h3><p>We&rsquo;ll help you understand what the results mean for your project.</p></li>
+        <li><span class="n">02</span><h3>Identify the right habitat</h3><p>We&rsquo;ll identify the most appropriate <a class="ilink" href="https://www.biofarm.co.uk/habitat-banks">Biofarm Habitat Bank</a>.</p></li>
+        <li><span class="n">03</span><h3>Secure biodiversity units</h3><p>We&rsquo;ll help you secure the right <a class="ilink" href="https://www.biofarm.co.uk/biodiversity-units">off site biodiversity units</a>.</p></li>
+        <li><span class="n">04</span><h3>Long term stewardship</h3><p>We create, manage and monitor every habitat for at least 30 years.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ FAQ (white) ============ -->
+  <section class="s faq">
+    <div class="wrap">
+      <div class="two">
+        <div class="side">
+          <h2>Frequently asked questions</h2>
+          <p style="margin-top:1.6em;">Can’t find what you’re looking for? <a class="ilink" href="https://www.biofarm.co.uk/contact">Talk to our team</a>.</p>
+        </div>
+        <div>
+          <details>
+            <summary>Who completes the Biodiversity Metric?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>The Biodiversity Metric is normally completed by a suitably qualified ecologist. Biofarm works alongside ecologists, planning consultants and developers to help interpret the results and identify appropriate off site habitat options where required.</p></div>
+          </details>
+          <details>
+            <summary>What is strategic significance?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>Strategic significance recognises habitats that support local ecological priorities, including Local Nature Recovery Strategies. Creating habitats in these locations can contribute more effectively to wider nature recovery.</p></div>
+          </details>
+          <details>
+            <summary>What is the Spatial Risk Multiplier?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>The Spatial Risk Multiplier reflects the importance of creating biodiversity close to the development it supports. Choosing locally appropriate habitat banks can help reduce additional biodiversity unit requirements.</p></div>
+          </details>
+          <details>
+            <summary>What is the Temporal Risk Multiplier?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>The Temporal Risk Multiplier recognises that habitats take time to establish. Habitats that take longer to reach their target condition carry greater delivery risk, which is reflected within the Biodiversity Metric.</p></div>
+          </details>
+          <details>
+            <summary>Does every development require the Biodiversity Metric?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>Most developments subject to Biodiversity Net Gain will need the Biodiversity Metric to demonstrate how biodiversity has been assessed and how the required uplift will be achieved.</p></div>
+          </details>
+          <details>
+            <summary>What happens if my site cannot achieve Biodiversity Net Gain?<span class="plus" aria-hidden="true"></span></summary>
+            <div class="a"><p>Where sufficient Biodiversity Net Gain cannot be delivered on site, developers may need to secure <a class="ilink" href="https://www.biofarm.co.uk/biodiversity-units">off site biodiversity units</a> from professionally managed habitat banks.</p></div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLOSING (green, angled) ============ -->
+  <div class="s angle" style="background:#fff;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
+  <section class="s closing">
+    <div class="wrap">
+      <div class="two">
+        <h2>Let’s make the Biodiversity Metric work for your project</h2>
+        <div>
+          <p class="lead">Understanding the Biodiversity Metric is only the first step.</p>
+          <p>We’ll help you interpret the results, identify the right opportunities and create habitats that support both your development and nature.</p>
+          <p class="statement">Better decisions create better&nbsp;places.</p>
+          <div class="ctas" style="margin-top:34px;">
+            <a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="black-note">
+  Prototype for <a href="https://www.biofarm.co.uk/">biofarm.co.uk</a>/biodiversity-metric &mdash; the live page inherits the real site header &amp; footer.
+</footer>
+
+<script>
+  (function(){
+    var h=document.getElementById('hdr');
+    addEventListener('scroll',function(){h.classList.toggle('scrolled',scrollY>40);},{passive:true});
+  })();
+</script>
+
+<!-- ============ JSON-LD — paste into Squarespace Page Settings → Advanced → Header Code Injection ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.biofarm.co.uk/biodiversity-metric",
+      "url": "https://www.biofarm.co.uk/biodiversity-metric",
+      "name": "The Biodiversity Metric Explained | Biofarm",
+      "description": "Understand how the Biodiversity Metric measures Biodiversity Net Gain and how Biofarm helps developers secure the right habitat in the right place."
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.biofarm.co.uk/" },
+        { "@type": "ListItem", "position": 2, "name": "The Biodiversity Metric", "item": "https://www.biofarm.co.uk/biodiversity-metric" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Who completes the Biodiversity Metric?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The Biodiversity Metric is normally completed by a suitably qualified ecologist. Biofarm works alongside ecologists, planning consultants and developers to help interpret the results and identify appropriate off site habitat options where required." } },
+        { "@type": "Question", "name": "What is strategic significance?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Strategic significance recognises habitats that support local ecological priorities, including Local Nature Recovery Strategies. Creating habitats in these locations can contribute more effectively to wider nature recovery." } },
+        { "@type": "Question", "name": "What is the Spatial Risk Multiplier?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The Spatial Risk Multiplier reflects the importance of creating biodiversity close to the development it supports. Choosing locally appropriate habitat banks can help reduce additional biodiversity unit requirements." } },
+        { "@type": "Question", "name": "What is the Temporal Risk Multiplier?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The Temporal Risk Multiplier recognises that habitats take time to establish. Habitats that take longer to reach their target condition carry greater delivery risk, which is reflected within the Biodiversity Metric." } },
+        { "@type": "Question", "name": "Does every development require the Biodiversity Metric?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Most developments subject to Biodiversity Net Gain will need the Biodiversity Metric to demonstrate how biodiversity has been assessed and how the required uplift will be achieved." } },
+        { "@type": "Question", "name": "What happens if my site cannot achieve Biodiversity Net Gain?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Where sufficient Biodiversity Net Gain cannot be delivered on site, developers may need to secure off site biodiversity units from professionally managed habitat banks." } }
+      ]
+    }
+  ]
+}
+</script>
+
+</body>
+</html>
