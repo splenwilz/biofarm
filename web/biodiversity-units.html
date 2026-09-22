@@ -2,12 +2,18 @@
 <html lang="en-GB">
 <head>
 <!--
-  BIOFARM — /biodiversity-units (Web Copy v3, section 2.4 — approved CMS copy, complete)
+  BIOFARM — /biodiversity-units  (Web Copy v3, section 2.4 — approved CMS copy, complete & verbatim)
 
-  Third sibling of biodiversity-net-gain.html / biodiversity-metric.html — same measured
-  design grammar. This page is the commercial one: hero = restored habitat (no development
-  imagery, per the doc), the "every unit comes from a Biofarm Habitat Bank" message carried
-  by the immersive set-piece, the five-step process as the horizontal journey.
+  Built in the design language of the team's staged page https://www.biofarm.co.uk/developers-2
+  (measured Sept 2026):
+    type      RATI H1 98.6/1.23 · H2 44.2/1.41 · H3 35.1/1.44 · H4 26/1.47 · Inter 17/1.8 body · Inter 26/1.8 large
+    grounds   cream #F7F8F3 · white · green #71977A (black text) · black #111 with photo wash
+    buttons   black pill RATI caps (radius 300, pad 25/37) + outlined Inter caps pill; white outline on black
+    devices   scribble underline on the key word of the H1, overlapping two-photo collages (no border),
+              green section with H2 left + hairline rows right, centred numbered columns with green numerals,
+              wave divider (white → cream), soft wave (green → closing), watercolour canvas behind the closing
+    assets    all on the site CDN (DACRE photos, sp-building.png, journey-path.png, Oak_Tree_FINAL.jpg,
+              "Let's talk about your project.jpg" canvas, stephen-arnold hills)
 
   SQUARESPACE PAGE SETTINGS
   URL slug:         /biodiversity-units
@@ -18,8 +24,6 @@
   OG title:         Secure Biodiversity Units | Biofarm
   OG description:   Secure off site biodiversity units from Biofarm Habitat Banks with fair
                     pricing, local delivery and long term stewardship.
-  Schema:           WebPage + FAQPage + BreadcrumbList — JSON-LD at the bottom
-                    (paste into Page Settings → Advanced → Header Code Injection).
 -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,311 +42,358 @@
     src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
         url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
     font-weight:300;font-display:swap;}
-  html{scroll-behavior:smooth;}
-  body{margin:0;background:#F5F6F1;color:#111;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:clip;}
 
-  /* ================= header (prototype — live page inherits the real nav) ================= */
+  :root{
+    --cream:#F7F8F3; --white:#fff; --green:#71977A; --black:#111; --ink:#111;
+    --rati:'RATI_v2',Georgia,'Times New Roman',serif;
+    --inter:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    --gutter:clamp(24px,7vw,109px); --max:1350px;
+    --h1:clamp(52px,6.3vw,98.6px); --h2:clamp(34px,2.82vw,44.2px); --h3:clamp(28px,2.24vw,35.1px); --h4:clamp(22px,1.66vw,26px);
+    --big:clamp(20px,1.66vw,26px);
+  }
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--inter);font-weight:300;font-size:17px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:clip;}
+  *,*::before,*::after{box-sizing:border-box;}
+  img{display:block;max-width:100%;}
+
+  /* ================= header (prototype — the live page inherits the real nav) ================= */
   .hdr{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s;}
-  .hdr.scrolled{background:rgba(245,246,241,.97);}
-  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px clamp(24px,3.2vw,48px);}
-  .hdr .logo img{height:30px;display:block;}
-  .hdr .logo img.dk{display:none;}
-  .hdr ul{list-style:none;display:flex;align-items:center;gap:32px;margin:0;padding:0;}
-  .hdr ul a{text-decoration:none;color:#111;font-size:14px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;}
-  .hdr ul a.pill{background:#111;color:#F5F6F1;border-radius:25px;padding:13px 26px;font-family:'RATI_v2',Georgia,serif;font-size:17px;letter-spacing:.01em;text-transform:none;white-space:nowrap;}
-  /* over the dark hero the nav runs light; solid cream after scrolling */
-  .hdr.on-dark:not(.scrolled) ul a{color:#F5F6F1;}
-  .hdr.on-dark:not(.scrolled) ul a.pill{background:#F5F6F1;color:#111;}
-  .hdr.on-dark:not(.scrolled) .logo img.lt{display:none;}
-  .hdr.on-dark:not(.scrolled) .logo img.dk{display:block;}
+  .hdr.scrolled{background:rgba(247,248,243,.97);}
+  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px clamp(24px,3vw,46px);}
+  .hdr .logo img{height:32px;}
+  .hdr ul{list-style:none;display:flex;align-items:center;gap:30px;margin:0;padding:0;}
+  .hdr ul a{text-decoration:none;color:var(--ink);font-size:15px;font-weight:400;letter-spacing:.06em;text-transform:uppercase;}
+  .hdr ul a.navpill{background:var(--black);color:#fff;border-radius:300px;padding:12px 26px;font-family:var(--rati);font-size:17px;letter-spacing:.02em;text-transform:none;white-space:nowrap;}
   @media(max-width:940px){.hdr ul li:not(:last-child){display:none;}}
 
-  /* ================= shared ================= */
-  .s{box-sizing:border-box;}
-  .s *,.s *::before,.s *::after{box-sizing:border-box;}
-  .s .wrap{max-width:1512px;margin-inline:auto;padding-inline:clamp(24px,7vw,105px);}
-  .s h1,.s h2,.s h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;margin:0;}
-  .s h1{font-size:clamp(3rem,6.5vw,6.19rem);line-height:1.04;letter-spacing:-.01em;}
-  .s h2{font-size:clamp(2rem,3vw,2.75rem);line-height:1.14;}
-  .s h3{font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.28;}
-  .s .lead{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.3rem,1.75vw,1.63rem);line-height:1.42;margin:0 0 1.1em;}
-  .s p{margin:0 0 1.2em;}
-  .s .statement{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.5rem,2.35vw,2.19rem);line-height:1.3;margin:1.6em 0 0;}
-  .s a.tlink{display:inline-block;font-size:14px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:inherit;text-decoration:none;transition:opacity .2s;}
-  .s a.tlink:hover{opacity:.55;}
-  .s a.pill{display:inline-block;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;text-decoration:none;border-radius:25px;padding:15px 30px;background:#111;color:#F5F6F1;transition:background .3s;white-space:nowrap;}
-  .s a.pill:hover{background:#333;}
-  .s .ctas{display:flex;flex-wrap:wrap;align-items:center;gap:34px;margin-top:44px;}
-  .s a.ilink{color:inherit;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;}
-  .s .two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);}
-  @media(max-width:900px){.s .two{grid-template-columns:1fr;}}
+  /* ================= type ================= */
+  h1,h2,h3,h4{font-family:var(--rati);font-weight:300;margin:0;letter-spacing:0;}
+  h1{font-size:var(--h1);line-height:1.23;}
+  h2{font-size:var(--h2);line-height:1.41;}
+  h3{font-size:var(--h3);line-height:1.44;}
+  h4{font-size:var(--h4);line-height:1.47;}
+  p{margin:0 0 1rem;}
+  .big p,p.big{font-size:var(--big);line-height:1.8;}
+  a.inl{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;}
 
-  .collage{position:relative;}
-  .collage img{display:block;object-fit:cover;width:100%;}
-  .collage .base{width:86%;margin-left:14%;aspect-ratio:4/4.4;}
-  .collage .over{position:absolute;left:0;bottom:-9%;width:46%;aspect-ratio:4/4.6;box-shadow:0 0 0 6px var(--edge,#fff);}
-  .collage.flip .base{margin-left:0;margin-right:14%;}
-  .collage.flip .over{left:auto;right:0;}
-  @media(max-width:900px){.collage{margin-bottom:9%;}}
+  /* buttons — primary black pill (RATI caps) · secondary outlined (Inter caps) */
+  .btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:300px;padding:24px 30px;line-height:1.2;white-space:nowrap;transition:background .25s,color .25s,border-color .25s;}
+  .btn.primary{font-family:var(--rati);font-weight:300;font-size:17px;letter-spacing:.04em;text-transform:uppercase;background:var(--black);color:#fff;border:1px solid var(--black);}
+  .btn.primary:hover{background:#2a2a2a;}
+  .btn.secondary{font-family:var(--inter);font-weight:400;font-size:17px;letter-spacing:.02em;text-transform:uppercase;background:transparent;color:var(--ink);border:1px solid var(--ink);}
+  .btn.secondary:hover{background:rgba(17,17,17,.06);}
+  .btn.white{color:#fff;border-color:#fff;}
+  .btn.white:hover{background:rgba(255,255,255,.12);}
+  .btns{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:center;}
 
-  .rows{border-top:1px solid rgba(17,17,17,.55);}
-  .row{border-bottom:1px solid rgba(17,17,17,.55);padding:30px 0 34px;}
-  .row h3{font-size:clamp(1.35rem,1.9vw,1.78rem);margin:0 0 .55em;}
-  .row p{margin:0;max-width:56ch;}
-  .row .num{font-family:'RATI_v2',Georgia,serif;font-size:15px;display:block;margin-bottom:10px;letter-spacing:.06em;}
-  /* hairline rows on light ground */
-  .rows.lt{border-top-color:rgba(17,17,17,.16);}
-  .rows.lt .row{border-bottom-color:rgba(17,17,17,.16);}
+  /* scribble underline (Squarespace text-highlight, underline style) */
+  .scribble{position:relative;display:inline-block;}
+  .scribble::after{content:"";position:absolute;left:-3%;right:-3%;bottom:-.02em;height:.24em;
+    background:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'%3E%3Cpath d='M4 30 C 90 22, 200 16, 396 24' fill='none' stroke='%23111' stroke-width='11' stroke-linecap='round'/%3E%3Cpath d='M396 24 C 300 20, 150 21, 40 32' fill='none' stroke='%23111' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat;}
 
-  .angle{display:block;width:100%;height:clamp(44px,6vw,92px);line-height:0;margin-top:-1px;margin-bottom:-1px;position:relative;z-index:1;}
-  .angle svg{width:100%;height:100%;display:block;}
+  /* layout */
+  .wrap{max-width:calc(var(--max) + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter);}
+  .split{display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(32px,6vw,100px);row-gap:40px;align-items:center;}
+  .sec{position:relative;padding-block:clamp(88px,9vw,140px);}
+  .white{background:var(--white);}
+  .cream{background:var(--cream);}
+  .green{background:var(--green);color:var(--black);}
+  .black{background:var(--black);color:#fff;}
 
-  /* ================= sections ================= */
-  /* hero — light, habitat collage right */
-  .hero{min-height:100vh;display:flex;align-items:center;}
-  .hero .wrap{width:100%;padding-top:130px;padding-bottom:70px;}
-  .hero .two{align-items:center;grid-template-columns:1.05fr .95fr;}
-  .hero h1{font-size:clamp(2.7rem,5.6vw,5.3rem);margin-bottom:.4em;max-width:12ch;}
-  .hero h3{max-width:22ch;margin-bottom:1.4em;}
-  .hero .intro p{max-width:52ch;}
-  .hero .unit{font-family:'RATI_v2',Georgia,serif;font-size:clamp(1.3rem,1.75vw,1.63rem);line-height:1.4;margin:1.4em 0 .8em;}
-  .hero .collage{--edge:#F5F6F1;}
+  /* dividers — Squarespace section dividers, same paths, 6vw tall */
+  .has-divider{padding-bottom:calc(clamp(88px,9vw,140px) + 6vw);}
+  .div-wave{clip-path:url(#wave);}
+  .div-soft{clip-path:url(#soft);}
+  .div-svgs{position:absolute;width:0;height:0;}
 
-  /* why the right units matter + location — one green spread */
-  .why{background:#71977A;color:#111;padding-block:clamp(90px,13vh,150px);}
-  .why .two{grid-template-columns:1fr 1fr;align-items:start;}
-  .why h2{max-width:14ch;}
-  .why .lead{margin-top:1.4em;max-width:30ch;}
-  .why .loc{border-top:1px solid rgba(17,17,17,.55);padding-top:30px;}
-  .why .loc h3{font-size:clamp(1.35rem,1.9vw,1.78rem);margin-bottom:.8em;}
-  .why .loc p{max-width:52ch;}
-  .why .tlink{border-bottom:1px solid rgba(17,17,17,.5);padding-bottom:6px;}
+  /* fade-up */
+  .fade{opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s ease;}
+  .fade.in{opacity:1;transform:none;}
+  @media(prefers-reduced-motion:reduce){.fade{opacity:1;transform:none;transition:none;}}
 
-  /* how Biofarm creates units — immersive set-piece */
-  .creates{position:relative;color:#F5F6F1;isolation:isolate;overflow:hidden;text-align:center;padding-block:clamp(130px,20vh,240px);}
-  .creates .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;}
-  .creates::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,12,9,.78),rgba(9,12,9,.58) 45%,rgba(9,12,9,.84));}
-  .creates h2{color:#F5F6F1;max-width:18ch;margin:0 auto .5em;font-size:clamp(2.3rem,4.2vw,3.9rem);line-height:1.1;}
-  .creates .lead{color:rgba(245,246,241,.94);max-width:34ch;margin-inline:auto;}
-  .creates .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,110px);text-align:left;align-items:start;max-width:1240px;margin:clamp(56px,8vh,96px) auto 0;}
-  .creates p{color:rgba(245,246,241,.92);}
-  .creates .statement{margin-top:0;color:#F5F6F1;}
-  .creates .tlink{color:#F5F6F1;border-bottom:1px solid rgba(245,246,241,.6);padding-bottom:6px;}
-  @media(max-width:900px){.creates .cols{grid-template-columns:1fr;}}
+  /* collages — overlapping pairs, no border (geometry from developers-2) */
+  .collage{position:relative;width:100%;}
+  .collage img{position:absolute;inset:0;object-fit:cover;width:100%;height:100%;}
+  .collage .base,.collage .over{position:absolute;overflow:hidden;background:#dfe1d8;}
+  .collage.hero{aspect-ratio:586/611;max-width:586px;margin-left:auto;}
+  .collage.hero .base{right:0;top:0;width:79.5%;height:79.9%;}
+  .collage.hero .over{left:0;top:47.5%;width:49%;height:52.5%;}
+  .collage.tall{aspect-ratio:586/779;max-width:586px;}
+  .collage.tall .base{left:0;top:0;width:89.8%;height:100%;}
+  .collage.tall .over{left:40.8%;top:21.4%;width:59.2%;height:57.3%;}
+  .collage.right{aspect-ratio:586/654;max-width:586px;margin-left:auto;}
+  .collage.right .base{right:0;top:0;width:89.8%;height:100%;}
+  .collage.right .over{left:0;top:25.4%;width:49%;height:55.5%;}
 
-  /* planning confidence — light split */
-  .early{padding-block:clamp(110px,16vh,190px);}
-  .early .two{align-items:start;}
-  .early h2{max-width:14ch;}
-  .early .lead{max-width:32ch;}
+  /* ================= 1 · hero (cream) ================= */
+  .hero{min-height:100vh;display:flex;align-items:center;padding-top:150px;padding-bottom:90px;}
+  .hero .wrap{width:100%;}
+  .hero h1{font-size:clamp(44px,4.4vw,68px);line-height:1.1;margin-bottom:.5em;}
+  .hero h4{margin-bottom:1.1em;max-width:28ch;}
+  .hero p{max-width:60ch;}
+  .hero h4.statement{margin-top:1.4em;}
+  .hero .btns{margin-top:44px;}
 
-  /* how to secure — tall photo left, large-type numbered steps right (white) */
-  .secure{background:#fff;padding-block:clamp(110px,16vh,190px);}
-  .secure .two{grid-template-columns:.85fr 1.15fr;align-items:center;}
-  .secure .photo{width:100%;aspect-ratio:3/3.9;object-fit:cover;display:block;}
-  .secure h2{max-width:14ch;margin-bottom:clamp(36px,5vh,56px);}
-  .secure .steps{list-style:none;margin:0;padding:0;border-top:1px solid rgba(17,17,17,.16);}
-  .secure .steps li{display:grid;grid-template-columns:56px 1fr;gap:16px;align-items:baseline;border-bottom:1px solid rgba(17,17,17,.16);padding:22px 0 24px;}
-  .secure .steps .num{font-family:'RATI_v2',Georgia,serif;font-size:15px;letter-spacing:.06em;color:#4c5048;}
-  .secure .steps h3{font-size:clamp(1.4rem,2vw,1.9rem);line-height:1.25;margin:0;max-width:22ch;}
-  @media(max-width:900px){.secure .photo{aspect-ratio:4/3;}}
+  /* ================= 2 · why (white, centred: H2 + big lead, journey illustration, location copy) ================= */
+  .why{padding-block:clamp(72px,7vw,104px);}
+  .why .top{text-align:center;}
+  .why h2{max-width:20ch;margin:0 auto .4em;}
+  .why .lead{max-width:46ch;margin:0 auto;}
+  /* species frieze — five watercolours on one baseline, sized by hand */
+  .why .frieze{display:flex;justify-content:center;align-items:flex-end;gap:clamp(20px,4vw,72px);max-width:1220px;margin:clamp(36px,4vw,56px) auto;padding:0 4%;}
+  .why .frieze img{height:auto;flex:0 1 auto;}
+  .why .frieze .cowslip{width:clamp(90px,11vw,170px);}
+  .why .frieze .dormouse{width:clamp(80px,9vw,140px);margin-bottom:6px;}
+  .why .frieze .lapwing{width:clamp(110px,13vw,200px);}
+  .why .frieze .orchid{width:clamp(80px,10vw,150px);}
+  .why .frieze .beaver{width:clamp(120px,15vw,230px);}
+  .why .loc{align-items:start;text-align:left;border-top:1px solid rgba(17,17,17,.14);padding-top:clamp(40px,4vw,56px);margin-top:clamp(36px,4vw,56px);}
+  .why .loc h3{max-width:12ch;}
+  .why .loc p{max-width:58ch;}
+  .why .loc .btns{margin-top:28px;}
 
-  /* fair pricing — white split */
-  .fair{padding-block:clamp(110px,16vh,190px);}
-  .fair .two{align-items:start;}
-  .fair h2{max-width:12ch;}
-  .fair .statement{max-width:20ch;}
+  /* ================= 3 · creates (green: H2 + big copy left, rows right) ================= */
+  .creates .split{align-items:start;}
+  .creates h2{margin-bottom:.9em;max-width:13ch;}
+  .creates .rows{border-top:1px solid var(--black);margin-top:6px;}
+  .creates .row{border-bottom:1px solid var(--black);padding:30px 0 32px;}
+  .creates .row h4{margin:0;}
+  .creates .link{display:inline-block;margin-top:36px;font-weight:400;}
 
-  /* FAQ — light */
-  .faq{background:#fff;padding-block:clamp(110px,15vh,180px);}
-  .faq .two{grid-template-columns:.8fr 1.2fr;align-items:start;}
-  .faq h2{max-width:12ch;}
-  .faq .side p{max-width:36ch;}
-  .faq details{border-bottom:1px solid rgba(17,17,17,.35);}
-  .faq details:first-of-type{border-top:1px solid rgba(17,17,17,.35);}
-  .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:26px;padding:27px 0;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(1.3rem,1.8vw,1.7rem);line-height:1.3;}
+  /* ================= 4 · secure (white: centred H2, five-step timeline — giant green numerals on one hairline) ================= */
+  .secure{text-align:center;}
+  .secure h2{margin-bottom:0;}
+  .secure .steps{display:grid;grid-template-columns:repeat(5,1fr);text-align:left;list-style:none;padding:0;margin:clamp(40px,4.5vw,64px) 0 0;}
+  .secure .steps li{padding-right:clamp(20px,2.6vw,40px);}
+  .secure .num{display:block;font-family:var(--rati);font-size:var(--h1);line-height:1;color:var(--green);padding-bottom:clamp(16px,2vw,28px);border-bottom:1px solid var(--black);margin-right:calc(-1 * clamp(20px,2.6vw,40px));}
+  .secure .steps li:last-child{padding-right:0;}
+  .secure .steps li:last-child .num{margin-right:0;}
+  .secure .steps h4{margin-top:clamp(18px,2vw,28px);max-width:15ch;}
+  .secure .btns{justify-content:center;margin-top:clamp(48px,5vw,72px);}
+
+  /* ================= 5 · early (black + photo wash, centred) ================= */
+  .early{isolation:isolate;text-align:center;min-height:946px;display:flex;align-items:center;padding-block:120px;}
+  .early .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;}
+  .early::after{content:"";position:absolute;inset:0;z-index:-1;background:rgba(17,17,17,.6);}
+  .early .wrap{width:100%;}
+  .early h2{font-size:var(--h1);line-height:1.23;max-width:20ch;margin:0 auto .35em;}
+  .early h4{max-width:32ch;margin:0 auto 1.4em;}
+  .early p{max-width:56ch;margin-inline:auto;}
+  .early .btns{justify-content:center;margin-top:40px;}
+
+  /* ================= 6 · fair (white wave → cream split, collage right) ================= */
+    
+  .fair h2{margin-bottom:.8em;max-width:12ch;}
+  .fair h4{margin-bottom:1.1em;}
+  .fair h3{margin-top:1.6em;padding-top:1.2em;border-top:1px solid rgba(17,17,17,.18);max-width:16ch;}
+
+  /* ================= 7 · FAQ (green) ================= */
+  .faq .split{align-items:start;}
+  .faq h2{max-width:12ch;margin-bottom:1.6em;}
+  .faq .side p{max-width:30ch;margin-bottom:.9em;}
+  .faq details{border-bottom:1px solid var(--black);}
+  .faq details:first-of-type{border-top:1px solid var(--black);}
+  .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:28px;padding:28px 0;font-family:var(--inter);font-weight:300;font-size:var(--big);line-height:1.3;}
   .faq summary::-webkit-details-marker{display:none;}
-  .faq summary .plus{position:relative;flex:none;width:15px;height:15px;top:2px;}
-  .faq summary .plus::before,.faq summary .plus::after{content:"";position:absolute;background:#111;transition:transform .25s;}
-  .faq summary .plus::before{left:0;right:0;top:7px;height:1px;}
-  .faq summary .plus::after{top:0;bottom:0;left:7px;width:1px;}
-  .faq details[open] summary .plus::after{transform:rotate(90deg);}
-  .faq .a{padding:0 0 32px;max-width:58ch;}
+  .faq .plus{position:relative;flex:none;width:18px;height:18px;}
+  .faq .plus::before,.faq .plus::after{content:"";position:absolute;background:var(--black);transition:transform .25s;}
+  .faq .plus::before{left:0;right:0;top:8.5px;height:1px;}
+  .faq .plus::after{top:0;bottom:0;left:8.5px;width:1px;}
+  .faq details[open] .plus::after{transform:rotate(90deg);}
+  .faq .a{padding:0 0 30px;max-width:60ch;}
 
-  /* closing — green angled */
-  .closing{background:#71977A;color:#111;padding-block:clamp(100px,14vh,170px);}
-  .closing .two{grid-template-columns:1.15fr .85fr;align-items:center;}
-  .closing .lead{font-size:clamp(1.6rem,2.5vw,2.3rem);line-height:1.3;max-width:26ch;margin:0;}
-  .closing .ctas{margin-top:0;}
+  /* ================= 8 · closing (watercolour canvas) ================= */
+  .closing{background:var(--cream) url("https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c13b07fd-a101-4c15-aba9-2f66f3aa95d1/Let%E2%80%99s+talk+about+your+project.jpg?format=2500w") center/cover no-repeat;text-align:center;min-height:900px;display:flex;align-items:center;}
+  .closing .wrap{width:100%;}
+  .closing h3{max-width:34ch;margin:0 auto 1.2em;}
+  .closing .btns{justify-content:center;}
 
-  .black-note{background:#111;color:rgba(245,246,241,.75);font-size:13px;letter-spacing:.04em;padding:30px clamp(24px,7vw,105px);text-align:center;}
-  .black-note a{color:#F5F6F1;}
+  .note{background:var(--black);color:rgba(255,255,255,.6);font-size:12px;letter-spacing:.04em;padding:26px var(--gutter);text-align:center;}
+  .note a{color:#fff;}
 
-  /* ================= mobile (last so it wins) ================= */
+  /* ================= mobile (last, so it wins) ================= */
   @media(max-width:900px){
-    .s .two{grid-template-columns:1fr;gap:40px;}
-    .hero{min-height:0;}
+    .split{grid-template-columns:1fr;row-gap:44px;}
+    .hero{min-height:0;padding-top:120px;padding-bottom:64px;}
     .hero h1{max-width:none;}
-    .hero .wrap{padding-top:112px;padding-bottom:56px;}
-    .collage{margin:12px 0 11%;}
-    .collage .base{aspect-ratio:4/3.4;}
-    .s .statement{margin-top:1.2em;}
-    .s .ctas{margin-top:32px;gap:26px;}
-    .closing .ctas{margin-top:8px;}
+    .collage.hero,.collage.right{margin-left:0;}
+    .why .split > .collage{order:2;}
+    .secure .steps{grid-template-columns:1fr;row-gap:36px;}
+    .secure .steps li{padding-right:0;}
+    .secure .num{margin-right:0;font-size:64px;}
+    .secure .steps h4{max-width:none;}
+    .why .frieze{flex-wrap:wrap;gap:24px 32px;}
+    .early{min-height:0;padding-block:96px;}
+    .early h2{font-size:clamp(40px,9vw,64px);}
+    .closing{min-height:0;padding-block:110px;background-size:auto 100%;}
+    .has-divider{padding-bottom:calc(72px + 6vw);}
   }
   @media(max-width:520px){
-    .hdr .nav{padding:14px 18px;gap:14px;}
-    .hdr .logo img{height:24px;}
+    .hdr .nav{padding:16px 18px;gap:14px;}
+    .hdr .logo img{height:26px;}
     .hdr ul{gap:14px;}
-    .hdr ul a.pill{font-size:15px;padding:11px 18px;}
-    .s .wrap{padding-inline:22px;}
+    .hdr ul a.navpill{font-size:15px;padding:10px 18px;}
+    .btn{width:100%;padding:20px 18px;font-size:15px !important;}
+    .btns{gap:16px;}
+    .sec{padding-block:72px;}
+    .faq summary{padding:20px 0;}
   }
 </style>
 </head>
 <body>
 
+<svg class="div-svgs" aria-hidden="true">
+  <clipPath id="wave" clipPathUnits="objectBoundingBox">
+    <path d="M-1,0.929 L-1,0.9645 c0.25,0.04544 0.25,0.04544 0.5,0 s0.25,-0.04544 0.5,0 c0.25,0.04544 0.25,0.04544 0.5,0 s0.25,-0.04544 0.5,0 c0.25,0.04544 0.25,0.04544 0.5,0 s0.25,-0.04544 0.5,0 L1,-1 L0,-1 z"/>
+  </clipPath>
+  <clipPath id="soft" clipPathUnits="objectBoundingBox">
+    <path d="M2,0.912 L2,0.912 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 L-1,-1 L2,-1 z"/>
+  </clipPath>
+</svg>
+
 <header class="hdr" id="hdr">
   <nav class="nav" aria-label="Primary">
     <a class="logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home">
-      <img class="lt" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
-      <img class="dk" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/09b8344b-8b40-4f71-9a64-152e1ed34fa7/Asset+16LOGO.png?format=1500w" alt="Biofarm" />
+      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
     </a>
     <ul>
-      <li><a href="https://www.biofarm.co.uk/developers">Partners</a></li>
-      <li><a href="https://www.biofarm.co.uk/habitat-banks">Habitat Banks</a></li>
+      <li><a href="https://www.biofarm.co.uk/developers">Partners +</a></li>
       <li><a href="https://www.biofarm.co.uk/about">About</a></li>
       <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
       <li><a href="https://www.biofarm.co.uk/contact">Contact</a></li>
-      <li><a class="pill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+      <li><a class="navpill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
     </ul>
   </nav>
 </header>
 
 <main>
 
-  <!-- ============ HERO (light, restored-habitat collage) ============ -->
-  <section class="s hero">
+  <!-- ============ 1 · HERO (cream) ============ -->
+  <section class="sec cream hero">
     <div class="wrap">
-      <div class="two">
-        <div>
-          <h1>Secure off site biodiversity&nbsp;units</h1>
-          <h3>Secure the right biodiversity units, in the right place.</h3>
-          <div class="intro">
-            <p>When your development requires off site Biodiversity Net Gain, success is not simply about securing biodiversity units. It is about securing the right units, in the right location, with confidence they will support your planning strategy.</p>
-          </div>
-          <p class="unit">Every biodiversity unit starts with a Biofarm&nbsp;habitat.</p>
-          <div class="intro">
-            <p>We work with landowners to create habitats that generate biodiversity units, then manage every habitat bank for at least 30 years.</p>
-          </div>
-          <div class="ctas">
-            <a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
-            <a class="tlink" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a>
+      <div class="split">
+        <div class="fade">
+          <h1>Secure off site biodiversity <span class="scribble">units</span></h1>
+          <h4>Secure the right biodiversity units, in the right place.</h4>
+          <p>When your development requires off site Biodiversity Net Gain, success is not simply about securing biodiversity units. It is about securing the right units, in the right location, with confidence they will support your planning strategy.</p>
+          <h4 class="statement">Every biodiversity unit starts with a Biofarm habitat.</h4>
+          <p>We work with landowners to create habitats that generate biodiversity units, then manage every habitat bank for at least 30 years.</p>
+          <div class="btns">
+            <a class="btn primary" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
+            <a class="btn secondary" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a>
           </div>
         </div>
-        <div class="collage">
-          <img class="base" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756558934440-S53T4BEBNC2BOKV81G3J/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-2614.jpg?format=1500w" alt="Woodland canopy at a Biofarm habitat bank" />
-          <img class="over" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756561098277-2B227FIDENEPGJZDHBTB/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-2274.jpg?format=750w" alt="Land manager at work on a Biofarm habitat bank" />
+        <div class="collage hero fade">
+          <div class="base"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1754640171589-U6GYJWOXP4J8WW0WK3OT/2025_07_21_DACRE_Biofarm_Sleight_Farm-1727.jpg?format=1500w" alt="Restored species-rich grassland at Sleight Farm habitat bank" /></div>
+          <div class="over"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1e7d3d34-bf4a-4b28-8e87-91be4eacd861/2025_07_21_DACRE_Biofarm_Sleight_Farm-0579.jpg?format=1000w" alt="Common blue butterfly on a seed head at Sleight Farm" /></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ WHY THE RIGHT UNITS MATTER + WHY LOCATION MATTERS (green, angled) ============ -->
-  <div class="s angle" style="background:#F5F6F1;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
-  <section class="s why">
+  <!-- ============ 2 · WHY THE RIGHT UNITS MATTER + LOCATION (white, centred, journey illustration) ============ -->
+  <section class="sec white why">
     <div class="wrap">
-      <div class="two">
+      <div class="top fade">
+        <h2>Why the right biodiversity units matter</h2>
+        <p class="big lead">Developers do not simply need biodiversity units. They need biodiversity units that are locally relevant, support planning requirements and create lasting ecological value.</p>
+      </div>
+      <div class="frieze fade" aria-hidden="true">
+        <img class="cowslip" src="assets/illustrations/cowslip.png" alt="" />
+        <img class="dormouse" src="assets/illustrations/dormouse.png" alt="" />
+        <img class="lapwing" src="assets/illustrations/lapwing.png" alt="" />
+        <img class="orchid" src="assets/illustrations/orchid.png" alt="" />
+        <img class="beaver" src="assets/illustrations/beaver.png" alt="" />
+      </div>
+      <div class="loc split fade">
+        <h3>Why location matters</h3>
         <div>
-          <h2>Why the right biodiversity units matter</h2>
-          <p class="lead">Developers do not simply need biodiversity units. They need biodiversity units that are locally relevant, support planning requirements and create lasting ecological&nbsp;value.</p>
-        </div>
-        <div class="loc">
-          <h3>Why location matters</h3>
           <p>Location plays an important role in Biodiversity Net Gain.</p>
-          <p>The <a class="ilink" href="https://www.biofarm.co.uk/biodiversity-metric">statutory biodiversity metric</a> applies a Spatial Risk Multiplier where biodiversity is delivered further from a development.</p>
-          <p>Choosing a locally appropriate <a class="ilink" href="https://www.biofarm.co.uk/habitat-banks">Biofarm Habitat Bank</a> can help reduce additional unit requirements while supporting better outcomes for nature.</p>
-          <div class="ctas" style="margin-top:30px;"><a class="tlink" href="https://www.biofarm.co.uk/biodiversity-metric">Understand the Biodiversity Metric</a></div>
+          <p>The <a class="inl" href="https://www.biofarm.co.uk/biodiversity-metric">statutory biodiversity metric</a> applies a Spatial Risk Multiplier where biodiversity is delivered further from a development.</p>
+          <p>Choosing a locally appropriate <a class="inl" href="https://www.biofarm.co.uk/habitat-banks">Biofarm Habitat Bank</a> can help reduce additional unit requirements while supporting better outcomes for nature.</p>
+          <div class="btns"><a class="btn secondary" href="https://www.biofarm.co.uk/biodiversity-metric">Understand the Biodiversity Metric</a></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ HOW BIOFARM CREATES UNITS (immersive set-piece) ============ -->
-  <section class="s creates">
-    <img class="bg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1754640171589-U6GYJWOXP4J8WW0WK3OT/2025_07_21_DACRE_Biofarm_Sleight_Farm-1727.jpg?format=2500w" alt="Restored species-rich grassland at Sleight Farm habitat bank" />
+  <!-- ============ 3 · HOW BIOFARM CREATES UNITS (green) ============ -->
+  <section class="sec green creates">
     <div class="wrap">
-      <h2>How Biofarm creates biodiversity&nbsp;units</h2>
-      <p class="lead">Every Biofarm biodiversity unit begins with land that has the potential to become something&nbsp;more.</p>
-      <div class="cols">
-        <div>
+      <div class="split">
+        <div class="fade big">
+          <h2>How Biofarm creates biodiversity units</h2>
+          <p>Every Biofarm biodiversity unit begins with land that has the potential to become something more.</p>
           <p>We identify suitable land, restore habitats and manage every habitat bank ourselves for at least 30 years.</p>
-          <p>Behind every biodiversity unit is a real place. One that will continue to grow, evolve and support wildlife for decades to come.</p>
         </div>
-        <div>
-          <p class="statement">Every biodiversity unit we provide comes from a Biofarm Habitat&nbsp;Bank.</p>
-          <div class="ctas" style="margin-top:38px;"><a class="tlink" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ PLANNING CONFIDENCE STARTS EARLY (light) ============ -->
-  <section class="s early">
-    <div class="wrap">
-      <div class="two">
-        <h2>Planning confidence starts early</h2>
-        <div>
-          <p class="lead">The earlier we understand your project, the more opportunity there is to identify locally appropriate habitat banks, provide certainty around availability and pricing, and reduce planning risk.</p>
-          <p>Early engagement gives you more choice, greater certainty and more time to integrate Biodiversity Net Gain into your planning strategy.</p>
-          <div class="ctas" style="margin-top:30px;"><a class="tlink" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+        <div class="fade">
+          <div class="rows">
+            <div class="row"><h4>Behind every biodiversity unit is a real place.</h4></div>
+            <div class="row"><h4>One that will continue to grow, evolve and support wildlife for decades to come.</h4></div>
+            <div class="row"><h4>Every biodiversity unit we provide comes from a Biofarm Habitat Bank.</h4></div>
+          </div>
+          <a class="inl link" href="https://www.biofarm.co.uk/habitat-banks">Explore our Habitat Banks</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ HOW TO SECURE UNITS (white, photo + large-type steps) ============ -->
-  <section class="s secure">
+  <!-- ============ 4 · HOW TO SECURE UNITS (white, five-step timeline — copy verbatim from Web Copy v3, which asks for a five-step visual process ============ -->
+  <section class="sec white secure">
     <div class="wrap">
-      <div class="two">
-        <img class="photo" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756560129670-HN7ZFJM1QYXQMTX1MX3A/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-1889.jpg?format=1500w" alt="Ponies grazing species-rich grassland at Sleight Farm habitat bank" />
-        <div>
-          <h2>How to secure biodiversity units</h2>
-          <ol class="steps">
-            <li><span class="num">01</span><h3>Talk to Biofarm early.</h3></li>
-            <li><span class="num">02</span><h3>Understand your Biodiversity Net Gain requirements.</h3></li>
-            <li><span class="num">03</span><h3>Identify the right Biofarm Habitat Bank.</h3></li>
-            <li><span class="num">04</span><h3>Secure your biodiversity units.</h3></li>
-            <li><span class="num">05</span><h3>We create, manage, monitor and report for the long term.</h3></li>
-          </ol>
-          <div class="ctas" style="margin-top:40px;"><a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+      <div class="fade">
+        <h2>How to secure biodiversity units</h2>
+      </div>
+      <ol class="steps fade">
+        <li><span class="num">1</span><h4>Talk to Biofarm early.</h4></li>
+        <li><span class="num">2</span><h4>Understand your Biodiversity Net Gain requirements.</h4></li>
+        <li><span class="num">3</span><h4>Identify the right Biofarm Habitat Bank.</h4></li>
+        <li><span class="num">4</span><h4>Secure your biodiversity units.</h4></li>
+        <li><span class="num">5</span><h4>We create, manage, monitor and report for the long term.</h4></li>
+      </ol>
+      <div class="btns fade"><a class="btn primary" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+    </div>
+  </section>
+
+  <!-- ============ 5 · PLANNING CONFIDENCE STARTS EARLY (black + photo wash) ============ -->
+  <section class="sec black early has-divider div-wave">
+    <img class="bg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756560530359-Y0G0MRPQAVSXQUKT30XB/low-res-stephen-arnold-ygi0RcsuR6U-unsplash.jpg?format=2500w" alt="" />
+    <div class="wrap fade">
+      <h2>Planning confidence starts early</h2>
+      <h4>The earlier we understand your project, the more opportunity there is to identify locally appropriate habitat banks, provide certainty around availability and pricing, and reduce planning risk.</h4>
+      <p>Early engagement gives you more choice, greater certainty and more time to integrate Biodiversity Net Gain into your planning strategy.</p>
+      <div class="btns"><a class="btn secondary white" href="https://www.biofarm.co.uk/contact">Talk to our team</a></div>
+    </div>
+  </section>
+
+  <!-- ============ 6 · FAIR PRICING (white wave → cream split, collage right) ============ -->
+  <section class="sec cream fair">
+    <div class="wrap">
+      <div class="split">
+        <div class="fade">
+          <h2>Fair pricing. Long term value.</h2>
+          <h4>We believe in fair, transparent pricing and practical advice.</h4>
+          <h4>We are here to help you secure the right biodiversity units for your development, not simply the first units available.</h4>
+          <h3>Every biodiversity unit starts with a real place.</h3>
+        </div>
+        <div class="collage right fade">
+          <div class="base"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756560129670-HN7ZFJM1QYXQMTX1MX3A/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-1889.jpg?format=1500w" alt="Ponies grazing species-rich grassland at Sleight Farm habitat bank" /></div>
+          <div class="over"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c725401e-c0e5-4ed1-ba8e-03f267ca828c/2025_07_21_DACRE_Biofarm_Sleight_Farm-2614.jpg?format=1000w" alt="Woodland canopy at Sleight Farm habitat bank" /></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ FAIR PRICING (white) ============ -->
-  <section class="s fair">
+  <!-- ============ 7 · FAQ (green, soft wave into the closing) ============ -->
+  <section class="sec green faq has-divider div-soft">
     <div class="wrap">
-      <div class="two">
-        <h2>Fair pricing. Long term value.</h2>
-        <div>
-          <p class="lead">We believe in fair, transparent pricing and practical advice.</p>
-          <p>We are here to help you secure the right biodiversity units for your development, not simply the first units available.</p>
-          <p class="statement">Every biodiversity unit starts with a real&nbsp;place.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ FAQ (light) ============ -->
-  <section class="s faq">
-    <div class="wrap">
-      <div class="two">
-        <div class="side">
+      <div class="split">
+        <div class="side fade">
           <h2>Frequently asked questions</h2>
-          <p style="margin-top:1.6em;">Can&rsquo;t find what you&rsquo;re looking for? <a class="ilink" href="https://www.biofarm.co.uk/contact">Talk to our team</a>.</p>
+          <p>Can&rsquo;t find what you&rsquo;re looking for?</p>
+          <p><a class="inl" href="https://www.biofarm.co.uk/contact">Talk to our team</a></p>
         </div>
-        <div>
+        <div class="fade">
           <details>
             <summary>When is off site Biodiversity Net Gain the right choice?<span class="plus" aria-hidden="true"></span></summary>
             <div class="a">
@@ -388,23 +439,20 @@
     </div>
   </section>
 
-  <!-- ============ CLOSING (green, angled) ============ -->
-  <div class="s angle" style="background:#fff;"><svg viewBox="0 0 100 8" preserveAspectRatio="none"><polygon points="0,0 50,8 100,0 100,8 0,8" fill="#71977A"/></svg></div>
-  <section class="s closing">
-    <div class="wrap">
-      <div class="two">
-        <p class="lead">Whether you are delivering a residential development, commercial scheme or infrastructure project, we will help you secure the right off site biodiversity units from a Biofarm Habitat&nbsp;Bank.</p>
-        <div class="ctas">
-          <a class="pill" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
-          <a class="tlink" href="https://www.biofarm.co.uk/biodiversity-net-gain">Learn about Biodiversity Net Gain</a>
-        </div>
+  <!-- ============ 8 · CLOSING (watercolour canvas) ============ -->
+  <section class="sec closing" id="closing">
+    <div class="wrap fade">
+      <h3>Whether you are delivering a residential development, commercial scheme or infrastructure project, we will help you secure the right off site biodiversity units from a Biofarm Habitat Bank.</h3>
+      <div class="btns">
+        <a class="btn primary" href="https://www.biofarm.co.uk/contact">Talk to our team</a>
+        <a class="btn secondary" href="https://www.biofarm.co.uk/biodiversity-net-gain">Learn about Biodiversity Net Gain</a>
       </div>
     </div>
   </section>
 
 </main>
 
-<footer class="black-note">
+<footer class="note">
   Prototype for <a href="https://www.biofarm.co.uk/">biofarm.co.uk</a>/biodiversity-units &mdash; the live page inherits the real site header &amp; footer.
 </footer>
 
@@ -412,36 +460,13 @@
   (function(){
     var h=document.getElementById('hdr');
     addEventListener('scroll',function(){h.classList.toggle('scrolled',scrollY>40);},{passive:true});
+    var els=document.querySelectorAll('.fade');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+    },{rootMargin:'0px 0px -8% 0px',threshold:.06});
+    els.forEach(function(e){io.observe(e);});
   })();
 </script>
-
-<!-- ============ JSON-LD — paste into Squarespace Page Settings → Advanced → Header Code Injection ============ -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    { "@type": "WebPage", "@id": "https://www.biofarm.co.uk/biodiversity-units", "url": "https://www.biofarm.co.uk/biodiversity-units",
-      "name": "Biodiversity Units | Secure off site Biodiversity Units | Biofarm",
-      "description": "Secure off site biodiversity units from Biofarm Habitat Banks. Fair pricing, local delivery and long term stewardship to support residential, commercial and infrastructure developments." },
-    { "@type": "BreadcrumbList", "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.biofarm.co.uk/" },
-        { "@type": "ListItem", "position": 2, "name": "Biodiversity Units", "item": "https://www.biofarm.co.uk/biodiversity-units" } ] },
-    { "@type": "FAQPage", "mainEntity": [
-        { "@type": "Question", "name": "When is off site Biodiversity Net Gain the right choice?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Every development is different, and the most appropriate Biodiversity Net Gain strategy will depend on the type of development, the characteristics of the site and the applicable regulatory requirements. Biofarm works with developers to identify the most appropriate route to achieving Biodiversity Net Gain. Depending on the project, this may include on-site habitat creation or enhancement, off-site biodiversity units, or a combination of both. Where off-site delivery is the right solution, Biofarm provides high-quality biodiversity units through our professionally managed habitat banks, helping developers meet their obligations efficiently and with confidence." } },
-        { "@type": "Question", "name": "What is the difference between biodiversity units and statutory biodiversity credits?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Biodiversity units are created through habitat banks such as those developed and managed by Biofarm. Statutory biodiversity credits are provided by Government and are intended as a last resort where suitable market units are not available." } },
-        { "@type": "Question", "name": "What is the difference between biodiversity units and carbon credits?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Although both support environmental outcomes, they serve different purposes. Biodiversity units are used to measure and deliver Biodiversity Net Gain and help developments meet planning requirements. Carbon credits measure the reduction or removal of greenhouse gas emissions and are used to help organisations manage their carbon footprint. While the same habitat may provide both biodiversity and carbon benefits, they are different products, measured in different ways and created for different purposes. Every biodiversity unit Biofarm provides comes from a real habitat that we create, restore and manage for at least 30 years." } },
-        { "@type": "Question", "name": "What is the Spatial Risk Multiplier?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The Spatial Risk Multiplier recognises that biodiversity delivered closer to a development generally provides greater ecological value than biodiversity delivered further away." } },
-        { "@type": "Question", "name": "Why does location matter?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Choosing a locally appropriate Biofarm Habitat Bank can help reduce planning risk, avoid unnecessary additional unit requirements and support better outcomes for nature." } },
-        { "@type": "Question", "name": "How much do biodiversity units cost?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Costs depend on habitat type, location and the number of units required. We provide fair, transparent pricing and clear advice from the outset." } } ] }
-  ]
-}
-</script>
-
 </body>
 </html>

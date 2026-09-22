@@ -1,0 +1,80 @@
+/* =====================================================================
+   BIOFARM — /home-2 mobile fixes
+   Paste into Website → Pages → Custom CSS (site-wide) — every rule is
+   scoped to the home-2 collection, so nothing else on the site changes.
+   Breakpoint 767px = Squarespace's own mobile breakpoint (Fluid Engine).
+   Measured at 410px on 10 Sep 2026.
+   ===================================================================== */
+
+/* ---------- 1. Type scale on phones ---------- */
+@media (max-width: 767px) {
+  #collection-6a97e8e37e79440b8a26a046 h1 { font-size: 52px !important; line-height: 1.08 !important; }
+  #collection-6a97e8e37e79440b8a26a046 h2 { font-size: 34px !important; line-height: 1.2 !important; }
+  #collection-6a97e8e37e79440b8a26a046 h3 { font-size: 27px !important; line-height: 1.3 !important; }
+  #collection-6a97e8e37e79440b8a26a046 h4 { font-size: 21px !important; line-height: 1.4 !important; }
+  #collection-6a97e8e37e79440b8a26a046 .sqs-html-content p { font-size: 16px !important; line-height: 1.65 !important; }
+  #collection-6a97e8e37e79440b8a26a046 .sqs-html-content p.sqsrte-large { font-size: 19px !important; line-height: 1.5 !important; }
+  /* the "National by nature, local by design" H2 is set to H1 size on desktop */
+  #collection-6a97e8e37e79440b8a26a046 [data-section-id="6a97e8e37e79440b8a26a05f"] h2 { font-size: 40px !important; line-height: 1.1 !important; }
+  /* "Work with people who get it": breathing room under the heading */
+  #collection-6a97e8e37e79440b8a26a046 [data-section-id="6a97e8e37e79440b8a26a065"] h2 { margin-bottom: .6em !important; }
+}
+
+/* ---------- 2. Pill buttons: never squash into 2–3 lines ---------- */
+@media (max-width: 767px) {
+  /* let a narrow button block grow to its label and stay centred */
+  #collection-6a97e8e37e79440b8a26a046 .fe-block:has(.sqs-block-button) {
+    min-width: max-content;
+    justify-self: center;
+  }
+  #collection-6a97e8e37e79440b8a26a046 .sqs-block-button-element {
+    white-space: nowrap !important;
+    font-size: 14px !important;
+    letter-spacing: .04em !important;
+    padding: 18px 28px !important;
+  }
+}
+
+/* ---------- 3. Section spacing & overflow ---------- */
+@media (max-width: 767px) {
+  /* the giant "No wild claims" marquee SVG is wider than the phone */
+  #collection-6a97e8e37e79440b8a26a046 .page-section { overflow-x: clip; }
+  /* tighter side gutter on phones */
+  #collection-6a97e8e37e79440b8a26a046 { --sqs-site-gutter: 24px; }
+  /* small-height sections: less top/bottom air */
+  #collection-6a97e8e37e79440b8a26a046 .section-height--small .content-wrapper {
+    padding-top: 56px !important; padding-bottom: 56px !important;
+  }
+}
+
+/* ---------- 4. Developers / Landowners black band ---------- */
+@media (max-width: 767px) {
+  /* photos shorter than the 430px they get by default */
+  #collection-6a97e8e37e79440b8a26a046 [data-section-id="6a97e8e37e79440b8a26a04e"] .sqs-block-image .image-block-outer-wrapper,
+  #collection-6a97e8e37e79440b8a26a046 [data-section-id="6a97e8e37e79440b8a26a04e"] .sqs-block-image img {
+    max-height: 300px; object-fit: cover;
+  }
+  /* outlined pills over the photos read clearer with a solid fill */
+  #collection-6a97e8e37e79440b8a26a046 [data-section-id="6a97e8e37e79440b8a26a04e"] .sqs-button-element--secondary {
+    background: rgba(17,17,17,.55) !important;
+  }
+}
+
+/* ---------- 5. "How Biofarm works" four-step list ---------- */
+@media (max-width: 767px) {
+  #collection-6a97e8e37e79440b8a26a046 .user-items-list-item-container .list-item {
+    padding-top: 16px !important; padding-bottom: 16px !important;
+  }
+  #collection-6a97e8e37e79440b8a26a046 .user-items-list-item-container .list-item-media,
+  #collection-6a97e8e37e79440b8a26a046 .user-items-list-item-container .list-item-media img {
+    max-height: 260px; object-fit: cover;
+  }
+  #collection-6a97e8e37e79440b8a26a046 .user-items-list-item-container .list-item-content__title { font-size: 26px !important; }
+  #collection-6a97e8e37e79440b8a26a046 .user-items-list-item-container .list-item-content__description p { font-size: 16px !important; }
+}
+
+/* ---------- 6. Newsletter form on green ---------- */
+@media (max-width: 767px) {
+  #collection-6a97e8e37e79440b8a26a046 .bf-nl { max-width: 100%; }
+  #collection-6a97e8e37e79440b8a26a046 .bf-nl .bf-btn { width: 100%; }
+}
