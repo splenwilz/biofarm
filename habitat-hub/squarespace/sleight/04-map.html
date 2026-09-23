@@ -168,10 +168,13 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
           }
         }, 50);
       } else {
+        // Circle fallback: the view MUST be set before adding the circle — a circle
+        // can't be projected (and getBounds() throws) on a map with no centre/zoom.
+        // GeoJSON bounds work without a view, so the catchment path fits after adding.
+        var hasC = !!catchment(b);
+        if (!hasC) map.fitBounds(L.latLng(b.lat, b.lng).toBounds((b.served || 40000) * 2), { padding:[24,24] });
         var r = ring(map, b, true);
-        // Frame the whole catchment when we have the real boundary; otherwise centre the pin.
-        if (r.getBounds) map.fitBounds(r.getBounds(), { padding:[24,24] });
-        else map.setView([b.lat, b.lng], 10);
+        if (hasC && r.getBounds) map.fitBounds(r.getBounds(), { padding:[24,24] });
       }
       L.marker([b.lat, b.lng], { icon:pin(true) }).addTo(map).bindPopup(popup(b));
     } else {
