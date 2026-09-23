@@ -1,5 +1,14 @@
 # Sleight — FULL vs LEAN (for Vix to compare)
 
+> **DECIDED (23 Sep 2026): LEAN won.** The approved v3 Sleight copy maps exactly onto the
+> lean structure and is now applied to the lean blocks (01, 02, 03, 04-map, 06, 08,
+> 12, 15 — all carry "v3 copy applied" in their headers; 03-location.html IS the merged
+> lean version, the old lean-03-location-merged.html filename is gone). Apply the lean
+> layout to the
+> MAIN post (`/habitat-banks-lists/sleight-farm`) and delete the `sleight-farm-xeeg2`
+> comparison copy. Blocks 05/07/09/10/11/13/14 are retired for Sleight.
+> The rest of this document is the historical comparison spec.
+
 Vix's note: *"I'm not sure Biofarm is in a position yet to provide ongoing evidence
 through case study and reporting. I wonder if we just keep it leaner, simpler and low
 maintenance for now… it just needs to show developers we have the supply and capability

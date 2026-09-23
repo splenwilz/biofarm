@@ -145,7 +145,7 @@ var PIPELINE_SITES = [
 
 var BF_BANKS = [
   { id:'sleight',  name:'Sleight Farm',     region:'south west', habitats:'lowland meadow, neutral grassland, woodland, scrub, hedgerow',
-    lat:51.33102, lng:-2.48730, units:'374', area:'70 ha', where:'Bath &amp; NE Somerset · West of England', url:'/habitat-banks-lists/sleight-farm', img:'https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg' },
+    lat:51.33102, lng:-2.48730, units:'374', area:'70 ha', where:'Bath &amp; North East Somerset · West of England', url:'/habitat-banks-lists/sleight-farm', img:'https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273326161-SM35N2N30SSYP0KK9KPK/sleight-farm.jpg' },
   { id:'lesnewth', name:'Lesnewth',         region:'south west', habitats:'species-rich grassland, woodland, scrub, hedgerow',
     lat:50.68184, lng:-4.64390, units:'130', area:'26.8 ha', where:'North Cornwall', url:'/habitat-banks-lists/lesnewth', img:'https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1785273626716-HYCGIFGBWV6EV25H77MC/lesnewth.jpg' },
   { id:'b03',      name:'Avon Meadows',     region:'midlands', habitats:'species-rich meadow, grassland, wetland, hedgerow',
@@ -182,9 +182,9 @@ var BF_PREVIEWS = {};
     var ring = c ? L.geoJSON(c.geometry, { style:{ color:'#71977A', weight:1, dashArray:'5 6', fillColor:'#71977A', fillOpacity:0.05 },
       attribution:'Boundaries &copy; ONS &amp; Natural England, OS Crown copyright (OGL)' }).addTo(map) : null;
     var m = L.marker([b.lat, b.lng], { icon:pin() }).addTo(map)
-      .bindPopup('<b>'+b.name+'</b><br>'+b.where+'<br>'+b.units+' units · '+b.area
+      .bindPopup('<b>'+b.name+'</b><br>'+b.where+'<br>'+b.units+' BNG units · '+b.area
         + (c ? '<br><span style="color:#5c7a64;">Full value: '+c.label+'</span>' : '')
-        + '<br><a href="'+b.url+'">View habitat bank &rarr;</a>');
+        + '<br><a href="'+b.url+'">View '+b.name+' &rarr;</a>');
     layers.push({ marker:m, ring:ring, region:b.region, habitats:b.habitats, kind:'bank' });
   });
   if (typeof PIPELINE_SITES !== 'undefined') PIPELINE_SITES.forEach(function (p) {
@@ -345,7 +345,7 @@ var BF_PREVIEWS = {};
         content.insertBefore(eb, title);
         var st = document.createElement('div'); st.className = 'bf-stats';
         st.innerHTML = bank
-          ? '<span><b>' + bank.area + '</b> habitat bank</span><span><b>' + bank.units + '</b> units</span>' + (preview ? '<span class="bf-pill bf-pill--soon">Lean preview</span>' : '<span class="bf-pill">Registered</span>')
+          ? '<span><b>' + bank.area + '</b> habitat bank</span><span><b>' + bank.units + '</b> BNG units</span>' + (preview ? '<span class="bf-pill bf-pill--soon">Lean preview</span>' : '<span class="bf-pill">Registered</span>')
           : '<span>New habitat bank in development</span><span class="bf-pill bf-pill--soon">Coming soon</span>';
         title.insertAdjacentElement('afterend', st);
         if (bank && bank.habitats) {
@@ -360,7 +360,7 @@ var BF_PREVIEWS = {};
         }
         var cta = document.createElement('a'); cta.className = 'bf-cta';
         cta.href = bank ? bank.url : ('/habitat-banks-lists/' + sl);
-        cta.innerHTML = bank ? (preview ? 'View lean version &rarr;' : 'View habitat bank &rarr;') : 'View site &amp; register interest &rarr;';
+        cta.innerHTML = bank ? (preview ? 'View lean version &rarr;' : 'View ' + bank.name + ' &rarr;') : 'View site &amp; register interest &rarr;';
         content.appendChild(cta);
       });
     } catch (e) { /* enhancement only */ }
