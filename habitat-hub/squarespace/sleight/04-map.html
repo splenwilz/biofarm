@@ -73,7 +73,7 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
   }
   function tiles(map, style) {
     if (style === 'muted') {
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_3um7_1_39a8ccd213ed4059ae023b5a', {
         maxZoom:19, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
       }).addTo(map);
     } else {

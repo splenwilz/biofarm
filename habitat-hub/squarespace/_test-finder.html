@@ -113,8 +113,8 @@ var BF_BANKS = [
   if (!el) return;
 
   var map = L.map(el, { scrollWheelZoom:false });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom:19, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom:19, attribution:'&copy; OpenStreetMap contributors'
   }).addTo(map);
 
   function pin(){ return L.divIcon({ className:'', html:'<span class="bpin"></span>', iconSize:[22,22], iconAnchor:[11,22], popupAnchor:[0,-20] }); }

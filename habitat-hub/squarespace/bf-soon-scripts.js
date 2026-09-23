@@ -58,8 +58,8 @@ var PIPELINE_SITES = [{"name":"Iris Fen","lpa":"Somerset","nca":"Somerset Levels
     var el = document.getElementById('csMap');
     if (el && typeof L !== 'undefined') {
       var map = L.map(el, { scrollWheelZoom:false }).setView([site.lat, site.lng], 9);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        maxZoom:19, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom:19, attribution:'&copy; OpenStreetMap contributors'
       }).addTo(map);
       L.marker([site.lat, site.lng], {
         icon: L.divIcon({ className:'', html:'<span class="ppin"></span>', iconSize:[14,14], iconAnchor:[7,7], popupAnchor:[0,-8] })
