@@ -135,7 +135,7 @@ var SLEIGHT_SRM = {"local":{"type":"Polygon","coordinates":[[[-2.342,51.4394],[-
 var PIPELINE_SITES = [
   {"name":"Broadlands","lpa":"Test Valley","nca":"South Hampshire Lowlands","region":"south east","lat":50.9868,"lng":-1.4936},
   {"name":"Highfold","lpa":"Stroud","nca":"Cotswolds","region":"south west","lat":51.7343,"lng":-2.1935},
-  {"name":"Worth Abbey","lpa":"Mid Sussex","nca":"High Weald","region":"south east","lat":51.1188,"lng":-0.1539},
+  {"name":"Worth Abbey","lpa":"Mid Sussex","nca":"High Weald","region":"south east","lat":51.1188,"lng":-0.1539,"area":"24.6 ha","habitats":"neutral grassland, lowland meadow potential, historic parkland restoration"},
   {"name":"Dennington","lpa":"East Suffolk","nca":"South Suffolk & High Suffolk Claylands","region":"south east","lat":52.2312,"lng":1.5023},
   {"name":"Thoulstone","lpa":"Wiltshire","nca":"Avon Vales","region":"south west","lat":51.262,"lng":-2.1823},
   {"name":"Arthur Rickwood","lpa":"East Cambridgeshire","nca":"The Fens","region":"south east","lat":52.4063,"lng":0.2236},
@@ -350,11 +350,14 @@ var BF_PREVIEWS = {};
         var st = document.createElement('div'); st.className = 'bf-stats';
         st.innerHTML = bank
           ? '<span><b>' + bank.area + '</b> habitat bank</span><span><b>' + bank.units + '</b> BNG units</span>' + (preview ? '<span class="bf-pill bf-pill--soon">Lean preview</span>' : '<span class="bf-pill">Registered</span>')
-          : '<span>New habitat bank in development</span><span class="bf-pill bf-pill--soon">Coming soon</span>';
+          : (soon && soon.area
+            ? '<span><b>' + soon.area + '</b> emerging habitat bank</span><span class="bf-pill bf-pill--soon">Coming soon</span>'
+            : '<span>New habitat bank in development</span><span class="bf-pill bf-pill--soon">Coming soon</span>');
         title.insertAdjacentElement('afterend', st);
-        if (bank && bank.habitats) {
+        var chipSrc = bank ? bank.habitats : (soon && soon.habitats);
+        if (chipSrc) {
           var row = document.createElement('div'); row.className = 'bf-chiprow';
-          bank.habitats.split(',').forEach(function (h) {
+          chipSrc.split(',').forEach(function (h) {
             h = h.trim(); if (!h) return;
             var c = document.createElement('span'); c.className = 'bf-chip';
             c.textContent = h.charAt(0).toUpperCase() + h.slice(1);
@@ -364,7 +367,7 @@ var BF_PREVIEWS = {};
         }
         var cta = document.createElement('a'); cta.className = 'bf-cta';
         cta.href = bank ? bank.url : ('/habitat-banks-lists/' + sl);
-        cta.innerHTML = bank ? (preview ? 'View lean version &rarr;' : 'View ' + bank.name + ' &rarr;') : 'View site &amp; register interest &rarr;';
+        cta.innerHTML = bank ? (preview ? 'View lean version &rarr;' : 'View ' + bank.name + ' &rarr;') : (soon && soon.area ? 'View ' + soon.name + ' and register interest &rarr;' : 'View site &amp; register interest &rarr;');
         content.appendChild(cta);
       });
     } catch (e) { /* enhancement only */ }

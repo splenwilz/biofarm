@@ -1,0 +1,56 @@
+<!-- WORTH ABBEY · 04 MAP (coming-soon block 4 of 8), paste directly after 03-location.
+     Same single-site component, view-first fix baked in.
+     ⚠ INTERIM: pin + dashed INDICATIVE circle until the Mid Sussex LPA + High Weald
+     NCA boundary polygons are generated (the copy's solid/hatched key needs them). -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+  .bf-map{position:relative;height:min(60vh,460px);border-radius:18px;overflow:hidden;isolation:isolate;border:1px solid rgba(33,33,33,.14);}
+  .bf-map .leaflet-map{position:absolute;inset:0;background:#dfe6dc;}
+  .bpin{display:block;width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#71977A;border:2px solid #fff;box-shadow:0 2px 6px rgba(33,33,33,.35);}
+  .bf-legend{position:absolute;z-index:500;bottom:12px;left:12px;max-width:calc(100% - 24px);pointer-events:none;background:rgba(255,255,255,.94);border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:8px 12px;font-size:.74rem;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;}
+  .bf-legend .lg{display:flex;align-items:center;gap:7px;}
+  .bf-legend .lg-pin{width:12px;height:12px;border-radius:50% 50% 50% 0;background:#71977A;transform:rotate(-45deg);}
+  .bf-legend .lg-ring{width:15px;height:15px;border-radius:50%;border:1.5px dashed #71977A;background:rgba(113,151,122,.12);}
+  @media(max-width:700px){.bf-legend{bottom:46px;font-size:.66rem;gap:3px 10px;padding:6px 10px;}}
+  .bf-map-wrap{box-sizing:border-box;max-width:1320px;margin-inline:auto;padding-inline:clamp(18px,3.2vw,44px);}
+</style>
+<div class="bf-map-wrap">
+<div class="bf-map">
+  <div class="leaflet-map" data-mode="single" data-bank="worth" data-tiles="muted"></div>
+  <div class="bf-legend"><span class="lg"><span class="lg-pin"></span> Emerging Worth Abbey habitat bank</span><span class="lg"><span class="lg-ring"></span> Indicative potential reach</span></div>
+</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function () {
+  if (typeof L === 'undefined') return;
+  var BANKS = [
+    { id:'worth', name:'Worth Abbey', region:'Mid Sussex · High Weald',
+      lat:51.1188, lng:-0.1539, url:'/habitat-banks-lists/worth-abbey', served:35000 }
+  ];
+  function tiles(map) {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_3um7_1_39a8ccd213ed4059ae023b5a', {
+      maxZoom:19, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO'
+    }).addTo(map);
+  }
+  function pin() {
+    return L.divIcon({ className:'', html:'<span class="bpin"></span>',
+      iconSize:[22,22], iconAnchor:[11,22], popupAnchor:[0,-20] });
+  }
+  document.querySelectorAll('.bf-map .leaflet-map[data-bank="worth"]').forEach(function (el) {
+    var map = L.map(el, { scrollWheelZoom:false });
+    var b = BANKS[0];
+    // View first: circles can't project (and tiles can't load) before the map has one.
+    map.fitBounds(L.latLng(b.lat, b.lng).toBounds(b.served * 2), { padding:[24,24] });
+    tiles(map);
+    L.circle([b.lat, b.lng], { radius:b.served, color:'#71977A', weight:1.5,
+      dashArray:'5 6', fillColor:'#71977A', fillOpacity:0.08 }).addTo(map)
+      .bindPopup('<b>Indicative potential reach</b><br>Project-specific metric and trading checks determine suitability; talk to us early.');
+    L.marker([b.lat, b.lng], { icon:pin() }).addTo(map)
+      .bindPopup('<b>Worth Abbey</b><br>'+b.region+'<br>Coming soon, units not yet available for allocation.<br><a href="/contact">Register your interest &rarr;</a>');
+    setTimeout(function () { map.invalidateSize(); }, 200);
+  });
+})();
+</script>
