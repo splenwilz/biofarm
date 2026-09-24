@@ -138,7 +138,7 @@ var PIPELINE_SITES = [
   {"name":"Worth Abbey","lpa":"Mid Sussex","nca":"High Weald","region":"south east","lat":51.1188,"lng":-0.1539,"area":"24.6 ha","habitats":"neutral grassland, lowland meadow potential, historic parkland restoration"},
   {"name":"Dennington","lpa":"East Suffolk","nca":"South Suffolk & High Suffolk Claylands","region":"south east","lat":52.2312,"lng":1.5023},
   {"name":"Thoulstone","lpa":"Wiltshire","nca":"Avon Vales","region":"south west","lat":51.262,"lng":-2.1823},
-  {"name":"Arthur Rickwood","lpa":"East Cambridgeshire","nca":"The Fens","region":"south east","lat":52.4063,"lng":0.2236},
+  {"name":"Arthur Rickwood Farm","lpa":"East Cambridgeshire","nca":"The Fens","region":"south east","lat":52.4063,"lng":0.2236,"area":"15.6 ha","kind":"planned habitat bank","habitats":"grassland enhancement, scrub, ditches and temporary ponds"},
   {"name":"The Priory","lpa":"Herefordshire","nca":"Herefordshire Lowlands","region":"midlands","lat":52.2335,"lng":-2.7732}
 ];
 
@@ -351,7 +351,7 @@ var BF_PREVIEWS = {};
         st.innerHTML = bank
           ? '<span><b>' + bank.area + '</b> habitat bank</span><span><b>' + bank.units + '</b> BNG units</span>' + (preview ? '<span class="bf-pill bf-pill--soon">Lean preview</span>' : '<span class="bf-pill">Registered</span>')
           : (soon && soon.area
-            ? '<span><b>' + soon.area + '</b> emerging habitat bank</span><span class="bf-pill bf-pill--soon">Coming soon</span>'
+            ? '<span><b>' + soon.area + '</b> ' + (soon.kind || 'emerging habitat bank') + '</span><span class="bf-pill bf-pill--soon">Coming soon</span>'
             : '<span>New habitat bank in development</span><span class="bf-pill bf-pill--soon">Coming soon</span>');
         title.insertAdjacentElement('afterend', st);
         var chipSrc = bank ? bank.habitats : (soon && soon.habitats);
