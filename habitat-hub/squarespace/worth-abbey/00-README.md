@@ -23,3 +23,10 @@ keep the generic treatment until their copy arrives.
    Chase Vix; section skipped for now.
 3. **Map boundaries** — pin + indicative circle interim (Mid Sussex LPA + High Weald
    NCA polygons pending, same pipeline as the registered banks).
+
+
+## 27 Sep 2026 — REBUILT to Vix's revised copy
+Vix revised the listing after the 23 Sep download (no Developer FAQ; sections now Plans for
+nature / A place with a long view ×2 / Your BNG needs; CTAs "Discuss your BNG needs";
+"Approximate area"; opportunity, location and long-view copy rewritten). All eight blocks
+updated; images unchanged (already CDN-wired). RE-PASTE ALL BLOCKS 01–08 and 15.
