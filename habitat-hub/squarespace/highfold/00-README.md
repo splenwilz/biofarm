@@ -19,9 +19,8 @@ Trees / Hedgerows) + "View Highfold Farm and register interest".
    - `highfold-opportunity.jpg` = IMG_2057, 4:5 portrait (long grass, scrub, mature tree).
    - Spares: H5 (meadow + hedge, wide), IMG_2022 (barley close-up), "A1 Wwards from G2"
      (barley field, wide) — arable shots, less on-message for a habitat bank.
-   Both blocks still carry the temporary Sleight hay image with `data-todo`: upload the
-   two prepared files as image blocks → send me the CDN URLs → I wire → paste 01/02 once
-   → delete the upload image blocks.
+   CDN URLs WIRED (27 Sep): hero b7a34931…/highfold-hero.jpg, opportunity c5c5d438…/
+   highfold-opportunity.jpg. Re-paste 01/02 and delete the two upload image blocks.
 2. **Map** — pin + indicative circle interim (Stroud LPA + Cotswolds NCA polygons
    pending). Pin is the finder's Highfold coordinate (51.7343, -2.1935, Stroud side);
    copy says "near Painswick" — confirm the site postcode and I'll move it.
