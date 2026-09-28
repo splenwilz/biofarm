@@ -2,8 +2,11 @@
      v3 landing-page copy applied 22 Sep 2026. Self-contained, scoped under .bf-sections
      (cannot clash with the finder block or the rest of the site). Drop into ONE Code Block
      in the section below the finder. Copy/numbers are plain text, edit them right here.
-     ⚠ The stat figures (1142+ units / 378 ha) are the client's bracketed values and do NOT
-     reconcile with our registered-bank data (924 units / 155.8 ha) — confirm before launch. -->
+     STATS (28 Sep 2026): registered count, coming-soon count and unit total carry data-bf-stat and
+     are filled at runtime by the finder block from BF_BANKS / PIPELINE_SITES, so they always match the
+     grid and the map (the static numbers here are the no-JS fallback: 6 / 6 / 1,233). The client's
+     original bracketed values were 5 / 7 / 1142+. "378 ha" is NOT data-driven — our data gives
+     243.8 ha registered (359.4 ha incl. coming soon); Vix to confirm the basis of 378. -->
 <style>
   @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
   .bf-sections{--bf-ink:#212121;--bf-green:#71977A;--bf-muted:#5b5f57;--bf-hairline:rgba(33,33,33,.12);
@@ -40,9 +43,9 @@
     <h2 class="bf-h2">Our coverage at a glance</h2>
     <p class="bf-lead">Our registered habitat banks are only part of the picture. With sites in development across England, our coverage is designed to meet you where you&rsquo;re building, helping you secure suitable local supply now or progress the right site for what comes next.</p>
     <div class="bf-statband">
-      <div class="bf-sb"><span class="v">5</span><span class="k">Registered habitat banks</span></div>
-      <div class="bf-sb"><span class="v">7</span><span class="k">Habitat banks coming soon</span></div>
-      <div class="bf-sb"><span class="v">1142<span class="u">+</span></span><span class="k">BNG units across our registered habitat banks</span></div>
+      <div class="bf-sb"><span class="v" data-bf-stat="registered">6</span><span class="k">Registered habitat banks</span></div>
+      <div class="bf-sb"><span class="v" data-bf-stat="soon">6</span><span class="k">Habitat banks coming soon</span></div>
+      <div class="bf-sb"><span class="v"><span data-bf-stat="units">1,233</span><span class="u">+</span></span><span class="k">BNG units across our registered habitat banks</span></div>
       <div class="bf-sb"><span class="v">378<span class="u">ha</span></span><span class="k">Under long-term management</span></div>
     </div>
   </section>
