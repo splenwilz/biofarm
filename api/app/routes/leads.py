@@ -5,7 +5,12 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Lead
-from app.schemas import ContactSubmission, LeadSubmissionBase, NewsletterSubmission
+from app.schemas import (
+    ContactSubmission,
+    CpdSubmission,
+    LeadSubmissionBase,
+    NewsletterSubmission,
+)
 from app.services.spam import evaluate_spam
 from app.services.sync import process_lead
 
@@ -115,6 +120,48 @@ async def submit_newsletter(
         fields=[submission.field] if submission.field else [],
         # signing up to the newsletter IS the consent
         newsletter_opt_in=True,
+        page=submission.page,
+        attribution=submission.attribution.model_dump(exclude_none=True)
+        if submission.attribution
+        else None,
+        first_touch=submission.first_touch.model_dump(exclude_none=True)
+        if submission.first_touch
+        else None,
+        ga_client_id=submission.ga_client_id,
+        ga_session_id=submission.ga_session_id,
+    )
+    return await _accept_lead(submission, lead, request, background_tasks, session)
+
+
+def _cpd_message(submission: CpdSubmission) -> str:
+    """Fold the CPD-specific answers into the lead message so they land in the
+    Pipedrive note without a schema change (Lead has no company/role columns)."""
+    lines = [f"Company: {submission.company}"]
+    if submission.role:
+        lines.append(f"Role: {submission.role}")
+    if submission.team_size:
+        lines.append(f"Team size: {submission.team_size}")
+    if submission.message:
+        lines.append("")
+        lines.append(f"What the session should cover: {submission.message}")
+    return "\n".join(lines)
+
+
+@router.post("/cpd", status_code=202)
+async def submit_cpd(
+    submission: CpdSubmission,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    lead = Lead(
+        form="cpd",
+        name=submission.name,
+        email=submission.email,
+        phone=submission.phone,
+        message=_cpd_message(submission),
+        fields=list(submission.fields),
+        newsletter_opt_in=False,
         page=submission.page,
         attribution=submission.attribution.model_dump(exclude_none=True)
         if submission.attribution

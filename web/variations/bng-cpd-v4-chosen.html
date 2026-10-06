@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — /bng-cpd  VARIATION 4 = V2 dark hero + V3 topic cards + V1 quote band + V1 form (CPD landing page · built 1 Oct 2026 from "Biofarm CPD" PDF one-pager)
+
+  COPY: every sentence in the body is verbatim from the PDF. The only additions are structural
+  labels (eyebrows, field labels, the three "at a glance" facts, the form note) — all marked
+  [ADDED] in the source so Vix can approve or rewrite them.
+
+  Design language = the staged pages (developers-2 / biodiversity-units prototype):
+    type      RATI H1 · H2 44.2/1.41 · H4 26/1.47 · Inter 17/1.8 body · Inter 26/1.8 large
+    grounds   cream #F7F8F3 · white · green #71977A (black text on green) · black #111
+    buttons   black pill RATI caps + outlined Inter caps pill
+    devices   scribble underline on the key word of the H1, green numerals on one hairline,
+              hairline rows, soft wave divider (green → cream), brand watercolour illustrations
+              (crane, from the PDF)
+
+  SQUARESPACE PAGE SETTINGS (suggested — matches what the ads/SEO brief asks for)
+  URL slug:         /bng-cpd            (alt: /biodiversity-net-gain-cpd)
+  Page title (nav): BNG CPD
+  SEO title:        Biodiversity Net Gain CPD | Free virtual BNG training for development teams | Biofarm
+  SEO description:  Complimentary virtual Biodiversity Net Gain CPD sessions for developers, promoters,
+                    house builders, planners and landscape architects. Tailored to your team, with live
+                    project discussion. Arrange a session.
+  OG title:         Free virtual BNG CPD for development teams | Biofarm
+  OG description:   Tailored Continuing Professional Development sessions to help developers navigate
+                    Biodiversity Net Gain with clarity and confidence.
+
+  BUILD IN SQUARESPACE — section by section
+  1  Hero         black photo wash (stephen-arnold hills, 68% overlay), centred: eyebrow, H1 with scribble,
+                  two paragraphs, white solid + white outline pills, three facts on a hairline
+  2  Covers       white · centred H2 + lead, SIX-tile grid (five topics on cream cards with green numerals,
+                  sixth tile green = "Arrange a session for your team" link)
+  3  Quote        green · quote block, RATI, soft-wave divider at the bottom
+  4  Arrange      cream · H2 + copy left, NATIVE FORM BLOCK right (do NOT paste the HTML form —
+                  the form below is a visual stand-in so submissions go through the real Squarespace
+                  form → lead capture / Pipedrive, with the same GTM events as the contact form)
+  Form fields:    Name* · Company* · Role · Work email* · Phone · Team size · What would you like the
+                  session to cover? · (hidden) source=bng-cpd
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>V4 · Biodiversity Net Gain CPD | Free virtual BNG training for development teams | Biofarm</title>
+<meta name="description" content="Complimentary virtual Biodiversity Net Gain CPD sessions for developers, promoters, house builders, planners and landscape architects. Tailored to your team, with live project discussion. Arrange a session." />
+<link rel="canonical" href="https://www.biofarm.co.uk/bng-cpd" />
+<meta property="og:title" content="Free virtual BNG CPD for development teams | Biofarm" />
+<meta property="og:description" content="Tailored Continuing Professional Development sessions to help developers navigate Biodiversity Net Gain with clarity and confidence." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.biofarm.co.uk/bng-cpd" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  @font-face{font-family:'RATI_v2';
+    src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+        url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight:300;font-display:swap;}
+
+  :root{
+    --cream:#F7F8F3; --white:#fff; --green:#71977A; --black:#111; --ink:#111;
+    --rati:'RATI_v2',Georgia,'Times New Roman',serif;
+    --inter:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    --gutter:clamp(24px,7vw,109px); --max:1350px;
+    --h1:clamp(52px,6.3vw,98.6px); --h2:clamp(34px,2.82vw,44.2px); --h3:clamp(28px,2.24vw,35.1px); --h4:clamp(22px,1.66vw,26px);
+    --big:clamp(20px,1.66vw,26px);
+  }
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--inter);font-weight:300;font-size:17px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:clip;}
+  *,*::before,*::after{box-sizing:border-box;}
+  img{display:block;max-width:100%;}
+
+  /* header (prototype — the live page inherits the real nav) */
+  .hdr{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s;}
+  .hdr.scrolled{background:rgba(247,248,243,.97);}
+  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px clamp(24px,3vw,46px);}
+  .hdr .logo img{height:32px;}
+  .hdr ul{list-style:none;display:flex;align-items:center;gap:30px;margin:0;padding:0;}
+  .hdr ul a{text-decoration:none;color:var(--ink);font-size:15px;font-weight:400;letter-spacing:.06em;text-transform:uppercase;}
+  .hdr ul a.navpill{background:var(--black);color:#fff;border-radius:300px;padding:12px 26px;font-family:var(--rati);font-size:17px;letter-spacing:.02em;text-transform:none;white-space:nowrap;}
+  @media(max-width:940px){.hdr ul li:not(:last-child){display:none;}}
+
+  /* type */
+  h1,h2,h3,h4{font-family:var(--rati);font-weight:300;margin:0;letter-spacing:0;}
+  h1{font-size:var(--h1);line-height:1.23;}
+  h2{font-size:var(--h2);line-height:1.41;}
+  h3{font-size:var(--h3);line-height:1.44;}
+  h4{font-size:var(--h4);line-height:1.47;}
+  p{margin:0 0 1rem;}
+  .big p,p.big{font-size:var(--big);line-height:1.8;}
+  .eyebrow{font-family:var(--inter);font-weight:400;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin:0 0 1.4em;}
+  .green .eyebrow{color:var(--black);}
+  a.inl{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:300px;padding:24px 30px;line-height:1.2;white-space:nowrap;transition:background .25s,color .25s,border-color .25s;cursor:pointer;}
+  .btn.primary{font-family:var(--rati);font-weight:300;font-size:17px;letter-spacing:.04em;text-transform:uppercase;background:var(--black);color:#fff;border:1px solid var(--black);}
+  .btn.primary:hover{background:#2a2a2a;}
+  .btn.secondary{font-family:var(--inter);font-weight:400;font-size:17px;letter-spacing:.02em;text-transform:uppercase;background:transparent;color:var(--ink);border:1px solid var(--ink);}
+  .btn.secondary:hover{background:rgba(17,17,17,.06);}
+  .btns{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:center;}
+
+  /* scribble underline (Squarespace text-highlight, underline style) */
+  .scribble{position:relative;display:inline-block;}
+  .scribble::after{content:"";position:absolute;left:-3%;right:-3%;bottom:-.02em;height:.24em;
+    background:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'%3E%3Cpath d='M4 30 C 90 22, 200 16, 396 24' fill='none' stroke='%23111' stroke-width='11' stroke-linecap='round'/%3E%3Cpath d='M396 24 C 300 20, 150 21, 40 32' fill='none' stroke='%23111' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat;}
+
+  /* layout */
+  .wrap{max-width:calc(var(--max) + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter);}
+  .split{display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(32px,6vw,100px);row-gap:40px;align-items:center;}
+  .sec{position:relative;padding-block:clamp(88px,9vw,140px);}
+  .white{background:var(--white);}
+  .cream{background:var(--cream);}
+  .green{background:var(--green);color:var(--black);}
+
+  /* dividers — Squarespace section dividers, same paths, 6vw tall */
+  .has-divider{padding-bottom:calc(clamp(88px,9vw,140px) + 6vw);}
+  .div-soft{clip-path:url(#soft);}
+  .div-svgs{position:absolute;width:0;height:0;}
+
+  /* fade-up */
+  .fade{opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s ease;}
+  .fade.in{opacity:1;transform:none;}
+  @media(prefers-reduced-motion:reduce){.fade{opacity:1;transform:none;transition:none;}}
+
+  /* ================= 1 · hero (cream, crane illustration right) ================= */
+  .hero{min-height:100vh;display:flex;align-items:center;padding-top:150px;padding-bottom:90px;overflow:hidden;}
+  .hero .wrap{width:100%;}
+  .hero .split{grid-template-columns:1.15fr .85fr;}
+  .hero h1{font-size:clamp(44px,4.4vw,68px);line-height:1.1;margin-bottom:.55em;max-width:16ch;}
+  .hero p{max-width:56ch;}
+  .hero p.big{max-width:40ch;margin-bottom:1em;}
+  .hero .btns{margin-top:44px;}
+  .hero .art{position:relative;}
+  .hero .art img{width:min(100%,560px);height:auto;margin-left:auto;}
+  /* at a glance — three facts straight from the PDF, hairline row under the hero copy  [ADDED labels] */
+  .glance{display:flex;flex-wrap:wrap;gap:0 clamp(28px,3vw,48px);margin-top:48px;padding-top:28px;border-top:1px solid rgba(17,17,17,.18);}
+  .glance div{min-width:120px;}
+  .glance .k{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:400;color:#5b5f57;margin-bottom:4px;}
+  .glance .v{display:block;font-family:var(--rati);font-size:var(--h4);line-height:1.3;}
+
+  /* ================= 2 · covers (white: H2 + statement left, five numbered hairline rows right) ================= */
+  .covers .split{align-items:start;}
+  .covers h2{max-width:11ch;margin-bottom:.9em;}
+  .covers .aside p{max-width:30ch;}
+  .covers .aside p.big{margin-bottom:1.2em;}
+  .covers ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--black);}
+  .covers li{display:grid;grid-template-columns:72px 1fr;align-items:baseline;gap:20px;padding:26px 0;border-bottom:1px solid var(--black);}
+  .covers .num{font-family:var(--rati);font-size:var(--h3);line-height:1;color:var(--green);}
+  .covers li h4{margin:0;}
+
+  /* ================= 3 · quote (green, soft wave into cream) ================= */
+  .quote{text-align:center;}
+  .quote .mark{font-family:var(--rati);font-size:clamp(80px,9vw,140px);line-height:.6;color:rgba(17,17,17,.35);display:block;margin:0 auto 8px;}
+  .quote blockquote{margin:0 auto;max-width:30ch;font-family:var(--rati);font-size:var(--h3);line-height:1.44;}
+  .quote figcaption{margin-top:34px;font-size:15px;line-height:1.6;}
+  .quote figcaption b{display:block;font-weight:500;font-size:17px;}
+
+  /* ================= 4 · arrange (cream: copy + contact left, form right) ================= */
+  .arrange{overflow:hidden;}
+  .arrange .split{align-items:start;grid-template-columns:.9fr 1.1fr;}
+  .arrange h2{max-width:12ch;margin-bottom:.6em;}
+  .arrange .lead{max-width:30ch;}
+  .arrange .contact{margin-top:40px;padding-top:28px;border-top:1px solid rgba(17,17,17,.18);font-size:17px;line-height:2;}
+  .arrange .contact a{color:inherit;text-decoration:none;border-bottom:1px solid var(--green);}
+  /* form — visual stand-in for the native Squarespace form block */
+  .form{background:var(--white);border:1px solid rgba(17,17,17,.12);border-radius:24px;padding:clamp(28px,3.5vw,48px);}
+  .form .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 24px;}
+  .form .full{grid-column:1/-1;}
+  .form label{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;color:#5b5f57;margin-bottom:8px;}
+  .form label .req{color:var(--green);}
+  .form input,.form select,.form textarea{width:100%;font:inherit;font-size:17px;color:var(--ink);background:transparent;border:0;border-bottom:1px solid rgba(17,17,17,.35);border-radius:0;padding:10px 0;outline:none;transition:border-color .2s;}
+  .form input:focus,.form select:focus,.form textarea:focus{border-bottom-color:var(--black);}
+  .form textarea{min-height:110px;resize:vertical;}
+  .form .btn{margin-top:8px;}
+  .form .fine{font-size:13px;color:#5b5f57;line-height:1.6;margin:18px 0 0;}
+  .form .thanks{display:none;padding:12px 0 0;font-family:var(--rati);font-size:var(--h4);}
+  .form.sent .grid,.form.sent .btn,.form.sent .fine{display:none;}
+  .form.sent .thanks{display:block;}
+
+  .note{background:var(--black);color:rgba(255,255,255,.6);font-size:12px;letter-spacing:.04em;padding:26px var(--gutter);text-align:center;}
+  .note a{color:#fff;}
+
+  /* ================= mobile (last, so it wins) ================= */
+  @media(max-width:900px){
+    .split,.hero .split,.arrange .split{grid-template-columns:1fr;row-gap:44px;}
+    .hero{min-height:0;padding-top:120px;padding-bottom:64px;}
+    .hero h1{max-width:none;}
+    .hero .art img{width:min(72%,340px);margin:0 auto;}
+    .covers li{grid-template-columns:52px 1fr;}
+    .form .grid{grid-template-columns:1fr;}
+    .has-divider{padding-bottom:calc(72px + 6vw);}
+  }
+  @media(max-width:520px){
+    .hdr .nav{padding:16px 18px;gap:14px;}
+    .hdr .logo img{height:26px;}
+    .hdr ul{gap:14px;}
+    .hdr ul a.navpill{font-size:15px;padding:10px 18px;}
+    .btn{width:100%;padding:20px 18px;font-size:15px !important;}
+    .btns{gap:16px;}
+    .sec{padding-block:72px;}
+    .glance{gap:16px 28px;}
+  }
+  /* ===== V2 overrides: black photo-wash hero · five-step timeline · split quote with collage · green form band ===== */
+  .hero.v2{background:var(--black);color:#fff;isolation:isolate;min-height:88vh;}
+  .hero.v2 .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;}
+  .hero.v2::after{content:"";position:absolute;inset:0;z-index:-1;background:rgba(17,17,17,.68);}
+  .hero.v2 .split{grid-template-columns:1fr;max-width:900px;margin-inline:auto;text-align:center;}
+  .hero.v2 h1{max-width:none;margin-inline:auto;}
+  .hero.v2 p{margin-inline:auto;}
+  .hero.v2 .eyebrow{color:#fff;opacity:.75;}
+  .hero.v2 .scribble::after{filter:invert(1);}
+  .hero.v2 .btns{justify-content:center;}
+  .hero.v2 .btn.primary{background:#fff;color:var(--black);border-color:#fff;}
+  .hero.v2 .btn.primary:hover{background:#e8e8e8;}
+  .hero.v2 .btn.secondary{color:#fff;border-color:#fff;}
+  .hero.v2 .btn.secondary:hover{background:rgba(255,255,255,.12);}
+  .hero.v2 .glance{justify-content:center;border-top-color:rgba(255,255,255,.3);}
+  .hero.v2 .glance .k{color:rgba(255,255,255,.7);}
+  .cards{text-align:center;}
+  .cards h2{margin-bottom:.4em;}
+  .cards .lead{max-width:46ch;margin:0 auto;}
+  .cards .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:clamp(40px,4.5vw,64px);text-align:left;}
+  .cards .card{background:var(--cream);border-radius:24px;padding:clamp(26px,3vw,40px);min-height:220px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;}
+  .cards .card .num{font-family:var(--rati);font-size:var(--h2);line-height:1;color:var(--green);}
+  .cards .card h4{margin:0;max-width:16ch;}
+  .cards .card.wide{grid-column:span 1;}
+  @media(max-width:900px){
+    .cards .grid{grid-template-columns:1fr;}
+    .hero.v2{min-height:0;}
+  }
+</style>
+</head>
+<body>
+
+<svg class="div-svgs" aria-hidden="true">
+  <clipPath id="soft" clipPathUnits="objectBoundingBox">
+    <path d="M2,0.912 L2,0.912 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 L-1,-1 L2,-1 z"/>
+  </clipPath>
+</svg>
+
+<header class="hdr" id="hdr">
+  <nav class="nav" aria-label="Primary">
+    <a class="logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home">
+      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
+    </a>
+    <ul>
+      <li><a href="https://www.biofarm.co.uk/developers">Partners +</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
+      <li><a href="https://www.biofarm.co.uk/contact">Contact</a></li>
+      <li><a class="navpill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ 1 · HERO (black, photo wash, centred) ============ -->
+  <section class="sec hero v2">
+    <img class="bg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756560530359-Y0G0MRPQAVSXQUKT30XB/low-res-stephen-arnold-ygi0RcsuR6U-unsplash.jpg?format=2500w" alt="" />
+    <div class="wrap">
+      <div class="split">
+        <div class="fade">
+          <p class="eyebrow">Complimentary virtual CPD</p>
+          <h1>Complimentary virtual Biodiversity Net Gain <span class="scribble">CPD</span> for development teams</h1>
+          <p class="big">BNG is changing how development teams approach planning, viability and early-stage decision making.</p>
+          <p>Our tailored virtual Continuing Professional Development (CPD) sessions are designed to help developers navigate BNG with greater clarity and confidence.</p>
+          <div class="btns">
+            <a class="btn primary" href="#arrange">Arrange a session</a>
+            <a class="btn secondary" href="mailto:info@biofarm.co.uk">Email us</a>
+          </div>
+          <div class="glance" aria-label="At a glance">
+            <div><span class="k">Format</span><span class="v">Virtual</span></div>
+            <div><span class="k">Cost</span><span class="v">Complimentary</span></div>
+            <div><span class="k">Content</span><span class="v">Tailored to your team</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · SESSIONS COVER (white, topic cards) ============ -->
+  <section class="sec white cards">
+    <div class="wrap">
+      <div class="fade">
+        <h2>Sessions cover</h2>
+        <p class="big lead">Created for developers, promoters, house builders, planners and landscape architects.</p>
+        <div class="grid">
+          <div class="card"><span class="num">01</span><h4>Where BNG fits within planning process</h4></div>
+          <div class="card"><span class="num">02</span><h4>Balancing on-site delivery with viability</h4></div>
+          <div class="card"><span class="num">03</span><h4>How the off-site market is evolving</h4></div>
+          <div class="card"><span class="num">04</span><h4>Practical ways for smoother project delivery</h4></div>
+          <div class="card"><span class="num">05</span><h4>Live project discussion tailored to your team</h4></div>
+          <div class="card" style="background:var(--green);"><span class="num" style="color:var(--black);">&rarr;</span><h4><a href="#arrange" style="color:inherit;text-decoration:none;">Arrange a session for your team</a></h4></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 · QUOTE (green, soft wave into cream) ============ -->
+  <section class="sec green quote has-divider div-soft">
+    <div class="wrap fade">
+      <figure style="margin:0;">
+        <span class="mark" aria-hidden="true">&ldquo;</span>
+        <blockquote>Biofarm provided an online CPD Seminar on BNG. The structure, content and insight provided was invaluable and enabled those with limited knowledge to quickly become acquainted.</blockquote>
+        <figcaption><b>Craig Cobham</b>Senior Project Manager, Newland Homes</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ 4 · ARRANGE A SESSION (cream, form) ============ -->
+  <section class="sec cream arrange" id="arrange">
+    <div class="wrap">
+      <div class="split">
+        <div class="fade">
+          <p class="eyebrow">Arrange a session <!-- [ADDED] eyebrow --></p>
+          <h2>Arrange a session</h2>
+          <p class="big lead">Get in touch to arrange a tailored BNG CPD session for your business.</p>
+          <div class="contact">
+            <a href="https://www.biofarm.co.uk/contact">www.biofarm.co.uk/contact</a><br />
+            <a href="mailto:info@biofarm.co.uk">info@biofarm.co.uk</a>
+          </div>
+        </div>
+
+        <!-- VISUAL STAND-IN: build this as a native Squarespace Form Block (see header notes). -->
+        <form class="form fade" id="cpd-form" novalidate>
+          <div class="grid">
+            <div><label for="f-name">Name <span class="req">*</span></label><input id="f-name" name="name" type="text" autocomplete="name" required /></div>
+            <div><label for="f-company">Company <span class="req">*</span></label><input id="f-company" name="company" type="text" autocomplete="organization" required /></div>
+            <div><label for="f-role">Role</label><input id="f-role" name="role" type="text" autocomplete="organization-title" /></div>
+            <div><label for="f-email">Work email <span class="req">*</span></label><input id="f-email" name="email" type="email" autocomplete="email" required /></div>
+            <div><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" /></div>
+            <div><label for="f-size">Team size</label>
+              <select id="f-size" name="team_size">
+                <option value="">Select</option><option>1&ndash;5</option><option>6&ndash;15</option><option>16&ndash;40</option><option>40+</option>
+              </select></div>
+            <div class="full"><label for="f-msg">What would you like the session to cover?</label><textarea id="f-msg" name="message"></textarea></div>
+          </div>
+          <input type="hidden" name="source" value="bng-cpd" />
+          <button class="btn primary" type="submit">Arrange a session</button>
+          <p class="fine">We&rsquo;ll come back to you to agree a date and tailor the session to your team. <!-- [ADDED] form note --></p>
+          <p class="thanks">Thank you. We&rsquo;ll be in touch to arrange your session. <!-- [ADDED] success message --></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="note">
+  Prototype for <a href="https://www.biofarm.co.uk/">biofarm.co.uk</a>/bng-cpd &mdash; the live page inherits the real site header &amp; footer; the form becomes a native Form Block.
+</footer>
+
+<script>
+  (function(){
+    var h=document.getElementById('hdr');
+    addEventListener('scroll',function(){h.classList.toggle('scrolled',scrollY>40);},{passive:true});
+    var els=document.querySelectorAll('.fade');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
+    else{
+      var io=new IntersectionObserver(function(entries){
+        entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+      },{rootMargin:'0px 0px -8% 0px',threshold:.06});
+      els.forEach(function(e){io.observe(e);});
+    }
+    /* prototype only: show the success state; the live Form Block handles submission */
+    var f=document.getElementById('cpd-form');
+    f.addEventListener('submit',function(e){e.preventDefault();if(f.checkValidity()){f.classList.add('sent');}else{f.reportValidity();}});
+  })();
+</script>
+</body>
+</html>

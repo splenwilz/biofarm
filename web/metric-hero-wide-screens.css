@@ -1,0 +1,18 @@
+/* Metric page hero on wide screens (1800px and up): close the gaps and bring the buttons up.
+   Same cause as the BNG hero: the 20 grid rows grow with the site width while the text stops
+   growing. The title block (rows 2–12) is taller than its text, so a gap opens before the
+   statement; rows 16–17 and 20 are empty, so the buttons drift below the fold.
+   Rows 10, 11, 16, 17 and 20 are collapsed to near-zero; everything else stays as Squarespace
+   sizes it. Nothing changes below 1800px (at 1440–1728 the hero already fits).
+   ⚠ Tied to the current block rows (title 2–12, statement 12–16, buttons 18–20). */
+@media (min-width: 1800px) {
+  #collection-6a8d594f900acc637afd27e0 .fe-6a8d594f900acc637afd27e3 {
+    grid-template-rows:
+      repeat(9, minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto))
+      repeat(2, minmax(10px, auto))
+      repeat(4, minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto))
+      repeat(2, minmax(10px, auto))
+      repeat(2, minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto))
+      minmax(0, auto) !important;
+  }
+}

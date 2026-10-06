@@ -49,3 +49,19 @@ class ContactSubmission(LeadSubmissionBase):
 
 class NewsletterSubmission(LeadSubmissionBase):
     field: FieldChoice | None = None
+
+
+TeamSize = Literal["1-5", "6-15", "16-40", "40+"]
+
+
+class CpdSubmission(LeadSubmissionBase):
+    """'Arrange a session' form on the BNG CPD landing page."""
+
+    company: str = Field(min_length=1, max_length=200)
+    role: str | None = Field(default=None, max_length=120)
+    phone: str | None = Field(default=None, max_length=50)
+    # "What field are you in?" chips - same values as the contact form so the
+    # Pipedrive Client Type mapping applies unchanged.
+    fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
+    team_size: TeamSize | None = None
+    message: str | None = Field(default=None, max_length=5000)

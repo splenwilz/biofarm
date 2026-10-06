@@ -1,0 +1,21 @@
+/* BNG page hero on wide screens (1500px and up): bring the buttons up to the paragraph.
+   The hero grid has 20 rows that grow with the site width (set to 2000px). The paragraph sits in
+   rows 12–17 but only fills the first few, so on wide screens the empty rows 15–17 open up a gap
+   above the buttons (row 18), and the empty row 20 pads the bottom. Rows 15–17 and 20 are
+   collapsed here so the buttons follow the paragraph at a steady distance whatever the width.
+   Heading keeps the site's own scale (client preference, 2 Oct); balanced wrap stops
+   "Biodiversity Net / Gain" on very wide screens. Nothing changes below 1500px.
+   ⚠ Tied to the current block rows (heading 2–9, sub 9–12, paragraph 12–17, buttons 18–20):
+   if blocks are moved in the editor, re-point the collapsed rows. */
+@media (min-width: 1500px) {
+  #collection-6a981f21e6465e6163653d65 .fe-6a981f21e6465e6163653d68 {
+    grid-template-rows:
+      repeat(14, minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto))
+      repeat(3, minmax(8px, auto))
+      repeat(2, minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto))
+      minmax(0, auto) !important;
+  }
+  #collection-6a981f21e6465e6163653d65 .fe-6a981f21e6465e6163653d68 h1 {
+    text-wrap: balance;
+  }
+}

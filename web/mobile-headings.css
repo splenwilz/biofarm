@@ -1,0 +1,18 @@
+/* Mobile H1s on narrow phones (Android 320–375px widths). LIVE in site-wide Custom CSS (user's
+   choice, 2 Oct 2026, tested on Android across pages).
+   The site's mobile H1 is a fixed 59.2px, so on 360px screens a long word ("Biodiversity",
+   "development") is wider than its column and Chrome splits it or runs it off the screen edge;
+   iOS renders the face slightly narrower and gets away with it. Below ~411px the H1 scales with
+   the screen, and words are never broken. Units page (own 40px mobile H1) is not included. */
+@media (max-width: 767px) {
+  #collection-6a97e8e37e79440b8a26a046 h1,   /* home-2 */
+  #collection-6a9807f31a7e0c7b260833f0 h1,   /* developers-2 */
+  #collection-6a8d594f900acc637afd27e0 h1,   /* biodiversity-metric */
+  #collection-6a981f21e6465e6163653d65 h1,   /* biodiversity-net-gain */
+  #collection-6a687c0d5a396e73c9b9ef10 h1 {  /* habitat-banks hub */
+    font-size: min(59.2px, 14.4vw) !important;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    hyphens: manual;
+  }
+}

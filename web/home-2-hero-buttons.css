@@ -1,0 +1,48 @@
+/* HOME-2 hero buttons: equal width, centred, labels on one line (tablet, laptop, desktop).
+   Andy's feedback 30 Sep: buttons were different sizes and the labels wrapped on laptops. */
+@media (min-width: 768px) {
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-71e31e3023205459a61b,
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-501e915789683b7f8d51 {
+    width: clamp(344px, 25vw, 360px);
+  }
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-71e31e3023205459a61b {
+    grid-column: 2 / 14 !important;
+    justify-self: end;
+  }
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-501e915789683b7f8d51 {
+    grid-column: 14 / 26 !important;
+    justify-self: start;
+  }
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-71e31e3023205459a61b a,
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-501e915789683b7f8d51 a {
+    white-space: nowrap;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+/* Laptop and tablet range: smaller label so the pair stays clear of the side illustrations */
+@media (min-width: 768px) and (max-width: 1279px) {
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-71e31e3023205459a61b,
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-501e915789683b7f8d51 {
+    width: 288px;
+  }
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-71e31e3023205459a61b a,
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-501e915789683b7f8d51 a {
+    font-size: 13.5px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+/* Tablet landscape / small laptop: tighter again, the illustrations sit closer in */
+@media (min-width: 768px) and (max-width: 959px) {
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-71e31e3023205459a61b,
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-501e915789683b7f8d51 {
+    width: 262px;
+  }
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-71e31e3023205459a61b a,
+  #collection-6a97e8e37e79440b8a26a046 .fe-block-501e915789683b7f8d51 a {
+    font-size: 12px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}

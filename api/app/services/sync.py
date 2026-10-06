@@ -27,7 +27,11 @@ _NOTE_ATTRIBUTION_LABELS = {
 def build_note_html(lead: Lead) -> str:
     parts: list[str] = []
     if lead.message:
-        parts.append(f"<p><b>Message</b><br>{html.escape(lead.message)}</p>")
+        # Pipedrive renders note content as HTML, so newlines must become <br>
+        # or multi-line messages (and the CPD Company/Role/Team size lines)
+        # collapse into one run-on line.
+        body = html.escape(lead.message).replace("\n", "<br>")
+        parts.append(f"<p><b>Message</b><br>{body}</p>")
     if lead.fields:
         parts.append(f"<p><b>Field</b>: {html.escape(', '.join(lead.fields))}</p>")
     rows: list[str] = []
@@ -107,11 +111,11 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
 
     lead_id = lead.pipedrive_lead_id
     if lead_id is None:
-        title = (
-            f"Website enquiry - {lead.name}"
-            if lead.form == "contact"
-            else f"Newsletter signup - {lead.name}"
-        )
+        title = {
+            "contact": f"Website enquiry - {lead.name}",
+            "newsletter": f"Newsletter signup - {lead.name}",
+            "cpd": f"CPD session request - {lead.name}",
+        }.get(lead.form, f"Website lead - {lead.name}")
         label_ids = list(
             dict.fromkeys(
                 settings.pipedrive_lead_label_ids

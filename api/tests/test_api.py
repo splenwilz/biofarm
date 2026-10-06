@@ -143,6 +143,53 @@ async def test_newsletter_endpoint(client):
     assert lead.newsletter_opt_in is True
 
 
+@respx.mock
+async def test_cpd_endpoint(client):
+    mock_pipedrive_happy_path()
+    r = await client.post(
+        "/v1/leads/cpd",
+        json={
+            "name": "Jane",
+            "email": "jane@example.com",
+            "company": "Acme Homes",
+            "role": "Planning Manager",
+            "fields": ["other"],
+            "team_size": "6-15",
+            "message": "Viability and the off-site market",
+            "page": "/bng-cpd",
+        },
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.form == "cpd"
+    assert lead.fields == ["other"]
+    assert lead.newsletter_opt_in is False
+    # company / role / team size fold into the message so they reach the note
+    assert "Company: Acme Homes" in lead.message
+    assert "Role: Planning Manager" in lead.message
+    assert "Team size: 6-15" in lead.message
+    assert "Viability and the off-site market" in lead.message
+    assert lead.sync_status == "synced"
+
+
+def test_note_html_keeps_line_breaks():
+    from app.models import Lead
+    from app.services.sync import build_note_html
+
+    lead = Lead(form="cpd", name="Jane", email="jane@example.com",
+                message="Company: Acme <Ltd>\nRole: PM", fields=[])
+    note = build_note_html(lead)
+    assert "Company: Acme &lt;Ltd&gt;<br>Role: PM" in note
+
+
+async def test_cpd_rejects_bad_team_size(client):
+    r = await client.post(
+        "/v1/leads/cpd",
+        json={"name": "Jane", "email": "jane@example.com", "company": "Acme", "team_size": "lots"},
+    )
+    assert r.status_code == 422
+
+
 async def test_validation_error_is_422(client):
     r = await client.post("/v1/leads/contact", json={"name": "J", "email": "nope"})
     assert r.status_code == 422
