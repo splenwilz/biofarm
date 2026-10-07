@@ -190,6 +190,37 @@ async def test_cpd_rejects_bad_team_size(client):
     assert r.status_code == 422
 
 
+@respx.mock
+async def test_fold_endpoint(client):
+    mock_pipedrive_happy_path()
+    r = await client.post(
+        "/v1/leads/fold",
+        json={
+            "name": "Ed",
+            "email": "ed@example.com",
+            "habitat_bank": "Slades Farm",
+            "location": "Waverley, Surrey",
+            "units": "309",
+            "message": "Registered since March.",
+            "page": "/fold",
+        },
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.form == "fold"
+    assert lead.fields == ["landowner"]
+    assert "Habitat bank: Slades Farm" in lead.message
+    assert "Location: Waverley, Surrey" in lead.message
+    assert "Registered units (approx.): 309" in lead.message
+    assert "Registered since March." in lead.message
+    assert lead.sync_status == "synced"
+
+
+async def test_fold_requires_habitat_bank_and_location(client):
+    r = await client.post("/v1/leads/fold", json={"name": "Ed", "email": "ed@example.com"})
+    assert r.status_code == 422
+
+
 async def test_validation_error_is_422(client):
     r = await client.post("/v1/leads/contact", json={"name": "J", "email": "nope"})
     assert r.status_code == 422

@@ -65,3 +65,13 @@ class CpdSubmission(LeadSubmissionBase):
     fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
     team_size: TeamSize | None = None
     message: str | None = Field(default=None, max_length=5000)
+
+
+class FoldSubmission(LeadSubmissionBase):
+    """'Join the Fold' form on the landowner Fold landing page."""
+
+    phone: str | None = Field(default=None, max_length=50)
+    habitat_bank: str = Field(min_length=1, max_length=200)
+    location: str = Field(min_length=1, max_length=200)
+    units: str | None = Field(default=None, max_length=50)
+    message: str | None = Field(default=None, max_length=5000)

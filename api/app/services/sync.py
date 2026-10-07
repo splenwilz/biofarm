@@ -115,6 +115,7 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
             "contact": f"Website enquiry - {lead.name}",
             "newsletter": f"Newsletter signup - {lead.name}",
             "cpd": f"CPD session request - {lead.name}",
+            "fold": f"Fold enquiry - {lead.name}",
         }.get(lead.form, f"Website lead - {lead.name}")
         label_ids = list(
             dict.fromkeys(

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — /fold  (Biofarm Fold landing page · landowners · UNLINKED · built 7 Oct 2026 from Vix's copy)
+
+  COPY: every sentence in the body is verbatim from the copy doc. Structural additions (eyebrows,
+  form labels, form note, success message) are marked [ADDED] in the source.
+
+  Design = the live site's own section patterns (developers / BNG / units pages):
+    1  Hero         cream split: eyebrow, H1 with scribble on "sell", lead, two paragraphs, pill CTA;
+                    Slades Farm photo collage right (the testimonial is from Slades)
+    2  Wait         white: H2 left · four paragraphs right  ("Breaking down the walls" pattern)
+    3  Quote        green band, centred, Ed Hutley / Slades Farm, soft wave into next
+    4  Gives you    cream: H2 + five hairline items with green numerals ("How we'll support" pattern)
+    5  Focused      dark photo band (Sleight summer field, washed), centred white copy
+    6  Join         cream: H2 + copy left, FORM right (same lead-capture form pattern as the CPD page; live block = fold-join-section-INLINE.html)
+    7  Sign-off     "We're in the business of nature." as the closing line under the form section
+
+  SQUARESPACE PAGE SETTINGS (suggested)
+  URL slug:         /fold           (alt: /biofarm-fold)   — keep UNLINKED from nav
+  SEO title:        Biofarm Fold | Sell your registered BNG units | Biofarm
+  SEO description:  The Biofarm Fold takes registered habitat banks to developers, builds demand and
+                    drives BNG unit sales, deal after deal. For landowners who want a more active
+                    route to market.
+
+  FORM: posts to the lead API (new /v1/leads/fold route — see api/ change). Fields: Name*, Email*,
+  Phone, Habitat bank name*, Location (county/LPA)*, Registered units (approx), Message.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Biofarm Fold | Sell your registered BNG units | Biofarm</title>
+<meta name="description" content="The Biofarm Fold takes registered habitat banks to developers, builds demand and drives BNG unit sales, deal after deal. For landowners who want a more active route to market." />
+<link rel="canonical" href="https://www.biofarm.co.uk/fold" />
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  @font-face{font-family:'RATI_v2';
+    src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+        url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight:300;font-display:swap;}
+
+  :root{
+    --cream:#F7F8F3; --white:#fff; --green:#71977A; --black:#111; --ink:#111;
+    --rati:'RATI_v2',Georgia,'Times New Roman',serif;
+    --inter:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    --gutter:clamp(24px,7vw,109px); --max:1350px;
+    --h1:clamp(52px,6.3vw,98.6px); --h2:clamp(34px,2.82vw,44.2px); --h3:clamp(28px,2.24vw,35.1px); --h4:clamp(22px,1.66vw,26px);
+    --big:clamp(20px,1.66vw,26px);
+  }
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--inter);font-weight:300;font-size:17px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:clip;}
+  *,*::before,*::after{box-sizing:border-box;}
+  img{display:block;max-width:100%;}
+
+  /* header (prototype — the live page inherits the real nav) */
+  .hdr{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s;}
+  .hdr.scrolled{background:rgba(247,248,243,.97);}
+  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px clamp(24px,3vw,46px);}
+  .hdr .logo img{height:32px;}
+  .hdr ul{list-style:none;display:flex;align-items:center;gap:30px;margin:0;padding:0;}
+  .hdr ul a{text-decoration:none;color:var(--ink);font-size:15px;font-weight:400;letter-spacing:.06em;text-transform:uppercase;}
+  .hdr ul a.navpill{background:var(--black);color:#fff;border-radius:300px;padding:12px 26px;font-family:var(--rati);font-size:17px;letter-spacing:.02em;text-transform:none;white-space:nowrap;}
+  @media(max-width:940px){.hdr ul li:not(:last-child){display:none;}}
+
+  /* type */
+  h1,h2,h3,h4{font-family:var(--rati);font-weight:300;margin:0;letter-spacing:0;}
+  h1{font-size:var(--h1);line-height:1.23;}
+  h2{font-size:var(--h2);line-height:1.41;}
+  h3{font-size:var(--h3);line-height:1.44;}
+  h4{font-size:var(--h4);line-height:1.47;}
+  p{margin:0 0 1rem;}
+  .big p,p.big{font-size:var(--big);line-height:1.8;}
+  .eyebrow{font-family:var(--inter);font-weight:400;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin:0 0 1.4em;}
+  .green .eyebrow{color:var(--black);}
+  a.inl{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:300px;padding:24px 30px;line-height:1.2;white-space:nowrap;transition:background .25s,color .25s,border-color .25s;cursor:pointer;}
+  .btn.primary{font-family:var(--rati);font-weight:300;font-size:17px;letter-spacing:.04em;text-transform:uppercase;background:var(--black);color:#fff;border:1px solid var(--black);}
+  .btn.primary:hover{background:#2a2a2a;}
+  .btn.secondary{font-family:var(--inter);font-weight:400;font-size:17px;letter-spacing:.02em;text-transform:uppercase;background:transparent;color:var(--ink);border:1px solid var(--ink);}
+  .btn.secondary:hover{background:rgba(17,17,17,.06);}
+  .btns{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:center;}
+
+  /* scribble underline (Squarespace text-highlight, underline style) */
+  .scribble{position:relative;display:inline-block;}
+  .scribble::after{content:"";position:absolute;left:-3%;right:-3%;bottom:-.02em;height:.24em;
+    background:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'%3E%3Cpath d='M4 30 C 90 22, 200 16, 396 24' fill='none' stroke='%23111' stroke-width='11' stroke-linecap='round'/%3E%3Cpath d='M396 24 C 300 20, 150 21, 40 32' fill='none' stroke='%23111' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat;}
+
+  /* layout */
+  .wrap{max-width:calc(var(--max) + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter);}
+  .split{display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(32px,6vw,100px);row-gap:40px;align-items:center;}
+  .sec{position:relative;padding-block:clamp(88px,9vw,140px);}
+  .white{background:var(--white);}
+  .cream{background:var(--cream);}
+  .green{background:var(--green);color:var(--black);}
+
+  /* dividers — Squarespace section dividers, same paths, 6vw tall */
+  .has-divider{padding-bottom:calc(clamp(88px,9vw,140px) + 6vw);}
+  .div-soft{clip-path:url(#soft);}
+  .div-svgs{position:absolute;width:0;height:0;}
+
+  /* fade-up */
+  .fade{opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s ease;}
+  .fade.in{opacity:1;transform:none;}
+  @media(prefers-reduced-motion:reduce){.fade{opacity:1;transform:none;transition:none;}}
+
+  /* ================= 1 · hero (cream, crane illustration right) ================= */
+  .hero{min-height:100vh;display:flex;align-items:center;padding-top:150px;padding-bottom:90px;overflow:hidden;}
+  .hero .wrap{width:100%;}
+  .hero .split{grid-template-columns:1.15fr .85fr;}
+  .hero h1{font-size:clamp(44px,4.4vw,68px);line-height:1.1;margin-bottom:.55em;max-width:16ch;}
+  .hero p{max-width:56ch;}
+  .hero p.big{max-width:40ch;margin-bottom:1em;}
+  .hero .btns{margin-top:44px;}
+  .hero .art{position:relative;}
+  .hero .art img{width:min(100%,560px);height:auto;margin-left:auto;}
+  /* at a glance — three facts straight from the PDF, hairline row under the hero copy  [ADDED labels] */
+  .glance{display:flex;flex-wrap:wrap;gap:0 clamp(28px,3vw,48px);margin-top:48px;padding-top:28px;border-top:1px solid rgba(17,17,17,.18);}
+  .glance div{min-width:120px;}
+  .glance .k{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:400;color:#5b5f57;margin-bottom:4px;}
+  .glance .v{display:block;font-family:var(--rati);font-size:var(--h4);line-height:1.3;}
+
+  /* ================= 2 · covers (white: H2 + statement left, five numbered hairline rows right) ================= */
+  .covers .split{align-items:start;}
+  .covers h2{max-width:11ch;margin-bottom:.9em;}
+  .covers .aside p{max-width:30ch;}
+  .covers .aside p.big{margin-bottom:1.2em;}
+  .covers ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--black);}
+  .covers li{display:grid;grid-template-columns:72px 1fr;align-items:baseline;gap:20px;padding:26px 0;border-bottom:1px solid var(--black);}
+  .covers .num{font-family:var(--rati);font-size:var(--h3);line-height:1;color:var(--green);}
+  .covers li h4{margin:0;}
+
+  /* ================= 3 · quote (green, soft wave into cream) ================= */
+  .quote{text-align:center;}
+  .quote .mark{font-family:var(--rati);font-size:clamp(80px,9vw,140px);line-height:.6;color:rgba(17,17,17,.35);display:block;margin:0 auto 8px;}
+  .quote blockquote{margin:0 auto;max-width:30ch;font-family:var(--rati);font-size:var(--h3);line-height:1.44;}
+  .quote figcaption{margin-top:34px;font-size:15px;line-height:1.6;}
+  .quote figcaption b{display:block;font-weight:500;font-size:17px;}
+
+  /* form — visual stand-in for the native Squarespace form block */
+  .form{background:var(--white);border:1px solid rgba(17,17,17,.12);border-radius:24px;padding:clamp(28px,3.5vw,48px);}
+  .form .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 24px;}
+  .form .full{grid-column:1/-1;}
+  .form label{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;color:#5b5f57;margin-bottom:8px;}
+  .form label .req{color:var(--green);}
+  .form input,.form select,.form textarea{width:100%;font:inherit;font-size:17px;color:var(--ink);background:transparent;border:0;border-bottom:1px solid rgba(17,17,17,.35);border-radius:0;padding:10px 0;outline:none;transition:border-color .2s;}
+  .form input:focus,.form select:focus,.form textarea:focus{border-bottom-color:var(--black);}
+  .form textarea{min-height:110px;resize:vertical;}
+  .form .btn{margin-top:8px;}
+  .form .fine{font-size:13px;color:#5b5f57;line-height:1.6;margin:18px 0 0;}
+  .form .thanks{display:none;padding:12px 0 0;font-family:var(--rati);font-size:var(--h4);}
+  .form.sent .grid,.form.sent .btn,.form.sent .fine{display:none;}
+  .form.sent .thanks{display:block;}
+  .form .thanks{display:none;padding:12px 0 0;font-family:var(--rati);font-size:var(--h4);}
+  .form.sent .grid,.form.sent .btn,.form.sent .fine{display:none;}
+  .form.sent .thanks{display:block;}
+
+  .note{background:var(--black);color:rgba(255,255,255,.6);font-size:12px;letter-spacing:.04em;padding:26px var(--gutter);text-align:center;}
+  .note a{color:#fff;}
+
+  /* ================= mobile (last, so it wins) ================= */
+  @media(max-width:900px){
+    .split,.hero .split{grid-template-columns:1fr;row-gap:44px;}
+    .hero{min-height:0;padding-top:120px;padding-bottom:64px;}
+    .hero h1{max-width:none;}
+    .hero .art img{width:min(72%,340px);margin:0 auto;}
+    .covers li{grid-template-columns:52px 1fr;}
+    .form .grid{grid-template-columns:1fr;}
+    .has-divider{padding-bottom:calc(72px + 6vw);}
+  }
+  @media(max-width:520px){
+    .hdr .nav{padding:16px 18px;gap:14px;}
+    .hdr .logo img{height:26px;}
+    .hdr ul{gap:14px;}
+    .hdr ul a.navpill{font-size:15px;padding:10px 18px;}
+    .btn{width:100%;padding:20px 18px;font-size:15px !important;}
+    .btns{gap:16px;}
+    .sec{padding-block:72px;}
+    .glance{gap:16px 28px;}
+  }
+
+  /* ===== FOLD page ===== */
+  .hero.fold{min-height:0;padding-top:150px;padding-bottom:clamp(72px,7vw,110px);}
+  .hero.fold .split{grid-template-columns:1.05fr .95fr;}
+  .hero.fold h1{font-size:clamp(44px,4.4vw,68px);line-height:1.1;margin-bottom:.5em;max-width:16ch;}
+  .hero.fold h4{margin-bottom:1em;max-width:32ch;}
+  .hero.fold p{max-width:56ch;}
+  .hero.fold p.last{font-family:var(--rati);font-size:var(--h4);line-height:1.3;margin-top:.4em;}
+  .hero.fold .btns{margin-top:40px;}
+  .collage.hero{aspect-ratio:586/611;max-width:586px;margin-left:auto;position:relative;min-height:0;display:block;padding:0;}
+  .collage .base,.collage .over{position:absolute;overflow:hidden;background:#dfe1d8;}
+  .collage.hero .base{right:0;top:0;width:79.5%;height:79.9%;}
+  .collage.hero .over{left:0;top:47.5%;width:49%;height:52.5%;}
+  .collage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .wait .split{align-items:center;}
+  .wait h2{max-width:14ch;margin-bottom:.6em;}
+  .wait h4{margin-bottom:1em;max-width:30ch;}
+  .collage.tall{aspect-ratio:586/779;max-width:586px;position:relative;}
+  .collage.tall .base{left:0;top:0;width:89.8%;height:100%;}
+  .collage.tall .over{left:40.8%;top:21.4%;width:59.2%;height:57.3%;}
+  .wait p.last{font-family:var(--rati);font-size:var(--h4);line-height:1.4;margin-top:1.2em;}
+  .quote{text-align:center;}
+  .quote .mark{font-family:var(--rati);font-size:clamp(80px,9vw,140px);line-height:.6;color:rgba(17,17,17,.35);display:block;margin:0 auto 8px;}
+  .quote blockquote{margin:0 auto;max-width:34ch;font-family:var(--rati);font-size:var(--h3);line-height:1.44;}
+  .quote figcaption{margin-top:34px;font-size:15px;line-height:1.6;}
+  .quote figcaption b{display:block;font-weight:500;font-size:17px;}
+  .gives .split{align-items:start;}
+  .gives h2{max-width:12ch;margin-bottom:1.2em;}
+  .gives .side p{max-width:34ch;margin-bottom:.9em;}
+  .gives .ill{width:min(100%,320px);height:auto;margin-top:clamp(40px,5vw,80px);}
+  .gives details{border-bottom:1px solid var(--black);}
+  .gives details:first-of-type{border-top:1px solid var(--black);}
+  .gives summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:28px;padding:30px 0;font-family:var(--rati);font-weight:300;font-size:var(--h4);line-height:1.35;}
+  .gives summary::-webkit-details-marker{display:none;}
+  .gives .plus{position:relative;flex:none;width:18px;height:18px;}
+  .gives .plus::before,.gives .plus::after{content:"";position:absolute;background:var(--black);transition:transform .25s;}
+  .gives .plus::before{left:0;right:0;top:8.5px;height:1px;}
+  .gives .plus::after{top:0;bottom:0;left:8.5px;width:1px;}
+  .gives details[open] .plus::after{transform:rotate(90deg);}
+  .gives .a{padding:0 0 30px;max-width:60ch;}
+  .focus{isolation:isolate;text-align:center;min-height:620px;display:flex;align-items:center;padding-block:110px;color:#fff;}
+  .focus .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;}
+  .focus::after{content:"";position:absolute;inset:0;z-index:-1;background:rgba(17,17,17,.66);}
+  .focus .wrap{width:100%;}
+  .focus h2{font-size:clamp(40px,4.5vw,68px);line-height:1.15;max-width:14ch;margin:0 auto .5em;}
+  .focus h4{max-width:28ch;margin:0 auto 1em;}
+  .focus p{max-width:58ch;margin-inline:auto;}
+  .focus p.last{font-family:var(--rati);font-size:var(--h4);line-height:1.4;max-width:30ch;margin-top:1.2em;}
+  .join{overflow:hidden;}
+  .join .split{align-items:start;grid-template-columns:.9fr 1.1fr;}
+  .join h2{max-width:14ch;margin-bottom:.6em;}
+  .join .lead{max-width:30ch;}
+  .join p.sub{max-width:34ch;margin-top:1em;}
+  .join .sign{margin-top:40px;padding-top:28px;border-top:1px solid rgba(17,17,17,.18);font-family:var(--rati);font-size:var(--h4);line-height:1.3;}
+  .form{background:var(--white);border:1px solid rgba(17,17,17,.12);border-radius:24px;padding:clamp(28px,3.5vw,48px);}
+  .form .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 24px;}
+  .form .full{grid-column:1/-1;}
+  .form label{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;color:#5b5f57;margin-bottom:8px;}
+  .form label .req{color:var(--green);}
+  .form input,.form textarea{width:100%;font:inherit;font-size:17px;color:var(--ink);background:transparent;border:0;border-bottom:1px solid rgba(17,17,17,.35);border-radius:0;padding:10px 0;outline:none;transition:border-color .2s;}
+  .form input:focus,.form textarea:focus{border-bottom-color:var(--black);}
+  .form textarea{min-height:110px;resize:vertical;}
+  .form .btn{margin-top:8px;}
+  .form .fine{font-size:13px;color:#5b5f57;line-height:1.6;margin:18px 0 0;}
+  .form .thanks{display:none;padding:12px 0 0;font-family:var(--rati);font-size:var(--h4);}
+  .form.sent .grid,.form.sent .btn,.form.sent .fine{display:none;}
+  .form.sent .thanks{display:block;}
+  @media(max-width:900px){
+    .hero.fold .split,.join .split{grid-template-columns:1fr;}
+    .collage.hero{margin-left:0;}
+    .collage.tall{max-width:420px;}
+    .gives .split{grid-template-columns:1fr;}
+    .gives .ill{display:none;}
+    .gives summary{padding:20px 0;}
+    .focus{min-height:0;padding-block:90px;}
+    .focus h2{font-size:clamp(36px,8vw,56px);}
+    .form .grid{grid-template-columns:1fr;}
+  }
+</style>
+
+</head>
+<body>
+
+<svg class="div-svgs" aria-hidden="true">
+  <clipPath id="soft" clipPathUnits="objectBoundingBox">
+    <path d="M2,0.912 L2,0.912 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 l0,0 c-0.25,0 -0.5,0 -1,0.088 l0,-0.088 L-1,-1 L2,-1 z"/>
+  </clipPath>
+</svg>
+
+<header class="hdr" id="hdr">
+  <nav class="nav" aria-label="Primary">
+    <a class="logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home">
+      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
+    </a>
+    <ul>
+      <li><a href="https://www.biofarm.co.uk/developers">Partners +</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
+      <li><a href="https://www.biofarm.co.uk/contact">Contact</a></li>
+      <li><a class="navpill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ 1 · HERO (cream split, Slades collage) ============ -->
+  <section class="sec cream hero fold">
+    <div class="wrap">
+      <div class="split">
+        <div class="fade">
+          <p class="eyebrow">Biofarm Fold <!-- [ADDED] eyebrow --></p>
+          <h1>Your BNG units are registered. Now they need to <span class="scribble">sell</span>.</h1>
+          <h4>Getting your habitat bank registered is one thing. Turning those units into revenue is another.</h4>
+          <p>The Biofarm Fold is for landowners with registered habitat banks who want a more active route to market.</p>
+          <p>We take your habitat bank to developers, build demand and drive unit sales.</p>
+          <p class="last">Deal after deal.</p>
+          <div class="btns"><a class="btn primary" href="#join">Join the Fold</a></div>
+        </div>
+        <div class="collage hero fade">
+          <div class="base"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/757fb3f6-7690-441b-8645-3468d76f59c8/slades-hero.jpg?format=1500w" alt="Slades Farm habitat bank, Surrey" /></div>
+          <div class="over"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/0b4d7f25-214c-4a9c-8638-85ece2908890/slades-overview.jpg?format=1000w" alt="Grassland and woodland edge at Slades Farm" /></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · DON'T JUST WAIT FOR BUYERS (white, collage left · copy right) — "Breaking down the walls" pattern ============ -->
+  <section class="sec white wait">
+    <div class="wrap">
+      <div class="split">
+        <div class="collage tall fade">
+          <div class="base"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/3e168ca1-4032-42e4-b490-e0ab6d9382e5/sleight-farm-hero.jpg?format=1500w" alt="Oaks and restored grassland at Sleight Farm habitat bank" /></div>
+          <div class="over"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756560129670-HN7ZFJM1QYXQMTX1MX3A/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-1889.jpg?format=1000w" alt="Conservation grazing ponies at Sleight Farm" /></div>
+        </div>
+        <div class="fade">
+          <h2>Don&rsquo;t just wait for buyers</h2>
+          <h4>You&rsquo;ve already invested in your land and committed it to nature. Now it needs to work commercially too.</h4>
+          <p>Selling BNG units takes more than putting them on the market and waiting for the right development to come along.</p>
+          <p>When you join the Biofarm Fold, your habitat bank becomes part of what we actively take to developers looking for BNG units in your area.</p>
+          <p>We create opportunities, convert demand into sales and see each deal through to completion.</p>
+          <p class="last">So your investment in nature can generate the revenue it was designed to.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 · QUOTE (green, soft wave) ============ -->
+  <section class="sec green quote has-divider div-soft">
+    <div class="wrap fade">
+      <figure style="margin:0;">
+        <span class="mark" aria-hidden="true">&ldquo;</span>
+        <blockquote>The challenge wasn&rsquo;t creating the units, it was building a consistent pipeline of sales. By joining the Biofarm Fold, we have a long-term partner invested in making the habitat bank work, actively driving sales and seeing each deal through with us.</blockquote>
+        <figcaption><b>Ed Hutley</b>Landowner, Slades Farm</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ 4 · WHAT JOINING THE FOLD GIVES YOU (cream: heading + line + crane left · accordion rows right) — metric FAQ pattern ============ -->
+  <section class="sec cream gives">
+    <div class="wrap">
+      <div class="split">
+        <div class="side fade">
+          <h2>What joining the Fold gives you</h2>
+          <p>Five things every habitat bank in the Fold gets. <!-- [ADDED] short line, for Vix --></p>
+          <p><a class="inl" href="#join">Join the Fold</a>.</p>
+          <img class="ill" src="assets/illustrations/crane.png" alt="" width="1100" height="900" />
+        </div>
+        <div class="acc fade">
+          <details><summary>Active developer demand<span class="plus"></span></summary><div class="a">We work directly with developers looking for BNG solutions and match live requirements with the right habitat banks.</div></details>
+          <details><summary>A team focused on marketing your habitat bank<span class="plus"></span></summary><div class="a">We actively market your habitat bank to developers, building its profile and creating new sales opportunities in your area.</div></details>
+          <details><summary>A team focused on sales<span class="plus"></span></summary><div class="a">We turn demand into a pipeline of opportunities and actively drive unit sales over time.</div></details>
+          <details><summary>Commercial expertise<span class="plus"></span></summary><div class="a">We use live market insight to position and price your units, negotiate deals and help protect their value.</div></details>
+          <details><summary>Deals seen through<span class="plus"></span></summary><div class="a">From first enquiry to allocation and completion, we manage the sales process and keep things moving.</div></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 · FOCUSED BY DESIGN (dark photo band) ============ -->
+  <section class="sec focus">
+    <img class="bg" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/28e2e17f-d3dc-4783-bccb-fa2bc34f7ca4/Biofarm+BNG+Sleight+Farm+Field+Summer?format=2500w" alt="" />
+    <div class="wrap fade">
+      <h2>Focused by design</h2>
+      <h4>The Fold isn&rsquo;t a marketplace. It&rsquo;s deliberately selective.</h4>
+      <p>We bring together habitat banks in strategic locations where we can put our developer relationships, marketing and sales expertise to work.</p>
+      <p>That means focus for every habitat bank in the Fold, with a team actively building demand and driving sales.</p>
+      <p class="last">Your habitat bank. Our developer relationships and commercial expertise. One team focused on making it work.</p>
+    </div>
+  </section>
+
+  <!-- ============ 6 · TURN YOUR INVESTMENT INTO REVENUE (cream, form) ============ -->
+  <section class="sec cream join" id="join">
+    <div class="wrap">
+      <div class="split">
+        <div class="fade">
+          <p class="eyebrow">Join the Fold <!-- [ADDED] eyebrow --></p>
+          <h2>Turn your investment in nature into revenue</h2>
+          <p class="big lead">If you have a registered habitat bank and want a more active approach to unit sales, we&rsquo;d like to hear from you.</p>
+          <p class="sub">Tell us about your habitat bank and we&rsquo;ll talk through whether the Biofarm Fold is the right fit.</p>
+          <p class="sign">We&rsquo;re in the business of nature.</p>
+        </div>
+
+        <!-- VISUAL STAND-IN: on the live page this is the fold-form code block (posts to the lead API). -->
+        <form class="form fade" id="fold-form" novalidate>
+          <div class="grid">
+            <div><label for="f-name">Name <span class="req">*</span></label><input id="f-name" name="name" type="text" required /></div>
+            <div><label for="f-email">Email <span class="req">*</span></label><input id="f-email" name="email" type="email" required /></div>
+            <div><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" /></div>
+            <div><label for="f-bank">Habitat bank name <span class="req">*</span></label><input id="f-bank" name="habitat_bank" type="text" required /></div>
+            <div><label for="f-loc">Location (county or local authority) <span class="req">*</span></label><input id="f-loc" name="location" type="text" required /></div>
+            <div><label for="f-units">Registered units (approx.)</label><input id="f-units" name="units" type="text" inputmode="numeric" /></div>
+            <div class="full"><label for="f-msg">Anything else we should know?</label><textarea id="f-msg" name="message"></textarea></div>
+          </div>
+          <button class="btn primary" type="submit">Join the Fold</button>
+          <p class="fine">We&rsquo;ll come back to you to talk through your habitat bank and whether the Fold is the right fit. <!-- [ADDED] form note --></p>
+          <p class="thanks">Thank you. We&rsquo;ll be in touch about your habitat bank. <!-- [ADDED] success message --></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+</main>
+
+<footer class="note">
+  Prototype for <a href="https://www.biofarm.co.uk/">biofarm.co.uk</a>/fold &mdash; the live page inherits the real site header &amp; footer; the form becomes the fold-form code block.
+</footer>
+
+<script>
+  (function(){
+    var h=document.getElementById('hdr');
+    addEventListener('scroll',function(){h.classList.toggle('scrolled',scrollY>40);},{passive:true});
+    var els=document.querySelectorAll('.fade');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
+    else{
+      var io=new IntersectionObserver(function(entries){
+        entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+      },{rootMargin:'0px 0px -8% 0px',threshold:.06});
+      els.forEach(function(e){io.observe(e);});
+    }
+    /* prototype only: show the success state; the live Form Block handles submission */
+    var f=document.getElementById('fold-form');
+    f.addEventListener('submit',function(e){e.preventDefault();if(f.checkValidity()){f.classList.add('sent');}else{f.reportValidity();}});
+  })();
+</script>
+</body>
+</html>

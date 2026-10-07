@@ -8,6 +8,7 @@ from app.models import Lead
 from app.schemas import (
     ContactSubmission,
     CpdSubmission,
+    FoldSubmission,
     LeadSubmissionBase,
     NewsletterSubmission,
 )
@@ -161,6 +162,51 @@ async def submit_cpd(
         phone=submission.phone,
         message=_cpd_message(submission),
         fields=list(submission.fields),
+        newsletter_opt_in=False,
+        page=submission.page,
+        attribution=submission.attribution.model_dump(exclude_none=True)
+        if submission.attribution
+        else None,
+        first_touch=submission.first_touch.model_dump(exclude_none=True)
+        if submission.first_touch
+        else None,
+        ga_client_id=submission.ga_client_id,
+        ga_session_id=submission.ga_session_id,
+    )
+    return await _accept_lead(submission, lead, request, background_tasks, session)
+
+
+def _fold_message(submission: FoldSubmission) -> str:
+    """Fold the habitat-bank details into the lead message so they reach the
+    Pipedrive note without a schema change."""
+    lines = [
+        f"Habitat bank: {submission.habitat_bank}",
+        f"Location: {submission.location}",
+    ]
+    if submission.units:
+        lines.append(f"Registered units (approx.): {submission.units}")
+    if submission.message:
+        lines.append("")
+        lines.append(submission.message)
+    return "\n".join(lines)
+
+
+@router.post("/fold", status_code=202)
+async def submit_fold(
+    submission: FoldSubmission,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    lead = Lead(
+        form="fold",
+        name=submission.name,
+        email=submission.email,
+        phone=submission.phone,
+        message=_fold_message(submission),
+        # Fold enquiries come from landowners with registered habitat banks:
+        # sets the Client Type person field on NEW persons.
+        fields=["landowner"],
         newsletter_opt_in=False,
         page=submission.page,
         attribution=submission.attribution.model_dump(exclude_none=True)

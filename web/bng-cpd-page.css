@@ -1,0 +1,30 @@
+/* BNG CPD page (/bng-cpd) · Page Settings → Advanced → Page Header Code Injection, inside <style>.
+   Hero: smaller H1 (prototype size), white buttons on the dark photo, centred facts row.
+   Section theme is "White" so Squarespace draws the buttons black by default. */
+#collection-6ac2fd0e0a625b034f8b7f56 [data-section-id="6ac2fd0e0a625b034f8b7f5b"] h1 {
+  font-size: clamp(52px, 6vw, 90px) !important;
+  line-height: 1.1 !important;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 [data-section-id="6ac2fd0e0a625b034f8b7f5b"] .sqs-button-element--primary {
+  background: #fff !important;
+  color: #111 !important;
+  border-color: #fff !important;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 [data-section-id="6ac2fd0e0a625b034f8b7f5b"] .sqs-button-element--primary:hover {
+  background: #e8e8e8 !important;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 [data-section-id="6ac2fd0e0a625b034f8b7f5b"] .sqs-button-element--secondary {
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid #fff !important;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 [data-section-id="6ac2fd0e0a625b034f8b7f5b"] .sqs-button-element--secondary:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 .bf-cpdg {
+  max-width: 900px;
+  margin-inline: auto;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 .bf-cpdg div {
+  text-align: center;
+}

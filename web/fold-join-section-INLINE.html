@@ -1,0 +1,186 @@
+<!-- FOLD page · "Turn your investment in nature into revenue" — WHOLE section in ONE Code Block:
+     eyebrow, H2, lead, sub-line and the "We're in the business of nature." sign-off on the left; the
+     Join the Fold form on the right. Paste into ONE Code Block in a CREAM section. The hero button
+     links to #join (anchor is on this block). Self-contained CSS + font.
+     Form posts to https://biofarm-api.onrender.com/v1/leads/fold -> Pipedrive person (Client Type:
+     landowner) + lead "Fold enquiry - <name>" + note with habitat bank / location / units.
+     ⚠ Requires the API change (FoldSubmission + /v1/leads/fold) to be DEPLOYED first.
+     Analytics: dataLayer pipedrive_form_submit formId "fold" (own GTM trigger needed); gtag
+     generate_lead (website_fold_form). Built 7 Oct 2026 from fold.html. -->
+<style>
+  @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
+  .bf-foldf{--ink:#111;--muted:#5b5f57;--green:#71977A;box-sizing:border-box;background:#fff;border:1px solid rgba(17,17,17,.12);border-radius:24px;padding:clamp(28px,3.5vw,48px);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;}
+  .bf-foldf *,.bf-foldf *::before,.bf-foldf *::after{box-sizing:border-box;}
+  .bf-foldf .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 24px;}
+  .bf-foldf .full{grid-column:1/-1;}
+  .bf-foldf label{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;color:var(--muted);margin:0 0 8px;}
+  .bf-foldf label .req{color:var(--green);}
+  .bf-foldf input,.bf-foldf select,.bf-foldf textarea{width:100%;font-family:inherit;font-weight:300;font-size:17px;line-height:1.5;color:var(--ink);background:transparent;border:0;border-bottom:1px solid rgba(17,17,17,.35);border-radius:0;padding:10px 0;margin:0;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;}
+  .bf-foldf select{background:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23111' stroke-width='1.5'/%3E%3C/svg%3E") right center no-repeat;padding-right:24px;cursor:pointer;}
+  .bf-foldf input:focus,.bf-foldf select:focus,.bf-foldf textarea:focus{border-bottom-color:var(--ink);}
+  .bf-foldf textarea{min-height:110px;resize:vertical;}
+  .bf-foldf fieldset{border:0;margin:0;padding:0;min-width:0;}
+  .bf-foldf legend{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;color:var(--muted);margin:0 0 10px;padding:0;}
+  .bf-foldf .chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .bf-foldf .chips label{display:inline-flex;align-items:center;margin:0;font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink);padding:10px 16px;border-radius:300px;border:1px solid rgba(17,17,17,.35);background:transparent;cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
+  .bf-foldf .chips input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;}
+  .bf-foldf .chips label:has(input:checked){background:var(--ink);border-color:var(--ink);color:#fff;}
+  .bf-foldf .chips label:has(input:focus-visible){box-shadow:0 0 0 3px rgba(17,17,17,.25);}
+  .bf-foldf .bf-btn{display:inline-flex;align-items:center;justify-content:center;margin-top:8px;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:17px;letter-spacing:.04em;text-transform:uppercase;line-height:1.2;background:var(--ink);color:#fff;border:1px solid var(--ink);border-radius:300px;padding:24px 30px;cursor:pointer;white-space:nowrap;transition:background .25s;}
+  .bf-foldf .bf-btn:hover{background:#2a2a2a;}
+  .bf-foldf .bf-btn[disabled]{opacity:.6;cursor:wait;}
+  .bf-foldf .fine{font-size:13px;color:var(--muted);line-height:1.6;margin:18px 0 0;}
+  .bf-foldf .bf-status{margin-top:14px;font-size:15px;min-height:1.4em;}
+  .bf-foldf .bf-status.err{color:#4A1414;}
+  .bf-foldf .bf-done{padding:12px 0;}
+  .bf-foldf .bf-done h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(22px,1.66vw,26px);line-height:1.47;margin:0 0 .4em;color:var(--ink);}
+  .bf-foldf .bf-done p{margin:0;font-size:17px;line-height:1.8;}
+  .bf-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
+  @media(max-width:700px){.bf-foldf .grid{grid-template-columns:1fr;}.bf-foldf .bf-btn{width:100%;padding:20px 18px;}}
+</style>
+<style>
+  .bf-folda{--ink:#111;--muted:#5b5f57;--green:#71977A;box-sizing:border-box;max-width:1350px;margin:0 auto;color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;}
+  .bf-folda *,.bf-folda *::before,.bf-folda *::after{box-sizing:border-box;}
+  .bf-folda .split{display:grid;grid-template-columns:.9fr 1.1fr;column-gap:clamp(32px,6vw,100px);row-gap:40px;align-items:start;}
+  .bf-folda .eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:var(--green);margin:0 0 1.4em;}
+  .bf-folda h2{max-width:14ch;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(34px,2.82vw,44.2px);line-height:1.41;letter-spacing:0;margin:0 0 .6em;color:var(--ink);}
+  .bf-folda .lead{font-size:clamp(20px,1.66vw,26px);line-height:1.8;max-width:30ch;margin:0;}
+  .bf-folda .sub{max-width:34ch;margin:1em 0 0;}
+  .bf-folda .sign{margin:40px 0 0;padding-top:28px;border-top:1px solid rgba(17,17,17,.18);font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(22px,1.66vw,26px);line-height:1.3;}
+  @media(max-width:900px){.bf-folda .split{grid-template-columns:1fr;row-gap:44px;}}
+</style>
+<div class="bf-folda" id="join">
+  <div class="split">
+    <div>
+      <p class="eyebrow">Join the Fold</p>
+      <h2>Turn your investment in nature into revenue</h2>
+      <p class="lead">If you have a registered habitat bank and want a more active approach to unit sales, we&rsquo;d like to hear from you.</p>
+      <p class="sub">Tell us about your habitat bank and we&rsquo;ll talk through whether the Biofarm Fold is the right fit.</p>
+      <p class="sign">We&rsquo;re in the business of nature.</p>
+    </div>
+    <div class="bf-foldf" id="bfFold">
+      <noscript><p>This form needs JavaScript. Please enable it, or email us at info@biofarm.co.uk.</p></noscript>
+      <form id="bfFoldForm" method="post" novalidate>
+        <div class="grid">
+      <div><label for="bfFoldName">Name <span class="req">*</span></label><input id="bfFoldName" name="name" type="text" required maxlength="200" autocomplete="name"></div>
+      <div><label for="bfFoldEmail">Email <span class="req">*</span></label><input id="bfFoldEmail" name="email" type="email" required maxlength="320" autocomplete="email"></div>
+      <div><label for="bfFoldPhone">Phone</label><input id="bfFoldPhone" name="phone" type="tel" maxlength="50" autocomplete="tel"></div>
+      <div><label for="bfFoldBank">Habitat bank name <span class="req">*</span></label><input id="bfFoldBank" name="habitat_bank" type="text" required maxlength="200"></div>
+      <div><label for="bfFoldLoc">Location (county or local authority) <span class="req">*</span></label><input id="bfFoldLoc" name="location" type="text" required maxlength="200"></div>
+      <div><label for="bfFoldUnits">Registered units (approx.)</label><input id="bfFoldUnits" name="units" type="text" inputmode="numeric" maxlength="50"></div>
+      <div class="full"><label for="bfFoldMsg">Anything else we should know?</label><textarea id="bfFoldMsg" name="message" maxlength="5000"></textarea></div>
+    </div>
+    <!-- honeypot: humans never see or fill this -->
+        <div class="bf-hp" aria-hidden="true"><label for="bfFoldWebsite">Website</label><input type="text" id="bfFoldWebsite" name="website" tabindex="-1" autocomplete="off"></div>
+        <button type="submit" class="bf-btn" id="bfFoldSubmit">Join the Fold</button>
+        <p class="fine">We&rsquo;ll come back to you to talk through your habitat bank and whether the Fold is the right fit.</p>
+        <div class="bf-status" id="bfFoldStatus" role="alert" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var API_BASE = 'https://biofarm-api.onrender.com';
+  var GA_ID = 'G-3MS9TLLZRN';
+
+  var form = document.getElementById('bfFoldForm');
+  var statusEl = document.getElementById('bfFoldStatus');
+  var btn = document.getElementById('bfFoldSubmit');
+  var startedAt = null;
+
+  // wake a sleeping backend while the visitor is still typing
+  try { fetch(API_BASE + '/healthz').catch(function () {}); } catch (e) {}
+
+  form.addEventListener('focusin', function () {
+    if (!startedAt) startedAt = Date.now();
+  }, { once: true });
+
+  var gaIds = {};
+  if (typeof gtag === 'function') {
+    try {
+      gtag('get', GA_ID, 'client_id', function (v) { gaIds.client_id = v; });
+      gtag('get', GA_ID, 'session_id', function (v) { gaIds.session_id = String(v); });
+    } catch (e) {}
+  }
+
+  function readJSON(store, key) {
+    try { return JSON.parse(store.getItem(key)) || null; } catch (e) { return null; }
+  }
+  function legacyUTM() {
+    var out = {}, any = false;
+    try {
+      ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
+        var v = sessionStorage.getItem(k);
+        if (v) { out[k] = v.slice(0, 255); any = true; }
+      });
+    } catch (e) {}
+    return any ? out : null;
+  }
+  function fail(msg) { statusEl.className = 'bf-status err'; statusEl.textContent = msg; }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    statusEl.className = 'bf-status';
+    statusEl.textContent = '';
+
+    if (!form.name.value.trim()) return fail('Please add your name.');
+    if (!form.email.value.trim() || !/.+@.+\..+/.test(form.email.value)) return fail('Please add a valid email address.');
+    if (!form.habitat_bank.value.trim() || !form.location.value.trim()) return fail('Please tell us the name and location of your habitat bank.');
+
+    var payload = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      phone: form.phone.value.trim() || null,
+      habitat_bank: form.habitat_bank.value.trim(),
+      location: form.location.value.trim(),
+      units: form.units.value.trim() || null,
+      message: form.message.value.trim() || null,
+      website: form.website.value, // honeypot
+      fill_ms: startedAt ? Date.now() - startedAt : null,
+      page: location.pathname,
+      attribution: readJSON(sessionStorage, 'bf_attr_last') || legacyUTM(),
+      first_touch: readJSON(localStorage, 'bf_attr_first'),
+      ga_client_id: gaIds.client_id || null,
+      ga_session_id: gaIds.session_id || null
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 30000);
+
+    fetch(API_BASE + '/v1/leads/fold', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    }).then(function (resp) {
+      clearTimeout(timer);
+      if (resp.status === 429) throw new Error('rate');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'pipedrive_form_submit',
+        formId: 'fold',
+        formUUID: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
+      });
+      if (typeof gtag === 'function') {
+        gtag('event', 'generate_lead', { lead_source: 'website_fold_form' });
+      }
+      var wrap = document.getElementById('bfFold');
+      wrap.innerHTML = '<div class="bf-done" role="status" tabindex="-1"><h3>Thank you. We&rsquo;ll be in touch about your habitat bank.</h3>' +
+        '<p>We&rsquo;ll come back to you to talk through your habitat bank and whether the Fold is the right fit.</p></div>';
+      var done = wrap.querySelector('.bf-done');
+      if (done) done.focus();
+    }).catch(function (err) {
+      clearTimeout(timer);
+      btn.disabled = false;
+      btn.textContent = 'Join the Fold';
+      fail(err && err.message === 'rate'
+        ? 'A few too many attempts - please wait a minute and try again.'
+        : 'Something went wrong sending your details - please try again, or email us at info@biofarm.co.uk.');
+    });
+  });
+})();
+</script>

@@ -20,7 +20,7 @@ class Lead(Base):
     __tablename__ = "leads"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    form: Mapped[str] = mapped_column(String(20))  # contact | newsletter | cpd
+    form: Mapped[str] = mapped_column(String(20))  # contact | newsletter | cpd | fold
 
     name: Mapped[str] = mapped_column(String(200))
     email: Mapped[str] = mapped_column(String(320), index=True)
