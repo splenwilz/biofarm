@@ -1,0 +1,40 @@
+<!-- Infrastructure BNG page · "One partner. From strategy to stewardship." — the six steps in the
+     developers page's "How we'll support your project" pattern: numbered columns, hairline above each,
+     green numeral, title, sentence. Three across, two rows; one column on phones.
+     Paste into ONE Code Block. Use a NATIVE text block above it for the H2 and the lead
+     ("From the first conversation to year 30, we bring the whole BNG solution together."), centred,
+     as on the developers page — or uncomment the heading block at the top here to keep it all in one.
+     Copy verbatim from the NSIP brief (page copy v2, Prove step updated 10 Oct 2026). Self-contained: own CSS + font. -->
+<style>
+  @font-face{font-family:'RATI_v2';
+    src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+        url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight:300;font-display:swap;}
+  .bf-steps{--green:#71977A;--ink:#111;box-sizing:border-box;max-width:1350px;margin:0 auto;color:var(--ink);}
+  .bf-steps *,.bf-steps *::before,.bf-steps *::after{box-sizing:border-box;}
+  .bf-steps .head{text-align:center;margin:0 auto clamp(48px,5vw,80px);}
+  .bf-steps .head h2{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(34px,3.4vw,54px);line-height:1.15;letter-spacing:0;margin:0 0 .4em;}
+  .bf-steps .head p{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;font-size:clamp(18px,1.5vw,22px);line-height:1.7;max-width:44ch;margin:0 auto;}
+  .bf-steps ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(40px,4vw,64px) clamp(28px,3.5vw,56px);}
+  .bf-steps li{border-top:1px solid rgba(17,17,17,.3);padding-top:22px;margin:0;}
+  .bf-steps .num{display:block;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(34px,3vw,46px);line-height:1;color:var(--green);margin-bottom:14px;}
+  .bf-steps h3{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(24px,2vw,30px);line-height:1.2;letter-spacing:0;margin:0 0 .5em;max-width:14ch;}
+  .bf-steps p{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:300;font-size:15px;line-height:1.7;color:#3a3d38;margin:0;max-width:34ch;}
+  @media(max-width:900px){.bf-steps ol{grid-template-columns:1fr;gap:28px;}}
+</style>
+<div class="bf-steps">
+  <!-- Heading + lead: delete this block if you're using native text blocks above instead.
+  <div class="head">
+    <h2>One partner. From strategy to stewardship.</h2>
+    <p>From the first conversation to year 30, we bring the whole BNG solution together.</p>
+  </div>
+  -->
+  <ol role="list">
+    <li><span class="num">1</span><h3>Shape</h3><p>Work with your planning and ecology teams to define the right route to BNG.</p></li>
+    <li><span class="num">2</span><h3>Find</h3><p>Identify land around your location, habitat requirements, corridors and catchments.</p></li>
+    <li><span class="num">3</span><h3>Design</h3><p>Create a bespoke habitat bank around your project, the landscape and the outcomes you need to deliver.</p></li>
+    <li><span class="num">4</span><h3>Secure</h3><p>Put the contractual commitment in place, with payments structured around your programme.</p></li>
+    <li><span class="num">5</span><h3>Deliver</h3><p>Create and manage the habitat for 30 years, with long term delivery funds ring fenced.</p></li>
+    <li><span class="num">6</span><h3>Prove</h3><p>Track, adapt and report on habitat outcomes, with bespoke monitoring shaped around your priorities and the nature recovery stories you want to tell.</p></li>
+  </ol>
+</div>
