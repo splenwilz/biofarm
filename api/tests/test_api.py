@@ -172,6 +172,23 @@ async def test_cpd_endpoint(client):
     assert lead.sync_status == "synced"
 
 
+@respx.mock
+async def test_cpd_without_fields_is_accepted_and_sets_no_client_type(client):
+    """The CPD form dropped its field chips (8 Oct): no `fields` key at all must
+    still be accepted, stored as [], and sync without a Client Type person field."""
+    routes = mock_pipedrive_happy_path()
+    r = await client.post(
+        "/v1/leads/cpd",
+        json={"name": "Jane", "email": "jane@example.com", "company": "Acme", "page": "/bng-cpd"},
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.fields == []
+    assert lead.sync_status == "synced"
+    person_body = json.loads(routes["person"].calls.last.request.content)
+    assert "custom_fields" not in person_body
+
+
 def test_note_html_keeps_line_breaks():
     from app.models import Lead
     from app.services.sync import build_note_html

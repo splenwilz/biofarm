@@ -2,7 +2,7 @@
      column of the "Arrange a session" section (cream background). Self-contained: own CSS + font.
      Posts to the lead-capture API at https://biofarm-api.onrender.com/v1/leads/cpd, which stores the
      lead and syncs it to Pipedrive as a person + lead ("CPD session request - <name>") + note holding
-     company, role, team size and the session request; the field chips set the Client Type person field. Same spam checks and UTM attribution as the
+     company, role, team size and the session request. Same spam checks and UTM attribution as the
      contact form (needs attribution-injection.html, already live site-wide).
      ⚠ Requires the API change in api/ (CpdSubmission + /v1/leads/cpd) to be DEPLOYED first — until
        then the form will show the error message on submit.
@@ -21,13 +21,6 @@
   .bf-cpdf select{background:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23111' stroke-width='1.5'/%3E%3C/svg%3E") right center no-repeat;padding-right:24px;cursor:pointer;}
   .bf-cpdf input:focus,.bf-cpdf select:focus,.bf-cpdf textarea:focus{border-bottom-color:var(--ink);}
   .bf-cpdf textarea{min-height:110px;resize:vertical;}
-  .bf-cpdf fieldset{border:0;margin:0;padding:0;min-width:0;}
-  .bf-cpdf legend{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;color:var(--muted);margin:0 0 10px;padding:0;}
-  .bf-cpdf .chips{display:flex;flex-wrap:wrap;gap:10px;}
-  .bf-cpdf .chips label{display:inline-flex;align-items:center;margin:0;font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink);padding:10px 16px;border-radius:300px;border:1px solid rgba(17,17,17,.35);background:transparent;cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
-  .bf-cpdf .chips input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;}
-  .bf-cpdf .chips label:has(input:checked){background:var(--ink);border-color:var(--ink);color:#fff;}
-  .bf-cpdf .chips label:has(input:focus-visible){box-shadow:0 0 0 3px rgba(17,17,17,.25);}
   .bf-cpdf .bf-btn{display:inline-flex;align-items:center;justify-content:center;margin-top:8px;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:17px;letter-spacing:.04em;text-transform:uppercase;line-height:1.2;background:var(--ink);color:#fff;border:1px solid var(--ink);border-radius:300px;padding:24px 30px;cursor:pointer;white-space:nowrap;transition:background .25s;}
   .bf-cpdf .bf-btn:hover{background:#2a2a2a;}
   .bf-cpdf .bf-btn[disabled]{opacity:.6;cursor:wait;}
@@ -48,26 +41,17 @@
       <div><label for="bfCpdName">Name <span class="req">*</span></label><input id="bfCpdName" name="name" type="text" required maxlength="200" autocomplete="name"></div>
       <div><label for="bfCpdCompany">Company <span class="req">*</span></label><input id="bfCpdCompany" name="company" type="text" required maxlength="200" autocomplete="organization"></div>
       <div><label for="bfCpdRole">Role</label><input id="bfCpdRole" name="role" type="text" maxlength="120" autocomplete="organization-title"></div>
-      <div><label for="bfCpdEmail">Work email <span class="req">*</span></label><input id="bfCpdEmail" name="email" type="email" required maxlength="320" autocomplete="email"></div>
+      <div><label for="bfCpdEmail">Email <span class="req">*</span></label><input id="bfCpdEmail" name="email" type="email" required maxlength="320" autocomplete="email"></div>
       <div><label for="bfCpdPhone">Phone</label><input id="bfCpdPhone" name="phone" type="tel" maxlength="50" autocomplete="tel"></div>
       <div><label for="bfCpdSize">Team size</label>
         <select id="bfCpdSize" name="team_size">
           <option value="">Select</option><option value="1-5">1&ndash;5</option><option value="6-15">6&ndash;15</option><option value="16-40">16&ndash;40</option><option value="40+">40+</option>
         </select></div>
-      <fieldset class="full">
-        <legend>What field are you in? <span class="req">*</span></legend>
-        <div class="chips">
-          <label><input type="checkbox" name="fields" value="developer">Developer or promoter</label>
-          <label><input type="checkbox" name="fields" value="other">Planner or consultant</label>
-          <label><input type="checkbox" name="fields" value="landowner">Landowner</label>
-          <label><input type="checkbox" name="fields" value="other">Other</label>
-        </div>
-      </fieldset>
       <div class="full"><label for="bfCpdMsg">What would you like the session to cover?</label><textarea id="bfCpdMsg" name="message" maxlength="5000"></textarea></div>
     </div>
     <!-- honeypot: humans never see or fill this -->
     <div class="bf-hp" aria-hidden="true"><label for="bfCpdWebsite">Website</label><input type="text" id="bfCpdWebsite" name="website" tabindex="-1" autocomplete="off"></div>
-    <button type="submit" class="bf-btn" id="bfCpdSubmit">Arrange a session</button>
+    <button type="submit" class="bf-btn" id="bfCpdSubmit">Arrange a CPD session</button>
     <p class="fine">We&rsquo;ll come back to you to agree a date and tailor the session to your team.</p>
     <div class="bf-status" id="bfCpdStatus" role="alert" aria-live="polite"></div>
   </form>
@@ -119,11 +103,7 @@
     statusEl.textContent = '';
 
     if (!form.name.value.trim() || !form.company.value.trim()) return fail('Please add your name and company.');
-    if (!form.email.value.trim() || !/.+@.+\..+/.test(form.email.value)) return fail('Please add a valid work email address.');
-    var fields = Array.prototype.map.call(
-      form.querySelectorAll('input[name=fields]:checked'), function (el) { return el.value; });
-    fields = fields.filter(function (v, i) { return fields.indexOf(v) === i; }); // two chips map to "other"
-    if (!fields.length) return fail('Please tell us what field you are in.');
+    if (!form.email.value.trim() || !/.+@.+\..+/.test(form.email.value)) return fail('Please add a valid email address.');
 
     var payload = {
       name: form.name.value.trim(),
@@ -131,7 +111,6 @@
       role: form.role.value.trim() || null,
       email: form.email.value.trim(),
       phone: form.phone.value.trim() || null,
-      fields: fields,
       team_size: form.team_size.value || null,
       message: form.message.value.trim() || null,
       website: form.website.value, // honeypot
@@ -174,7 +153,7 @@
     }).catch(function (err) {
       clearTimeout(timer);
       btn.disabled = false;
-      btn.textContent = 'Arrange a session';
+      btn.textContent = 'Arrange a CPD session';
       fail(err && err.message === 'rate'
         ? 'A few too many attempts - please wait a minute and try again.'
         : 'Something went wrong sending your request - please try again, or email us at info@biofarm.co.uk.');

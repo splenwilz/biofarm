@@ -28,3 +28,26 @@
 #collection-6ac2fd0e0a625b034f8b7f56 .bf-cpdg div {
   text-align: center;
 }
+
+/* Takeaways accordion (block 78d17061536c7dab9cf1): statements only, nothing to expand —
+   hide the plus, disable the click, keep the empty panels shut. Vix, 7 Oct. */
+#collection-6ac2fd0e0a625b034f8b7f56 #block-78d17061536c7dab9cf1 .accordion-icon-container {
+  display: none !important;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 #block-78d17061536c7dab9cf1 .accordion-item__click-target {
+  pointer-events: none;
+  cursor: default;
+}
+#collection-6ac2fd0e0a625b034f8b7f56 #block-78d17061536c7dab9cf1 .accordion-item__dropdown {
+  display: none !important;
+}
+/* the native block reserves icon-width on the right of every title; reclaim it now the icon is gone */
+#collection-6ac2fd0e0a625b034f8b7f56 #block-78d17061536c7dab9cf1 .accordion-item__title {
+  padding-right: 0;
+}
+@media (max-width: 767px) {
+  /* Vix, 7 Oct: on phones the row text was touching the hairlines */
+  #collection-6ac2fd0e0a625b034f8b7f56 #block-78d17061536c7dab9cf1 .accordion-item__click-target {
+    padding-block: 22px;
+  }
+}

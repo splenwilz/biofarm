@@ -60,8 +60,8 @@ class CpdSubmission(LeadSubmissionBase):
     company: str = Field(min_length=1, max_length=200)
     role: str | None = Field(default=None, max_length=120)
     phone: str | None = Field(default=None, max_length=50)
-    # "What field are you in?" chips - same values as the contact form so the
-    # Pipedrive Client Type mapping applies unchanged.
+    # Field chips removed 8 Oct (Vix: a landowner wouldn't book a CPD session);
+    # still accepted if sent, so an old cached form can't 422.
     fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
     team_size: TeamSize | None = None
     message: str | None = Field(default=None, max_length=5000)
