@@ -1,6 +1,6 @@
 # Dennington Hall — coming-soon page build (v3 copy, 30 Sep 2026)
 
-Seventh and final coming-soon page (same pattern as Thoulstone / Priory).
+Seventh and final coming-soon page (same pattern as Thoulstone / Priority).
 ⚠ POST: create in "Habitat Banks Lists" with title "Dennington Hall", URL slug
 `dennington-hall` (the finder links to that slug).
 

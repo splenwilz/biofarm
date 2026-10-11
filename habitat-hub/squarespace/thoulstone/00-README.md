@@ -1,6 +1,6 @@
 # Thoulstone Park — coming-soon page build (v3 copy, 27 Sep 2026)
 
-Sixth coming-soon page (Worth Abbey / Arthur / Broadlands / Highfold / Priory pattern).
+Sixth coming-soon page (Worth Abbey / Arthur / Broadlands / Highfold / Priority pattern).
 ⚠ POST: title "Thoulstone Park", URL slug `thoulstone-park` (finder entry renamed to match;
 if the post is still at /thoulstone or /chapmanslade, rename it).
 

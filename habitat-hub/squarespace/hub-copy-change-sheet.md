@@ -13,10 +13,10 @@ Open flags for Vix/Chris are at the bottom — send those before launch.
 
 - "In the pipeline" → **"Coming soon"** (map legend + map popups).
 - Coming-soon list cut from 23 to the **7 launch sites**: Broadlands, Highfold, Worth Abbey,
-  Dennington, Thoulstone, Arthur Rickwood, The Priory.
+  Dennington, Thoulstone, Arthur Rickwood, The Priority.
   - The last four reuse the coordinates of the sites they appear to rename:
     Dennington = ex Framlingham · Thoulstone = ex Chapmanslade ·
-    Arthur Rickwood = ex Chatteris · The Priory = ex Leominster **(confirm all four)**.
+    Arthur Rickwood = ex Chatteris · The Priority = ex Leominster **(confirm all four)**.
 - **Avon Meadows kept** (registered, live page) pending client confirmation — it is NOT in
   the copy's 12-site list.
 - **Slades Farm not added** — no data (status/units/area/location). The copy's counts
@@ -35,7 +35,7 @@ The finder matches cards by post URL slug. **Rename these four posts** (title + 
 | Framlingham | Dennington | `dennington` |
 | Chapmanslade | Thoulstone | `thoulstone` |
 | Chatteris | Arthur Rickwood | `arthur-rickwood` |
-| Leominster | The Priory | `the-priory` |
+| Leominster | The Priority | `the-priority` |
 | Highfold Farm | Highfold | `highfold` |
 
 (Highfold: same site, but the copy drops "Farm" — slug must change from `highfold-farm`.)
@@ -150,7 +150,7 @@ project.
    registered bank (the counts suggest so), we need: status, units, area, location/postcode,
    habitats, photo, and whether it gets a detail page.
 3. **Site renames assumed** (same locations kept): Dennington = Framlingham,
-   Thoulstone = Chapmanslade, Arthur Rickwood = Chatteris, The Priory = Leominster.
+   Thoulstone = Chapmanslade, Arthur Rickwood = Chatteris, The Priority = Leominster.
    Confirm — any wrong match is a one-line fix.
 4. **Stats don't reconcile with our data:** registered units today total 924 (incl. Avon)
    vs copy's 1142+; hectares 155.8 vs copy's 378. Presumably Slades and/or coming-soon land

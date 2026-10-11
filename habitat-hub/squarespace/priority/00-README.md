@@ -1,7 +1,7 @@
-# The Priory — coming-soon page build (v3 copy, 27 Sep 2026)
+# The Priority — coming-soon page build (v3 copy, 27 Sep 2026)
 
 Fifth coming-soon page (Worth Abbey / Arthur / Broadlands / Highfold pattern).
-⚠ POST: title "The Priory", URL slug `the-priory` (the finder matches that slug).
+⚠ POST: title "The Priority", URL slug `the-priority` (the finder matches that slug).
 ⚠ FINDER FIX: the pipeline entry had been guessed as ex-Leominster (Herefordshire).
 The copy places it near Stoke-by-Nayland, Babergh, Suffolk — entry corrected to Babergh /
 South Suffolk & North Essex Clayland, region "south east", pin 51.985, 0.885 (village
@@ -12,7 +12,7 @@ Paste in order:
 
 Set SEO title/description (01-hero comment). Re-paste `finder-block-INLINE.html` on the
 hub — card reads "20.89 ha planned habitat bank" + chips (Grassland enhancement / Scrub /
-Trees) + "View The Priory and register interest".
+Trees) + "View The Priority and register interest".
 
 ## Flags
 1. **IMAGERY — prepared in `assets/`** from the 11 field photos (all 2419×1814, May, named
