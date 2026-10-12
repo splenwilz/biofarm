@@ -1,4 +1,4 @@
-<!-- LIVE COPY SNAPSHOT of https://www.biofarm.co.uk/habitat-banks taken 2026-10-04; The Priory → The Priority listing updated 2026-10-11 after the live rename. Source of truth for page copy is the LIVE site; the HTML prototypes in web/ are superseded for copy. Regenerate before editing. -->
+<!-- LIVE COPY SNAPSHOT of https://www.biofarm.co.uk/habitat-banks taken 2026-10-04; listing renamed to Priory Farm 2026-10-12 per feedback (was The Priory, briefly The Priority 9-11 Oct); live rename verified 2026-10-12 (post, slug, excerpt, finder, schema, 301s from the-priory and the-priority). Source of truth for page copy is the LIVE site; the HTML prototypes in web/ are superseded for copy. Regenerate before editing. -->
 
 # Find BNG units near your development
 Our habitat bank coverage
@@ -31,9 +31,9 @@ Thoulstone Park
 Explore Thoulstone Park, Biofarm’s coming soon habitat bank in Wiltshire near Frome. Talk to us about local BNG for your development.
 Read more →
 27 September 2026
-The Priority
+Priory Farm
 27 September 2026
-Explore The Priority, Biofarm’s coming soon habitat bank near Stoke-by-Nayland in Suffolk. Talk to us about local BNG for your development.
+Explore Priory Farm, Biofarm’s coming soon habitat bank near Stoke-by-Nayland in Suffolk. Talk to us about local BNG for your development.
 Read more →
 27 September 2026
 Highfold Farm
