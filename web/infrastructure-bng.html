@@ -227,6 +227,8 @@
   .collage.tall{aspect-ratio:586/779;width:100%;max-width:586px;position:relative;}
   .collage.tall .base{left:0;top:0;width:89.8%;height:100%;}
   .collage.tall .over{left:40.8%;top:21.4%;width:59.2%;height:57.3%;}
+  .built .collage.tall .base img{object-position:45% 50%;}
+  .built .collage.tall .over img{object-position:70% 40%;}
   /* 4 · certainty — the About page's "Finding common ground" band: the oak straddles a pointed
      divider into a green band of centred copy. The oak lives in the white section above (as on About);
      here it is positioned from the band so the overlap is one number: --oak-w. */
@@ -239,6 +241,8 @@
   .certainty p.big{max-width:40ch;margin:0 auto 1em;}
   .certainty p{max-width:52ch;margin-inline:auto;}
   .certainty .statement{font-family:var(--rati);font-size:var(--h4);line-height:1.4;max-width:30ch;margin:1.4em auto 0;}
+  .scale{padding:0;line-height:0;}
+  .scale img{display:block;width:100%;height:clamp(320px,38vw,560px);object-fit:cover;object-position:50% 30%;}
   @media(max-width:900px){:root{--oak-w:min(560px,96vw);}.certainty .oak{top:calc(var(--oak-w) * -0.44);}.built{padding-bottom:calc(72px + var(--oak-w) * .36);}}
   /* 5 · funds — the landowners page's "Make more from your land" / About's "Investing in the bigger picture"
      accordion concept: heading + lead left, the three claims as native accordion rows right, first row open. */
@@ -258,20 +262,8 @@
   .funds details .a{padding:0 0 28px;}
   .funds details .a p{max-width:54ch;margin:0 0 1em;}
   .funds details .a p:last-child{margin-bottom:0;}
-  .funds .stories{list-style:none;margin:1.1em 0 0;padding:0;font-size:15px;line-height:1.6;}
-  .funds .stories li{margin:0 0 .35em;}
-  .funds .stories a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;}
-  .funds .stories a:hover{text-decoration-thickness:2px;}
   .btn.primary.ghost{background:transparent;color:#fff;border-color:#fff;}
   .btn.primary.ghost:hover{background:rgba(255,255,255,.12);}
-  .place .split{align-items:center;grid-template-columns:1fr 1fr;}
-  .place h2{margin-bottom:.6em;max-width:16ch;}
-  .place h4{margin-bottom:1em;max-width:30ch;}
-  .place p{max-width:48ch;}
-  .place .photo{position:relative;margin:0 0 56px;justify-self:end;width:100%;max-width:560px;}
-  .place .photo img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:24px;}
-  .place .photo figcaption{position:absolute;left:-32px;bottom:-40px;max-width:min(78%,380px);background:var(--white);border-radius:20px;padding:26px 30px;font-family:var(--rati);font-size:clamp(22px,1.9vw,28px);line-height:1.3;box-shadow:0 10px 40px rgba(17,17,17,.08);}
-  @media(max-width:900px){.place .split{grid-template-columns:1fr;}.place .photo{justify-self:start;max-width:none;margin-bottom:0;order:2;}.place .photo img{aspect-ratio:4/3;}.place .photo figcaption{position:relative;z-index:1;left:auto;bottom:auto;margin:-28px 16px 0;max-width:none;padding:18px 20px;font-size:19px;}}
   .trust{text-align:center;}
   .trust h2{max-width:18ch;margin:0 auto .5em;}
   .trust h4{max-width:30ch;margin:0 auto 1em;}
@@ -290,7 +282,21 @@
     .collage.lead{justify-self:start;}
     .collage.tall{max-width:420px;}
   }
-</style>
+
+  /* 6 · place — the live site's stacked photo pair (/developers, /landowners): tall main photo, smaller second
+     photo overlapping its bottom-right corner, square corners; copy on the right, top-aligned. */
+  .place .split{align-items:start;grid-template-columns:1fr 1fr;column-gap:clamp(40px,6vw,96px);}
+  .place .pair{position:relative;width:100%;max-width:560px;aspect-ratio:560/612;}
+  .place .pair img{position:absolute;display:block;object-fit:cover;}
+  .place .pair .back{left:0;top:0;width:64%;height:100%;object-position:50% 50%;}
+  .place .pair .back[src*="stock-preview"]{object-position:50% 100%;}
+  .place .pair .front{left:18%;top:50%;width:82%;height:50%;object-position:50% 45%;box-shadow:0 18px 50px rgba(17,17,17,.18);}
+  .place .copy{padding-top:8px;}
+  .place h2{margin-bottom:.6em;max-width:14ch;}
+  .place h4{margin-bottom:1em;max-width:28ch;}
+  .place p{max-width:48ch;}
+  @media(max-width:900px){.place .split{grid-template-columns:1fr;row-gap:40px;}.place .pair{max-width:none;aspect-ratio:4/4.4;}}
+  </style>
 
 
 </head>
@@ -359,11 +365,14 @@
 
   <!-- ============ 3 · BUILT AROUND YOUR PROJECT (cream, collage left · copy right) ============ -->
   <section class="sec white built">
+    <!-- IMAGERY PREVIEW 13 Oct: the two Sleight photos swapped for infrastructure-scale shots from the shortlist
+         (web/nsip-imagery-shortlist.md) so Vix can judge the idea in place. These are Creative Commons previews,
+         not licensed stock - replace with purchased images (or credit them) before publishing. -->
     <div class="wrap">
       <div class="split">
         <div class="collage tall fade">
-          <div class="base"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/0e3f1fa5-9853-4b9e-ab8b-4125d9eb90df/2025_07_21_DACRE_Biofarm_Sleight_Farm-1649.jpg?format=1500w" alt="Grass seed heads against a pale summer sky at Sleight Farm" /></div>
-          <div class="over"><img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1756559511052-KRDOFJHK3DFB2RSIW3EN/low-res2025_07_21_DACRE_Biofarm_Sleight_Farm-1435.jpg?format=1000w" alt="A hay bale in a cut meadow edged by trees at Sleight Farm, under a cloudy sky" /></div>
+          <div class="base"><img src="assets/stock-preview/hs2-weeford-a5-aerial.jpg" alt="PREVIEW ONLY (CC BY-SA 2.0, TCExplorer via Geograph): aerial of the HS2 and A5 works at Weeford cutting through farmland" /></div>
+          <div class="over"><img src="assets/stock-preview/hs2-colne-valley-viaduct-harefield-lake.jpg" alt="PREVIEW ONLY (CC BY-SA 2.0, David Hawgood via Geograph): HS2 Colne Valley viaduct under construction across Harefield Lake" /></div>
         </div>
         <div class="fade">
           <p class="eyebrow">One Deal. One Partner.</p>
@@ -393,8 +402,14 @@
     </div>
   </section>
 
+  <!-- ============ 4b · SCALE BAND (full-bleed photo, no copy) — PREVIEW ONLY: Wikimedia Commons / Geograph image,
+       to be replaced with a licensed or credited image before publishing. Squarespace: a full-bleed Image Block. ============ -->
+  <section class="sec scale">
+    <img src="assets/stock-preview/hs2-wendover-dean-viaduct-aerial.jpg" alt="PREVIEW ONLY (CC BY 4.0, 42 Walkers via Wikimedia Commons): aerial of the HS2 Wendover Dean viaduct piers crossing a green valley beside a farm" />
+  </section>
+
   <!-- ============ 5 · RING-FENCED FUNDS + MONITORING EVIDENCE (cream) — heading + lead left, the brief's three
-       claims as a native Squarespace accordion right ("expand first item" on); the three monitoring Stories are links in row 3. Each claim opens onto the paragraph it summarises;
+       claims as a native Squarespace accordion right ("expand first item" on). The monitoring Stories links that sat in row 3 (brief §5, data-bf-event="cta_monitoring_story") were removed 13 Oct - restore them here if the click tracking is still wanted. Each claim opens onto the paragraph it summarises;
        the lead paragraph's two sentences are split between the lead and row 1 (each sentence verbatim). ============ -->
   <section class="sec cream funds">
     <div class="wrap">
@@ -410,13 +425,7 @@
           <details><summary>Your interests represented.<span class="plus" aria-hidden="true"></span></summary>
             <div class="a"><p>For major infrastructure projects, we can also give you an ongoing role in the governance of your BNG solution, including involvement in decisions around long term funding and strategy.</p></div></details>
           <details><summary>Delivery you can see.<span class="plus" aria-hidden="true"></span></summary>
-            <div class="a"><p>Our ecology and habitat management teams track progress on the ground, using insight to inform how habitats are managed. We can also tailor our approach to capture the outcomes that matter to your project, using techniques such as eDNA and bioacoustics to build a richer picture of nature recovery.</p><p>You&rsquo;ll have clear evidence of what&rsquo;s being delivered, giving you confidence in your BNG commitments and meaningful results to share with stakeholders.</p>
-            <!-- brief §5: monitoring evidence + case-study click tracking — the three monitoring Stories as links, titles are the posts' own headlines -->
-            <ul class="stories">
-              <li><a href="/stories/sleight-farm-wildlife-monitoring" data-bf-event="cta_monitoring_story">Eyes on nature: what wildlife reveals about a habitat in recovery</a></li>
-              <li><a href="/stories/sleight-farm-botanical-survey" data-bf-event="cta_monitoring_story">Beyond the biodiversity metric: what we&rsquo;re seeing at Sleight Farm</a></li>
-              <li><a href="/stories/how-drone-technology-is-strengthening-habitat-delivery" data-bf-event="cta_monitoring_story">How drone technology is strengthening habitat delivery</a></li>
-            </ul></div></details>
+            <div class="a"><p>Our ecology and habitat management teams track progress on the ground, using insight to inform how habitats are managed. We can also tailor our approach to capture the outcomes that matter to your project, using techniques such as eDNA and bioacoustics to build a richer picture of nature recovery.</p><p>You&rsquo;ll have clear evidence of what&rsquo;s being delivered, giving you confidence in your BNG commitments and meaningful results to share with stakeholders.</p></div></details>
         </div>
       </div>
     </div>
@@ -425,18 +434,26 @@
   <!-- ============ 6 · GOOD FOR THE PLACE (white) — copy left; photo right with the last line pulled out as a
        white statement card overlapping the photo. Builds natively: image block + text block overlapping. ============ -->
   <section class="sec white place">
+    <!-- copy doc order, no callout (Vix 13 Oct: copy lifted out of a paragraph has no context).
+         Layout lifted from the live site: the stacked photo pair used on /developers ("Breaking down the walls")
+         and /landowners ("You know your land best") - a tall photo with a smaller second photo overlapping its
+         bottom-right corner, square corners, copy on the right aligned to the top of the photos.
+         Front photo (whole, landscape): Worth Abbey community day, the group crossing the stone bridge (per Vix;
+         live CDN file, 1200 px wide - ask Vix for the original for retina). Back photo: the Lesnewth stream
+         (the Lesnewth listing's overview photo) - chosen to match the bridge photo in colour and light. -->
     <div class="wrap">
       <div class="split">
-        <div class="fade">
+        <div class="pair fade">
+          <img class="back" src="assets/stock-preview/railway-cutting-harrogate.jpg" alt="PREVIEW ONLY (CC BY-SA 2.0, Richard Humphrey via Geograph): railway cutting through woodland on the Stray, Harrogate" />
+          <img class="front" src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/e9163df5-a56d-443c-aebf-464ad9444a40/worth-abbey-1200x800.jpg?format=1500w" alt="A group of visitors walking over the old stone bridge at Worth Abbey habitat bank, with the pond and wildflowers in the foreground" />
+        </div>
+        <div class="copy fade">
           <h2>Good for nature. Good for the place around it.</h2>
           <h4>Because we build around your project, we can think beyond the units themselves.</h4>
           <p>We design habitat creation to support wider nature recovery and, where it makes sense, bring benefits to the communities around your project. That could mean access, education, wellbeing, or stronger connections with the local landscape.</p>
+          <p>For people living alongside major infrastructure, those things matter.</p>
           <p>We&rsquo;ll work with your communications team too, helping you share real outcomes from the ground and show what your investment in BNG is delivering for nature and local communities.</p>
         </div>
-        <figure class="photo fade">
-          <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/1789577922276-SZV6U03RYE82IJUA2LBH/Lesnewth+Skiddy+Activation.jpg?format=1500w" alt="Four people around a freshly dug planting hole on the grassland at Lesnewth habitat bank, with cattle grazing on the hill behind" />
-          <figcaption>For people living alongside major infrastructure, those things matter.</figcaption>
-        </figure>
       </div>
     </div>
   </section>

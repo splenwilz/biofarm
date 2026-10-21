@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — Fold roller banner · VERSION I "Panels" (13 Oct 2026)
+  New concept for Vix's copy doc: the four points as a 2 x 2 grid of white panels, each a numbered
+  statement at 34 mm wrapping naturally inside its panel (the panel gives the wrap a frame, so a
+  two-, three- or four-line point reads as a unit rather than a broken line). This is the mock-up's
+  card idea carried through with the brand treatment: white panels on off-white, a short green rule
+  under each numeral, no borders. Illustrations are E's set, cascading past the panels: breeze block
+  and hi-vis at the headline, cowslip over the top-right panel edge, worm at the foot on the
+  left, bee at the call to action.
+  Print: flat solids only (white panels, no gradients; the soft shadow is screen-only and removed
+  in print), rules 1.6 mm; relink full-size FINAL illustrations before print.
+  Shared base: assets/banner/banner-base.css. G hides the zone guides.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fold banner I · Panels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/banner/banner-base.css" />
+<style>
+  .banner{--gutter:60mm;}
+  .block{left:-60mm;top:-10mm;width:270mm;}
+  .vest{right:-45mm;top:245mm;width:260mm;}
+  .cowslip{right:-52mm;top:805mm;width:225mm;z-index:3;}
+  .worm{left:-44mm;top:1808mm;width:260mm;transform:rotate(-6deg);}
+  .bee{right:90mm;top:1760mm;width:160mm;}
+
+  .logo{left:50%;top:100mm;width:400mm;transform:translateX(-50%);} .logo img{width:100%;}
+  .h1{left:var(--gutter);top:265mm;width:580mm;font-size:70mm;line-height:1.08;}
+  .bring{left:var(--gutter);top:596mm;width:640mm;font-size:48mm;line-height:1.18;}
+  .sub{left:var(--gutter);top:800mm;width:730mm;font-size:28mm;line-height:1.4;white-space:nowrap;}
+
+  .panels{left:var(--gutter);top:880mm;width:730mm;display:grid;grid-template-columns:1fr 1fr;gap:22mm;z-index:2;}
+  .panel{background:var(--white);border-radius:16mm;padding:26mm 28mm 28mm;min-height:300mm;
+         box-shadow:0 6mm 30mm rgba(33,33,33,.07);}
+  .panel .n{display:block;font-size:30mm;line-height:1;}
+  .panel .n::after{content:"";display:block;width:44mm;height:1.6mm;background:var(--green);margin:12mm 0 18mm;}
+  .panel .t{display:block;font-size:34mm;line-height:1.14;}
+
+  .turn{left:var(--gutter);top:1555mm;width:600mm;font-size:46mm;line-height:1.14;}
+  .cta{left:var(--gutter);top:1745mm;}
+  .cta .pill{font-size:17mm;padding:16mm 30mm;}
+  @media print{.panel{box-shadow:none;}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="banner" id="banner">
+    <div class="guide top">15 mm · under the clamp</div>
+
+    <img class="block" src="assets/banner/breeze-block.png" alt="" />
+    <img class="vest" src="assets/banner/hi-vis.png" alt="" />
+    <img class="cowslip" src="assets/banner/cowslip.png" alt="" />
+    <img class="worm" src="assets/banner/earthworm.png" alt="" />
+    <img class="bee" src="assets/banner/bee.png" alt="" />
+
+    <div class="logo"><img src="assets/banner/logo-lockup-black.png" alt="Biofarm" /></div>
+    <h1 class="h1">Your BNG units are registered. Now they need to sell.</h1>
+    <h2 class="bring">Bring your land into the Biofarm Fold.</h2>
+    <p class="sub inter">Your habitat bank. The strength of Biofarm behind it.</p>
+
+    <div class="panels">
+      <div class="panel"><span class="n">01</span><span class="t">Your habitat bank, actively marketed</span></div>
+      <div class="panel"><span class="n">02</span><span class="t">Our developer relationships and commercial expertise</span></div>
+      <div class="panel"><span class="n">03</span><span class="t">Sales managed from enquiry to completion</span></div>
+      <div class="panel"><span class="n">04</span><span class="t">Deal after deal</span></div>
+    </div>
+
+    <p class="turn">Turn your investment in nature into revenue.</p>
+    <div class="cta"><span class="pill dark">Talk to us about joining the Fold.</span></div>
+
+    <div class="guide bottom">200 mm · inside the roller mechanism</div>
+  </div>
+</div>
+<script src="assets/banner/banner-fit.js"></script>
+</body>
+</html>

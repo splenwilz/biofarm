@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — Fold roller banner · VERSION B "Green band" (12 Oct 2026)
+  The live site's section rhythm stood on end: off-white → green → black. Headline on cream at the top,
+  the Fold proposition and four points in a green band with BLACK text (the only text that passes on
+  green, brand p39), the ask in a black band at the foot with a cream pill and green sign-off.
+  The cream chevron dipping into the green is the site's section divider.
+  Why it prints well: three flat brand solids, no gradients (banding risk on vinyl), the black band runs
+  into the roller so there's no visible edge, colour blocks read from across a hall.
+  Shared base: assets/banner/banner-base.css. G hides the zone guides.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fold banner B · Green band</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/banner/banner-base.css" />
+<style>
+  .band-green{left:0;top:800mm;width:100%;height:700mm;background:var(--green);}
+  .chevron{left:0;top:800mm;width:100%;height:70mm;background:var(--cream);clip-path:polygon(0 0,100% 0,50% 100%);z-index:1;}
+  .band-black{left:0;top:1500mm;width:100%;height:700mm;background:var(--ink);}
+
+  .block{left:-55mm;top:-5mm;width:250mm;}
+  .vest{right:-50mm;top:245mm;width:240mm;}
+  .cowslip{right:-34mm;top:545mm;width:235mm;z-index:2;}
+  .bee{right:60mm;top:70mm;width:115mm;z-index:2;}
+
+  .logo{left:50%;top:100mm;width:430mm;transform:translateX(-50%);} .logo img{width:100%;}
+  .h1{left:var(--gutter);top:290mm;width:600mm;font-size:62mm;line-height:1.14;}
+  .sub{left:var(--gutter);top:575mm;width:560mm;font-size:27mm;line-height:1.4;}
+
+  .bring{left:var(--gutter);top:915mm;width:660mm;font-size:48mm;line-height:1.18;z-index:2;}
+  .points{left:var(--gutter);top:1100mm;width:710mm;display:grid;grid-template-columns:1fr 1fr;gap:0 40mm;z-index:2;}
+  .pt{border-top:1.2mm solid rgba(33,33,33,.5);padding-top:18mm;height:185mm;}
+  .pt .n{display:block;font-size:28mm;line-height:1;margin-bottom:16mm;}
+  .pt .t{display:block;font-size:42mm;line-height:1.1;}
+
+  .turn{left:50%;top:1580mm;width:700mm;transform:translateX(-50%);text-align:center;font-size:42mm;line-height:1.2;color:var(--cream);z-index:2;}
+  .cta{left:50%;top:1740mm;transform:translateX(-50%);z-index:2;}
+  .sign{left:50%;top:1855mm;width:700mm;transform:translateX(-50%);text-align:center;font-size:26mm;line-height:1.3;color:var(--green);z-index:2;}
+  .url{left:50%;top:1915mm;width:700mm;transform:translateX(-50%);text-align:center;font-family:var(--inter);font-weight:400;font-size:18mm;letter-spacing:.06em;color:var(--cream);z-index:2;}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="banner" id="banner">
+    <div class="guide top">15 mm · under the clamp</div>
+
+    <div class="band-green"></div>
+    <div class="chevron"></div>
+    <div class="band-black"></div>
+
+    <img class="block" src="assets/banner/breeze-block.png" alt="" />
+    <img class="vest" src="assets/banner/hi-vis.png" alt="" />
+    <img class="cowslip" src="assets/banner/cowslip.png" alt="" />
+    <img class="bee" src="assets/banner/bee.png" alt="" />
+
+    <div class="logo"><img src="assets/banner/logo-lockup-black.png" alt="Biofarm" /></div>
+    <h1 class="h1">Your BNG units are registered. Now they need to sell.</h1>
+    <p class="sub inter">Getting your land registered is one thing. Turning units into income is another.</p>
+
+    <h2 class="bring">Bring your land into the Biofarm Fold.</h2>
+    <div class="points">
+      <div class="pt"><span class="n">01</span><span class="t">We build demand</span></div>
+      <div class="pt"><span class="n">02</span><span class="t">We drive unit&nbsp;sales</span></div>
+      <div class="pt"><span class="n">03</span><span class="t">We see it through</span></div>
+      <div class="pt"><span class="n">04</span><span class="t">Deal after deal</span></div>
+    </div>
+
+    <p class="turn">Turn your investment in nature into revenue.</p>
+    <div class="cta"><span class="pill light">Join the Fold</span></div>
+    <p class="sign">We&rsquo;re in the business of nature.</p>
+    <p class="url">biofarm.co.uk</p>
+
+    <div class="guide bottom">200 mm · inside the roller mechanism</div>
+  </div>
+</div>
+<script src="assets/banner/banner-fit.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — Fold roller banner · VERSION E "Collage" (12 Oct 2026)
+  Version A's monumental type + the mock's full illustration set, larger and bleeding off the edges.
+  Breeze block and hi-vis frame the headline (the build side); cowslip, worm and bee are woven into the
+  four points (the nature side), sitting in the space the short statements leave on the right.
+  Print: black on off-white only; illustrations are the FINAL files (relink full-size for print);
+  rules 1.2 mm. Shared base: assets/banner/banner-base.css. G hides the zone guides.
+  NOTE 13 Oct: copy here is from the mock-up. Vix's copy doc version (longer points) is
+  roller-banner-fold-G-ledger-full.html - this file is kept as the design reference she approved.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fold banner E · Collage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/banner/banner-base.css" />
+<style>
+  .block{left:-60mm;top:-10mm;width:270mm;}
+  .vest{right:-45mm;top:245mm;width:260mm;}
+  .cowslip{right:-30mm;top:925mm;width:270mm;z-index:2;}
+  .worm{right:-40mm;top:1290mm;width:290mm;z-index:2;transform:rotate(10deg);}
+  .bee{right:70mm;top:1690mm;width:165mm;}
+
+  .logo{left:50%;top:100mm;width:400mm;transform:translateX(-50%);} .logo img{width:100%;}
+  .h1{left:var(--gutter);top:265mm;width:580mm;font-size:70mm;line-height:1.08;}
+  .sub{left:var(--gutter);top:645mm;width:680mm;font-size:28mm;line-height:1.4;}
+  .bring{left:var(--gutter);top:790mm;width:640mm;font-size:48mm;line-height:1.18;}
+
+  .ledger{left:var(--gutter);top:975mm;width:710mm;}
+  .row{display:grid;grid-template-columns:120mm 1fr;align-items:baseline;border-top:1.2mm solid rgba(33,33,33,.35);padding:24mm 0 0;height:160mm;}
+  .row .n{font-size:34mm;line-height:1;}
+  .row .t{font-size:46mm;line-height:1.1;max-width:470mm;}
+  .row:last-child{border-bottom:1.2mm solid rgba(33,33,33,.35);}
+
+  .turn{left:var(--gutter);top:1690mm;width:560mm;font-size:42mm;line-height:1.2;}
+  .cta{left:var(--gutter);top:1835mm;display:flex;align-items:center;gap:30mm;}
+  .cta .url{font-family:var(--inter);font-weight:400;font-size:20mm;letter-spacing:.04em;}
+  .sign{left:var(--gutter);top:1945mm;width:600mm;font-size:24mm;line-height:1.3;}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="banner" id="banner">
+    <div class="guide top">15 mm · under the clamp</div>
+
+    <img class="block" src="assets/banner/breeze-block.png" alt="" />
+    <img class="vest" src="assets/banner/hi-vis.png" alt="" />
+    <img class="cowslip" src="assets/banner/cowslip.png" alt="" />
+    <img class="worm" src="assets/banner/earthworm.png" alt="" />
+    <img class="bee" src="assets/banner/bee.png" alt="" />
+
+    <div class="logo"><img src="assets/banner/logo-lockup-black.png" alt="Biofarm" /></div>
+    <h1 class="h1">Your BNG units are registered. Now they need to sell.</h1>
+    <p class="sub inter">Getting your land registered is one thing. Turning units into income is another.</p>
+    <h2 class="bring">Bring your land into the Biofarm Fold.</h2>
+
+    <div class="ledger">
+      <div class="row"><span class="n">01</span><span class="t">We build demand</span></div>
+      <div class="row"><span class="n">02</span><span class="t">We drive unit sales</span></div>
+      <div class="row"><span class="n">03</span><span class="t">We see it through</span></div>
+      <div class="row"><span class="n">04</span><span class="t">Deal after deal</span></div>
+    </div>
+
+    <p class="turn">Turn your investment in nature into revenue.</p>
+    <div class="cta"><span class="pill dark">Join the Fold</span><span class="url">biofarm.co.uk</span></div>
+    <p class="sign">We&rsquo;re in the business of nature.</p>
+
+    <div class="guide bottom">200 mm · inside the roller mechanism</div>
+  </div>
+</div>
+<script src="assets/banner/banner-fit.js"></script>
+</body>
+</html>

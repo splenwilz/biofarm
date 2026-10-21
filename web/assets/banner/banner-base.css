@@ -1,0 +1,39 @@
+/* Biofarm roller banner — shared base for all layout versions.
+   Display Wizard "Rapid Double Sided Banner Stand 850mm": 850 x 2200 mm finished,
+   top 15 mm under the clamp, bottom 200 mm inside the roller. Artboard in real mm.
+   Brand (guidelines p38–39): off-white #F5F6F1, black #212121, green #71977A, white.
+   Type (p33–34): Bauhaus Rati Display Extra Light titles, Inter Light body. */
+@font-face{font-family:'RATI_v2';
+  src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+      url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+  font-weight:300;font-display:block;}
+:root{--cream:#F5F6F1;--ink:#212121;--green:#71977A;--white:#fff;--rati:'RATI_v2',Georgia,serif;--inter:'Inter',sans-serif;
+      --W:850mm;--H:2200mm;--clamp:15mm;--roller:200mm;--gutter:70mm;}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;background:#dadbd5;}
+body{font-family:var(--rati);font-weight:300;color:var(--ink);min-height:100vh;display:grid;place-items:center;padding:24px;}
+.stage{width:var(--W);height:var(--H);transform-origin:top left;}
+.banner{position:relative;width:var(--W);height:var(--H);background:var(--cream);overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,.25);}
+.banner > *{position:absolute;}
+.banner img{display:block;}
+h1,h2,h3,p{margin:0;font-weight:300;letter-spacing:0;}
+.inter{font-family:var(--inter);font-weight:300;}
+/* pills (brand: black pill with cream text on light grounds, cream pill with black text on dark) */
+.pill{display:inline-block;font-family:var(--inter);font-weight:400;font-size:19mm;letter-spacing:.08em;text-transform:uppercase;line-height:1;
+      padding:17mm 34mm;border-radius:100mm;}
+.pill.dark{background:var(--ink);color:var(--cream);}
+.pill.light{background:var(--cream);color:var(--ink);}
+/* non-visible zones: shown on screen, never printed; G toggles */
+.guide{left:0;right:0;background:repeating-linear-gradient(45deg,rgba(220,60,60,.18) 0 6mm,transparent 6mm 12mm);
+       border:0 solid rgba(220,60,60,.7);font-family:var(--inter);font-weight:400;font-size:12mm;color:#b03030;
+       display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:9;}
+.guide.top{top:0;height:var(--clamp);border-bottom-width:.6mm;}
+.guide.bottom{bottom:0;height:var(--roller);border-top-width:.6mm;}
+.guides-off .guide{display:none;}
+@media print{
+  @page{size:850mm 2200mm;margin:0;}
+  html,body{background:#fff;padding:0;display:block;}
+  .stage{transform:none !important;}
+  .banner{box-shadow:none;}
+  .guide{display:none !important;}
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — Fold roller banner · VERSION H "Stepping stones" (13 Oct 2026)
+  New concept for Vix's copy doc (the four points are full sentences, so a one-line ledger means
+  28 mm type - too small for a banner). Each point is a two-line statement at 36 mm, set as its own
+  block and stepped down the banner left / right / left / right. The stagger makes the two-line
+  shape deliberate, the eye walks the path from "actively marketed" to "deal after deal", and each
+  step leaves clear ground on its other side for one illustration - so the pictures sit WITH the
+  points (cowslip by 01, worm by 02, bee by 04) rather than beside a column of text.
+  A short green rule marks each step (green as a decorative rule only - never as text on light,
+  brand p39). Illustrations are E's set plus the Tamworth pig (FINAL file) at the foot.
+  Print: black on off-white; rules 1.6 mm; relink full-size FINAL illustrations before print.
+  Shared base: assets/banner/banner-base.css. G hides the zone guides.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fold banner H · Stepping stones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/banner/banner-base.css" />
+<style>
+  .banner{--gutter:60mm;}
+  .block{left:-60mm;top:-10mm;width:270mm;}
+  .vest{right:-45mm;top:245mm;width:260mm;}
+  .cowslip{right:-20mm;top:812mm;width:200mm;}
+  .worm{left:-46mm;top:1005mm;width:230mm;transform:rotate(-10deg);}
+  .bee{left:95mm;top:1345mm;width:140mm;}
+  .pig{right:-30mm;top:1790mm;width:300mm;}
+
+  .logo{left:50%;top:100mm;width:400mm;transform:translateX(-50%);} .logo img{width:100%;}
+  .h1{left:var(--gutter);top:265mm;width:580mm;font-size:70mm;line-height:1.08;}
+  .bring{left:var(--gutter);top:596mm;width:640mm;font-size:48mm;line-height:1.18;}
+  .sub{left:var(--gutter);top:800mm;width:730mm;font-size:28mm;line-height:1.4;white-space:nowrap;}
+
+  .step{width:560mm;}
+  .step::before{content:"";display:block;width:60mm;height:1.6mm;background:var(--green);margin-bottom:16mm;}
+  .step .n{display:block;font-family:var(--inter);font-weight:400;font-size:15mm;letter-spacing:.14em;line-height:1;margin-bottom:14mm;}
+  .step .t{display:block;font-size:36mm;line-height:1.12;}
+  .step.l{left:var(--gutter);}
+  .step.r{right:var(--gutter);text-align:right;}
+  .step.r::before{margin-left:auto;}
+  .s1{top:880mm;} .s2{top:1040mm;} .s3{top:1200mm;} .s4{top:1360mm;}
+
+  .turn{left:var(--gutter);top:1540mm;width:600mm;font-size:48mm;line-height:1.14;}
+  .cta{left:var(--gutter);top:1705mm;}
+  .cta .pill{font-size:17mm;padding:16mm 30mm;}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="banner" id="banner">
+    <div class="guide top">15 mm · under the clamp</div>
+
+    <img class="block" src="assets/banner/breeze-block.png" alt="" />
+    <img class="vest" src="assets/banner/hi-vis.png" alt="" />
+    <img class="cowslip" src="assets/banner/cowslip.png" alt="" />
+    <img class="worm" src="assets/banner/earthworm.png" alt="" />
+    <img class="bee" src="assets/banner/bee.png" alt="" />
+    <img class="pig" src="assets/banner/tamworth-pig.png" alt="" />
+
+    <div class="logo"><img src="assets/banner/logo-lockup-black.png" alt="Biofarm" /></div>
+    <h1 class="h1">Your BNG units are registered. Now they need to sell.</h1>
+    <h2 class="bring">Bring your land into the Biofarm Fold.</h2>
+    <p class="sub inter">Your habitat bank. The strength of Biofarm behind it.</p>
+
+    <div class="step l s1"><span class="n">01</span><span class="t">Your habitat bank,<br>actively marketed</span></div>
+    <div class="step r s2"><span class="n">02</span><span class="t">Our developer relationships<br>and commercial expertise</span></div>
+    <div class="step l s3"><span class="n">03</span><span class="t">Sales managed from<br>enquiry to completion</span></div>
+    <div class="step r s4"><span class="n">04</span><span class="t">Deal after deal</span></div>
+
+    <p class="turn">Turn your investment in nature into revenue.</p>
+    <div class="cta"><span class="pill dark">Talk to us about joining the Fold.</span></div>
+
+    <div class="guide bottom">200 mm · inside the roller mechanism</div>
+  </div>
+</div>
+<script src="assets/banner/banner-fit.js"></script>
+</body>
+</html>

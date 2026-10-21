@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — Fold roller banner · VERSION A "Statement" (12 Oct 2026)
+  Typographic, monochrome. The headline is the hero at 88 mm (readable from 4–5 m); the four points sit
+  in a hairline ledger like the site's step pattern; one bee and the worm as margin texture only.
+  Why it prints well: black on off-white only, no tints or large solids, lines are 1.2 mm (thin rules under
+  0.5 mm drop out on vinyl), nothing important below 1000 mm from the floor except the sign-off.
+  Shared base: assets/banner/banner-base.css (template zones, fonts, print). G hides the zone guides.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fold banner A · Statement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/banner/banner-base.css" />
+<style>
+  .logo{left:50%;top:95mm;width:400mm;transform:translateX(-50%);} .logo img{width:100%;}
+  .bee{right:60mm;top:70mm;width:120mm;}
+  .h1{left:var(--gutter);top:250mm;width:720mm;font-size:88mm;line-height:1.06;}
+  .sub{left:var(--gutter);top:690mm;width:680mm;font-size:28mm;line-height:1.4;}
+  .bring{left:var(--gutter);top:815mm;width:640mm;font-size:46mm;line-height:1.2;}
+
+  .ledger{left:var(--gutter);top:985mm;width:710mm;}
+  .row{position:relative;display:grid;grid-template-columns:125mm 1fr;align-items:baseline;border-top:1.2mm solid rgba(33,33,33,.35);
+       padding:24mm 0 0;height:158mm;}
+  .row .n{font-size:34mm;line-height:1;}
+  .row .t{font-size:46mm;line-height:1.1;}
+  .row:last-child{border-bottom:1.2mm solid rgba(33,33,33,.35);height:160mm;}
+
+  .turn{left:var(--gutter);top:1670mm;width:560mm;font-size:40mm;line-height:1.2;}
+  .cta{left:var(--gutter);top:1800mm;display:flex;align-items:center;gap:30mm;}
+  .cta .url{font-family:var(--inter);font-weight:400;font-size:20mm;letter-spacing:.04em;}
+  .sign{left:var(--gutter);top:1930mm;width:600mm;font-size:24mm;line-height:1.3;}
+  .worm{right:-40mm;top:1700mm;width:250mm;transform:rotate(12deg);}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="banner" id="banner">
+    <div class="guide top">15 mm · under the clamp</div>
+
+    <div class="logo"><img src="assets/banner/logo-lockup-black.png" alt="Biofarm" /></div>
+    <img class="bee" src="assets/banner/bee.png" alt="" />
+
+    <h1 class="h1">Your BNG units are registered. Now they need to sell.</h1>
+    <p class="sub inter">Getting your land registered is one thing. Turning units into income is another.</p>
+    <h2 class="bring">Bring your land into the Biofarm Fold.</h2>
+
+    <div class="ledger">
+      <div class="row"><span class="n">01</span><span class="t">We build demand</span></div>
+      <div class="row"><span class="n">02</span><span class="t">We drive unit sales</span></div>
+      <div class="row"><span class="n">03</span><span class="t">We see it through</span></div>
+      <div class="row"><span class="n">04</span><span class="t">Deal after deal</span></div>
+    </div>
+
+    <p class="turn">Turn your investment in nature into revenue.</p>
+    <div class="cta"><span class="pill dark">Join the Fold</span><span class="url">biofarm.co.uk</span></div>
+    <p class="sign">We&rsquo;re in the business of nature.</p>
+    <img class="worm" src="assets/banner/earthworm.png" alt="" />
+
+    <div class="guide bottom">200 mm · inside the roller mechanism</div>
+  </div>
+</div>
+<script src="assets/banner/banner-fit.js"></script>
+</body>
+</html>
