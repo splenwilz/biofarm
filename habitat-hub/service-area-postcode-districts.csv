@@ -1,0 +1,348 @@
+bank,postcode_district,live_postcodes_in_service_area,district_live_postcodes_total,share,via_lpa,via_nca,class,non_geographic
+Avon Meadows,B47,1,241,0%,1,0,fringe,no
+Avon Meadows,B48,2,208,1%,2,0,fringe,no
+Avon Meadows,B49,372,394,94%,372,36,core,no
+Avon Meadows,B50,212,212,100%,208,212,core,no
+Avon Meadows,B60,257,849,30%,0,257,partial,no
+Avon Meadows,B61,66,746,9%,0,66,fringe,no
+Avon Meadows,B80,215,218,99%,215,0,core,no
+Avon Meadows,B94,134,340,39%,134,0,partial,no
+Avon Meadows,B95,308,328,94%,308,0,core,no
+Avon Meadows,B96,76,211,36%,19,57,partial,no
+Avon Meadows,B97,31,806,4%,2,29,fringe,no
+Avon Meadows,B98,13,822,2%,13,0,fringe,no
+Avon Meadows,BS10,23,777,3%,0,23,fringe,no
+Avon Meadows,BS11,250,573,44%,0,250,partial,no
+Avon Meadows,BS20,247,860,29%,0,247,partial,no
+Avon Meadows,BS21,3,695,0%,0,3,fringe,no
+Avon Meadows,BS32,15,429,3%,0,15,fringe,no
+Avon Meadows,BS35,311,757,41%,0,311,partial,no
+Avon Meadows,CV23,1,882,0%,1,0,fringe,no
+Avon Meadows,CV31,2,807,0%,2,0,fringe,no
+Avon Meadows,CV33,175,348,50%,175,0,core,no
+Avon Meadows,CV34,9,1001,1%,0,9,fringe,no
+Avon Meadows,CV35,659,984,67%,611,217,core,no
+Avon Meadows,CV36,415,415,100%,415,0,core,no
+Avon Meadows,CV37,1600,1600,100%,1547,1269,core,no
+Avon Meadows,CV47,642,643,100%,642,0,core,no
+Avon Meadows,DY10,19,999,2%,0,19,fringe,no
+Avon Meadows,DY13,22,689,3%,0,22,fringe,no
+Avon Meadows,GL1,1036,1036,100%,0,1036,core,no
+Avon Meadows,GL10,415,507,82%,0,415,core,no
+Avon Meadows,GL11,113,624,18%,0,113,partial,no
+Avon Meadows,GL12,19,470,4%,0,19,fringe,no
+Avon Meadows,GL13,244,244,100%,0,244,core,no
+Avon Meadows,GL14,118,666,18%,0,118,partial,no
+Avon Meadows,GL15,40,810,5%,0,40,fringe,no
+Avon Meadows,GL17,1,529,0%,0,1,fringe,no
+Avon Meadows,GL18,16,329,5%,0,16,fringe,no
+Avon Meadows,GL19,374,392,95%,0,374,core,no
+Avon Meadows,GL2,1503,1503,100%,0,1503,core,no
+Avon Meadows,GL20,1014,1014,100%,0,1014,core,no
+Avon Meadows,GL3,1055,1073,98%,0,1055,core,no
+Avon Meadows,GL4,1117,1163,96%,0,1117,core,no
+Avon Meadows,GL50,928,928,100%,0,928,core,no
+Avon Meadows,GL51,1565,1565,100%,0,1565,core,no
+Avon Meadows,GL52,1106,1385,80%,0,1106,core,no
+Avon Meadows,GL53,706,754,94%,0,706,core,no
+Avon Meadows,GL54,204,1067,19%,0,204,partial,no
+Avon Meadows,GL55,85,292,29%,3,82,partial,no
+Avon Meadows,GL56,57,532,11%,57,0,partial,no
+Avon Meadows,HR8,10,576,2%,0,10,fringe,no
+Avon Meadows,NN11,10,1182,1%,10,0,fringe,no
+Avon Meadows,NP16,80,784,10%,0,80,partial,no
+Avon Meadows,OX15,80,835,10%,80,0,fringe,no
+Avon Meadows,OX17,51,716,7%,51,0,fringe,no
+Avon Meadows,OX7,2,1083,0%,2,0,fringe,no
+Avon Meadows,WR1,432,432,100%,0,432,core,no
+Avon Meadows,WR10,675,675,100%,0,675,core,no
+Avon Meadows,WR11,1212,1212,100%,41,1212,core,no
+Avon Meadows,WR12,172,207,83%,0,172,core,no
+Avon Meadows,WR13,169,377,45%,0,169,partial,no
+Avon Meadows,WR14,786,1085,72%,0,786,core,no
+Avon Meadows,WR2,815,815,100%,0,815,core,no
+Avon Meadows,WR3,535,535,100%,0,535,core,no
+Avon Meadows,WR4,626,626,100%,0,626,core,no
+Avon Meadows,WR5,815,815,100%,0,815,core,no
+Avon Meadows,WR6,173,522,33%,0,173,partial,no
+Avon Meadows,WR7,168,221,76%,0,168,core,no
+Avon Meadows,WR8,343,343,100%,0,343,core,no
+Avon Meadows,WR9,890,892,100%,0,890,core,no
+Avon Meadows,WR99,3,3,100%,0,3,core,yes
+Badger Bank Farm,BB18,2,573,0%,2,0,fringe,no
+Badger Bank Farm,BD20,510,1381,37%,510,0,partial,no
+Badger Bank Farm,BD22,101,1073,9%,101,0,fringe,no
+Badger Bank Farm,BD23,972,1451,67%,972,0,core,no
+Badger Bank Farm,BD24,236,337,70%,236,0,core,no
+Badger Bank Farm,DL10,840,842,100%,840,0,core,no
+Badger Bank Farm,DL11,217,453,48%,217,0,partial,no
+Badger Bank Farm,DL12,2,726,0%,2,0,fringe,no
+Badger Bank Farm,DL2,102,848,12%,102,0,partial,no
+Badger Bank Farm,DL6,612,686,89%,612,0,core,no
+Badger Bank Farm,DL7,751,751,100%,751,0,core,no
+Badger Bank Farm,DL8,869,1169,74%,869,229,core,no
+Badger Bank Farm,DL9,398,398,100%,398,0,core,no
+Badger Bank Farm,DN1,1,483,0%,0,1,fringe,no
+Badger Bank Farm,DN11,226,843,27%,0,226,partial,no
+Badger Bank Farm,DN12,630,630,100%,0,630,core,no
+Badger Bank Farm,DN14,344,1693,20%,344,0,partial,no
+Badger Bank Farm,DN4,559,1329,42%,0,559,partial,no
+Badger Bank Farm,DN5,373,971,38%,0,373,partial,no
+Badger Bank Farm,DN6,473,857,55%,23,467,core,no
+Badger Bank Farm,HG1,943,943,100%,943,1,core,no
+Badger Bank Farm,HG2,726,726,100%,726,32,core,no
+Badger Bank Farm,HG3,1206,1207,100%,1206,176,core,no
+Badger Bank Farm,HG4,1015,1015,100%,1015,690,core,no
+Badger Bank Farm,HG5,637,637,100%,637,634,core,no
+Badger Bank Farm,LA2,207,987,21%,207,0,partial,no
+Badger Bank Farm,LA6,153,677,23%,153,0,partial,no
+Badger Bank Farm,LS14,66,1004,7%,0,66,fringe,no
+Badger Bank Farm,LS15,98,1008,10%,0,98,fringe,no
+Badger Bank Farm,LS17,181,1262,14%,90,91,partial,no
+Badger Bank Farm,LS21,128,651,20%,128,0,partial,no
+Badger Bank Farm,LS22,572,572,100%,119,562,core,no
+Badger Bank Farm,LS23,368,368,100%,0,368,core,no
+Badger Bank Farm,LS24,419,419,100%,409,248,core,no
+Badger Bank Farm,LS25,1215,1225,99%,431,884,core,no
+Badger Bank Farm,LS26,9,799,1%,0,9,fringe,no
+Badger Bank Farm,LS29,44,1246,4%,44,0,fringe,no
+Badger Bank Farm,NG15,861,1015,85%,0,861,core,no
+Badger Bank Farm,NG16,214,1452,15%,0,214,partial,no
+Badger Bank Farm,NG17,1473,1645,90%,0,1473,core,no
+Badger Bank Farm,NG19,279,1224,23%,0,279,partial,no
+Badger Bank Farm,NG20,469,737,64%,0,469,core,no
+Badger Bank Farm,NG5,40,1928,2%,0,40,fringe,no
+Badger Bank Farm,NG6,300,787,38%,0,300,partial,no
+Badger Bank Farm,S25,505,505,100%,0,505,core,no
+Badger Bank Farm,S26,199,548,36%,0,199,partial,no
+Badger Bank Farm,S43,311,1113,28%,0,311,partial,no
+Badger Bank Farm,S44,277,626,44%,0,277,partial,no
+Badger Bank Farm,S63,24,1160,2%,0,24,fringe,no
+Badger Bank Farm,S64,211,682,31%,0,211,partial,no
+Badger Bank Farm,S65,32,831,4%,0,32,fringe,no
+Badger Bank Farm,S66,554,1099,50%,0,554,core,no
+Badger Bank Farm,S80,365,1035,35%,0,365,partial,no
+Badger Bank Farm,S81,463,1108,42%,0,463,partial,no
+Badger Bank Farm,TS15,119,460,26%,119,0,partial,no
+Badger Bank Farm,TS7,4,606,1%,4,0,fringe,no
+Badger Bank Farm,TS8,14,396,4%,14,0,fringe,no
+Badger Bank Farm,TS9,454,549,83%,454,0,core,no
+Badger Bank Farm,WF10,733,1259,58%,0,733,core,no
+Badger Bank Farm,WF11,544,544,100%,130,527,core,no
+Badger Bank Farm,WF7,6,572,1%,0,6,fringe,no
+Badger Bank Farm,WF8,1004,1022,98%,32,1004,core,no
+Badger Bank Farm,WF9,424,1151,37%,0,424,partial,no
+Badger Bank Farm,YO11,796,796,100%,796,0,core,no
+Badger Bank Farm,YO12,885,889,100%,885,0,core,no
+Badger Bank Farm,YO13,299,419,71%,299,0,core,no
+Badger Bank Farm,YO14,405,405,100%,405,0,core,no
+Badger Bank Farm,YO17,833,833,100%,833,0,core,no
+Badger Bank Farm,YO18,294,434,68%,294,0,core,no
+Badger Bank Farm,YO19,182,494,37%,182,0,partial,no
+Badger Bank Farm,YO21,415,681,61%,415,0,core,no
+Badger Bank Farm,YO22,190,443,43%,190,0,partial,no
+Badger Bank Farm,YO23,87,585,15%,87,0,partial,no
+Badger Bank Farm,YO25,23,1403,2%,23,0,fringe,no
+Badger Bank Farm,YO26,274,885,31%,274,165,partial,no
+Badger Bank Farm,YO30,102,678,15%,102,0,partial,no
+Badger Bank Farm,YO32,9,793,1%,9,0,fringe,no
+Badger Bank Farm,YO41,49,439,11%,49,0,partial,no
+Badger Bank Farm,YO51,262,262,100%,262,255,core,no
+Badger Bank Farm,YO60,256,257,100%,256,0,core,no
+Badger Bank Farm,YO61,648,672,96%,648,0,core,no
+Badger Bank Farm,YO62,443,624,71%,443,0,core,no
+Badger Bank Farm,YO7,926,969,96%,926,0,core,no
+Badger Bank Farm,YO8,1283,1336,96%,1283,0,core,no
+Lesnewth,EX22,75,615,12%,75,0,partial,no
+Lesnewth,EX23,698,701,100%,698,0,core,no
+Lesnewth,PL10,177,177,100%,177,177,core,no
+Lesnewth,PL11,325,325,100%,325,325,core,no
+Lesnewth,PL12,756,756,100%,756,755,core,no
+Lesnewth,PL13,447,447,100%,447,447,core,no
+Lesnewth,PL14,1023,1023,100%,1023,894,core,no
+Lesnewth,PL15,779,812,96%,779,204,core,no
+Lesnewth,PL17,426,426,100%,426,426,core,no
+Lesnewth,PL18,229,229,100%,229,229,core,no
+Lesnewth,PL22,210,210,100%,210,204,core,no
+Lesnewth,PL23,171,171,100%,171,171,core,no
+Lesnewth,PL24,255,255,100%,255,245,core,no
+Lesnewth,PL25,790,790,100%,790,775,core,no
+Lesnewth,PL26,891,891,100%,891,436,core,no
+Lesnewth,PL27,591,591,100%,591,591,core,no
+Lesnewth,PL28,249,249,100%,249,249,core,no
+Lesnewth,PL29,59,59,100%,59,59,core,no
+Lesnewth,PL30,544,544,100%,544,342,core,no
+Lesnewth,PL31,496,496,100%,496,496,core,no
+Lesnewth,PL32,172,172,100%,172,45,core,no
+Lesnewth,PL33,78,78,100%,78,78,core,no
+Lesnewth,PL34,79,79,100%,79,79,core,no
+Lesnewth,PL35,80,80,100%,80,30,core,no
+Lesnewth,TR1,924,924,100%,924,924,core,no
+Lesnewth,TR10,384,384,100%,384,260,core,no
+Lesnewth,TR11,1038,1038,100%,1038,977,core,no
+Lesnewth,TR12,435,435,100%,435,36,core,no
+Lesnewth,TR13,783,783,100%,783,673,core,no
+Lesnewth,TR14,857,857,100%,857,539,core,no
+Lesnewth,TR15,725,725,100%,725,680,core,no
+Lesnewth,TR16,668,668,100%,668,427,core,no
+Lesnewth,TR17,93,93,100%,93,93,core,no
+Lesnewth,TR18,862,862,100%,862,691,core,no
+Lesnewth,TR19,517,517,100%,517,0,core,no
+Lesnewth,TR2,535,535,100%,535,535,core,no
+Lesnewth,TR20,517,517,100%,517,338,core,no
+Lesnewth,TR21,1,73,1%,1,1,fringe,no
+Lesnewth,TR26,651,651,100%,651,81,core,no
+Lesnewth,TR27,556,556,100%,556,545,core,no
+Lesnewth,TR3,489,489,100%,489,414,core,no
+Lesnewth,TR4,524,524,100%,524,524,core,no
+Lesnewth,TR5,183,183,100%,183,183,core,no
+Lesnewth,TR6,154,154,100%,154,154,core,no
+Lesnewth,TR7,682,682,100%,682,681,core,no
+Lesnewth,TR8,601,601,100%,601,601,core,no
+Lesnewth,TR9,286,286,100%,286,283,core,no
+Rycote Farm,GL7,656,1688,39%,0,656,partial,no
+Rycote Farm,HP14,4,541,1%,4,0,fringe,no
+Rycote Farm,HP17,324,373,87%,0,324,core,no
+Rycote Farm,HP18,349,695,50%,3,349,core,no
+Rycote Farm,HP19,593,593,100%,0,593,core,no
+Rycote Farm,HP20,530,530,100%,0,530,core,no
+Rycote Farm,HP21,725,725,100%,0,725,core,no
+Rycote Farm,HP22,339,976,35%,0,339,partial,no
+Rycote Farm,HP27,320,445,72%,0,320,core,no
+Rycote Farm,LU7,20,1402,1%,0,20,fringe,no
+Rycote Farm,MK17,2,909,0%,0,2,fringe,no
+Rycote Farm,MK18,359,1266,28%,0,359,partial,no
+Rycote Farm,OX1,644,845,76%,0,644,core,no
+Rycote Farm,OX10,1042,1042,100%,1042,938,core,no
+Rycote Farm,OX11,1009,1184,85%,862,989,core,no
+Rycote Farm,OX12,707,1036,68%,0,707,core,no
+Rycote Farm,OX13,182,477,38%,0,182,partial,no
+Rycote Farm,OX14,1212,1335,91%,90,1210,core,no
+Rycote Farm,OX18,593,932,64%,0,593,core,no
+Rycote Farm,OX2,826,1023,81%,1,826,core,no
+Rycote Farm,OX20,64,275,23%,0,64,partial,no
+Rycote Farm,OX25,251,526,48%,0,251,partial,no
+Rycote Farm,OX26,814,942,86%,0,814,core,no
+Rycote Farm,OX27,157,370,42%,0,157,partial,no
+Rycote Farm,OX28,775,775,100%,0,775,core,no
+Rycote Farm,OX29,753,1013,74%,0,753,core,no
+Rycote Farm,OX3,100,1004,10%,62,56,fringe,no
+Rycote Farm,OX33,247,281,88%,246,64,core,no
+Rycote Farm,OX39,255,259,98%,255,229,core,no
+Rycote Farm,OX4,92,1367,7%,35,57,fringe,no
+Rycote Farm,OX44,346,346,100%,346,259,core,no
+Rycote Farm,OX49,231,231,100%,231,122,core,no
+Rycote Farm,OX5,620,706,88%,0,620,core,no
+Rycote Farm,OX9,553,562,98%,552,552,core,no
+Rycote Farm,RG4,252,1000,25%,252,0,partial,no
+Rycote Farm,RG8,418,849,49%,418,0,partial,no
+Rycote Farm,RG9,925,1138,81%,925,0,core,no
+Rycote Farm,SN1,136,797,17%,0,136,partial,no
+Rycote Farm,SN15,79,1316,6%,0,79,fringe,no
+Rycote Farm,SN16,140,530,26%,0,140,partial,no
+Rycote Farm,SN2,601,956,63%,0,601,core,no
+Rycote Farm,SN25,241,821,29%,0,241,partial,no
+Rycote Farm,SN26,13,74,18%,0,13,partial,no
+Rycote Farm,SN3,194,1310,15%,0,194,partial,no
+Rycote Farm,SN38,89,124,72%,0,89,core,yes
+Rycote Farm,SN4,684,916,75%,0,684,core,no
+Rycote Farm,SN5,898,898,100%,0,898,core,no
+Rycote Farm,SN6,646,681,95%,0,646,core,no
+Rycote Farm,SN7,426,564,76%,0,426,core,no
+Rycote Farm,SN99,18,18,100%,0,18,core,yes
+Slades Farm,BN18,3,588,1%,0,3,fringe,no
+Slades Farm,CT18,22,451,5%,0,22,fringe,no
+Slades Farm,CT19,530,642,83%,0,530,core,no
+Slades Farm,CT20,830,830,100%,0,830,core,no
+Slades Farm,CT21,549,670,82%,0,549,core,no
+Slades Farm,CT50,5,5,100%,0,5,core,yes
+Slades Farm,GU10,691,984,70%,587,648,core,no
+Slades Farm,GU26,279,279,100%,168,279,core,no
+Slades Farm,GU27,571,622,92%,424,537,core,no
+Slades Farm,GU28,251,352,71%,0,251,core,no
+Slades Farm,GU29,422,431,98%,0,422,core,no
+Slades Farm,GU3,70,410,17%,0,70,partial,no
+Slades Farm,GU30,285,302,94%,0,285,core,no
+Slades Farm,GU31,390,432,90%,0,390,core,no
+Slades Farm,GU32,383,556,69%,0,383,core,no
+Slades Farm,GU33,346,346,100%,0,346,core,no
+Slades Farm,GU34,120,1223,10%,0,120,fringe,no
+Slades Farm,GU35,761,761,100%,0,761,core,no
+Slades Farm,GU4,148,493,30%,9,148,partial,no
+Slades Farm,GU5,381,394,97%,206,295,core,no
+Slades Farm,GU6,570,571,100%,570,21,core,no
+Slades Farm,GU7,793,793,100%,762,793,core,no
+Slades Farm,GU8,660,666,99%,634,473,core,no
+Slades Farm,GU9,991,991,100%,991,282,core,no
+Slades Farm,ME1,6,893,1%,0,6,fringe,no
+Slades Farm,ME14,997,1076,93%,0,997,core,no
+Slades Farm,ME15,1364,1388,98%,0,1364,core,no
+Slades Farm,ME16,795,795,100%,0,795,core,no
+Slades Farm,ME17,948,1105,86%,0,948,core,no
+Slades Farm,ME18,190,315,60%,0,190,core,no
+Slades Farm,ME19,782,787,99%,0,782,core,no
+Slades Farm,ME20,571,589,97%,0,571,core,no
+Slades Farm,ME6,310,313,99%,0,310,core,no
+Slades Farm,RH1,869,1245,70%,0,869,core,no
+Slades Farm,RH12,20,1389,1%,20,0,fringe,no
+Slades Farm,RH14,1,598,0%,1,0,fringe,no
+Slades Farm,RH2,591,842,70%,0,591,core,no
+Slades Farm,RH20,763,893,85%,0,763,core,no
+Slades Farm,RH3,84,145,58%,0,84,core,no
+Slades Farm,RH4,529,666,79%,0,529,core,no
+Slades Farm,RH5,161,642,25%,4,161,partial,no
+Slades Farm,RH8,368,420,88%,0,368,core,no
+Slades Farm,RH9,95,151,63%,0,95,core,no
+Slades Farm,TN11,19,594,3%,0,19,fringe,no
+Slades Farm,TN12,3,1262,0%,0,3,fringe,no
+Slades Farm,TN13,792,801,99%,0,792,core,no
+Slades Farm,TN14,208,581,36%,0,208,partial,no
+Slades Farm,TN15,616,948,65%,0,616,core,no
+Slades Farm,TN16,232,617,38%,0,232,partial,no
+Slades Farm,TN23,547,1031,53%,0,547,core,no
+Slades Farm,TN24,745,772,97%,0,745,core,no
+Slades Farm,TN25,493,756,65%,0,493,core,no
+Slades Farm,TN26,47,523,9%,0,47,fringe,no
+Slades Farm,TN27,148,642,23%,0,148,partial,no
+Slades Farm,TN8,22,573,4%,0,22,fringe,no
+Sleight Farm,BA1,1515,1526,99%,1515,0,core,no
+Sleight Farm,BA11,8,1180,1%,0,8,fringe,no
+Sleight Farm,BA15,1,470,0%,1,0,fringe,no
+Sleight Farm,BA2,2092,2213,95%,2092,197,core,no
+Sleight Farm,BA3,1035,1287,80%,685,979,core,no
+Sleight Farm,BS1,804,804,100%,0,804,core,no
+Sleight Farm,BS10,754,777,97%,0,754,core,no
+Sleight Farm,BS11,323,573,56%,0,323,core,no
+Sleight Farm,BS13,775,775,100%,0,775,core,no
+Sleight Farm,BS14,728,728,100%,59,728,core,no
+Sleight Farm,BS15,1162,1162,100%,0,1162,core,no
+Sleight Farm,BS16,2037,2037,100%,0,2037,core,no
+Sleight Farm,BS2,659,659,100%,0,659,core,no
+Sleight Farm,BS20,613,860,71%,0,613,core,no
+Sleight Farm,BS21,494,695,71%,0,494,core,no
+Sleight Farm,BS25,55,282,20%,0,55,partial,no
+Sleight Farm,BS3,979,979,100%,0,979,core,no
+Sleight Farm,BS30,749,758,99%,0,749,core,no
+Sleight Farm,BS31,687,687,100%,682,634,core,no
+Sleight Farm,BS32,414,429,97%,0,414,core,no
+Sleight Farm,BS34,917,917,100%,0,917,core,no
+Sleight Farm,BS35,446,757,59%,0,446,core,no
+Sleight Farm,BS36,506,506,100%,0,506,core,no
+Sleight Farm,BS37,1039,1066,97%,0,1039,core,no
+Sleight Farm,BS39,624,624,100%,622,624,core,no
+Sleight Farm,BS4,1111,1111,100%,0,1111,core,no
+Sleight Farm,BS40,664,720,92%,268,625,core,no
+Sleight Farm,BS41,196,196,100%,6,196,core,no
+Sleight Farm,BS48,747,771,97%,0,747,core,no
+Sleight Farm,BS49,147,346,42%,0,147,partial,no
+Sleight Farm,BS5,1308,1308,100%,0,1308,core,no
+Sleight Farm,BS6,780,780,100%,0,780,core,no
+Sleight Farm,BS7,792,792,100%,0,792,core,no
+Sleight Farm,BS8,826,826,100%,0,826,core,no
+Sleight Farm,BS9,886,886,100%,0,886,core,no
+Sleight Farm,BS98,1,1,100%,0,1,core,yes
+Sleight Farm,BS99,93,93,100%,0,93,core,yes
+Sleight Farm,GL11,1,624,0%,0,1,fringe,no
+Sleight Farm,GL12,260,470,55%,0,260,core,no
+Sleight Farm,GL9,7,112,6%,0,7,fringe,no
+Sleight Farm,SN14,10,974,1%,0,10,fringe,no
