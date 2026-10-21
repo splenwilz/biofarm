@@ -30,3 +30,24 @@ Google Maps pin for that one and it's a one-line change.
 - Units / area per bank (currently: Sleight 374u/70ha, Lesnewth 130u/26.8ha, Avon 110u/17.4ha,
   Badger 232u/30ha, Rycote 78u/11.6ha) — confirm these are current.
 - Whether any pin needs moving to the exact parcel (see caveat above).
+
+## Cross-check against the government register (13 Oct 2026)
+
+Each site's Ordnance Survey grid reference was taken from the public Biodiversity Gain Sites
+register (environment.data.gov.uk/biodiversity-net-gain, search API) and compared with the postcode
+above via postcodes.io. All five postcodes sit within 2 km of the registered site position and in
+the same planning authority.
+
+| Bank | BGS ref | Register grid ref | Register position (lat, lng) | Register LPA | Postcode held | Distance |
+|---|---|---|---|---|---|---|
+| Sleight Farm | BGS-281124001 | ST6622259312 | 51.3319, -2.4862 | Bath & NE Somerset | BA2 0HN | 0.1 km |
+| Rycote Farm | BGS-150725001 | SP6634004820 | 51.7382, -1.0407 | South Oxfordshire | OX9 2PF | 0.0 km |
+| Lesnewth | BGS-221025001 | SX1309690022 | 50.6798, -4.6469 | Cornwall | PL35 0HR | 0.3 km |
+| Avon Meadows | BGS-171125001 | SP2239356329 | 52.2047, -1.6737 | Stratford-on-Avon | CV37 0NS | 0.7 km |
+| Badger Bank Farm | BGS-060526001 | SE3046776819 | 54.1862, -1.5346 | North Yorkshire | HG4 3HT | 1.8 km |
+| Slades Farm | BGS-060325001 | TQ001409 (100 m) | 51.1586, -0.5700 | Waverley | none held; nearest is GU8 4JP (0.3 km) | — |
+
+Slades Farm: registered 88.14 ha, responsible body Harry Ferguson Holdings Limited (same as Rycote,
+Lesnewth, Avon Meadows and Badger Bank). The map pin for Slades should move to the register position
+above; the Bramley placeholder is ~4 km out. Ask Chris for the site's own postcode; GU8 4JP is the
+nearest postcode to the registered grid reference, not necessarily the farm's address.
