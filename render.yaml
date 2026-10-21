@@ -42,7 +42,8 @@ services:
       - key: BIOFARM_PIPEDRIVE_API_TOKEN
         sync: false
       # Optional - set in the dashboard when ready:
-      #   BIOFARM_PIPEDRIVE_OWNER_ID           (int user id to own new leads)
+      #   BIOFARM_PIPEDRIVE_OWNER_ID           (fallback user id for leads the owner map doesn't cover)
+      #   BIOFARM_PIPEDRIVE_OWNER_MAP          (JSON: "<form>" or "<form>:<field>" -> user id, see api/README.md)
       #   BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS     (JSON array of label UUIDs)
       #   BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP     (JSON from scripts/setup_pipedrive_fields.py)
       #   BIOFARM_GA4_MEASUREMENT_ID           (G-3MS9TLLZRN)

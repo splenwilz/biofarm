@@ -101,7 +101,8 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `DATABASE_URL` | on Render | `sqlite+aiosqlite:////var/data/leads.db` (set by Blueprint); any Postgres URL also works |
 | `BIOFARM_PIPEDRIVE_COMPANY_DOMAIN` | yes | `{domain}.pipedrive.com` |
 | `BIOFARM_PIPEDRIVE_API_TOKEN` | yes | secret; sent as `x-api-token` header |
-| `BIOFARM_PIPEDRIVE_OWNER_ID` | no | Pipedrive user ID to own new leads |
+| `BIOFARM_PIPEDRIVE_OWNER_ID` | no | fallback Pipedrive user ID for leads the owner map doesn't cover (unset = the API token's user) |
+| `BIOFARM_PIPEDRIVE_OWNER_MAP` | no | JSON: enquiry type -> Pipedrive user ID. Keys are `<form>` or `<form>:<field>` (forms: contact, newsletter, cpd, fold; fields: developer, landowner, other; lower-case); most specific wins. Applied to the lead and to newly created persons. Values are integers (a digit string is accepted). Unknown keys, bad values or malformed JSON are logged as errors and dropped, the service still boots and those leads use the fallback owner. If Pipedrive rejects the owner (deactivated user, wrong id) the record is created without one, a warning is logged and the lead's `sync_error` notes it (status stays `synced`). e.g. `{"contact:developer": 23328240, "contact:landowner": 27433044, "cpd": 123}` |
 | `BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS` | no | JSON array of lead label UUIDs, applied to every lead |
 | `BIOFARM_PIPEDRIVE_FORM_LABEL_MAP` | no | JSON: form -> extra label UUIDs, e.g. `{"newsletter": ["uuid"]}` |
 | `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` | no | JSON from the bootstrap script |
@@ -119,12 +120,17 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 - **Failed syncs need a manual nudge.** `sync_status='failed'` rows keep the
   error but nothing retries them automatically yet. Next step: a small retry
   command (Render cron job or admin endpoint) that re-runs `process_lead` for
-  failed rows.
+  failed rows. Select them by `sync_status = 'failed'`, never by
+  `sync_error IS NOT NULL`: a synced lead can carry a `sync_error` note when
+  its owner was rejected and the record was created without one, and
+  re-running those would duplicate the Pipedrive note.
 - **Rate limiting is in-memory, per instance.** Correct for a single Render
   instance; switch the `limits` storage to Redis before scaling horizontally.
-  Client IPs come from `X-Forwarded-For` (uvicorn `--proxy-headers`); a
-  determined client can forge that header to dodge the per-IP limit - the
-  honeypot/fill-time checks are the deeper layer.
+  Client IPs come from the edge-set `True-Client-IP` header (see
+  `client_ip()` in `app/routes/leads.py`), falling back to the socket peer.
+  Until step 4 above has confirmed Render overwrites a client-supplied value,
+  treat per-IP limiting as spoofable - the honeypot/fill-time checks are the
+  deeper layer.
 - **Spam protection is honeypot + fill-time + rate limit.** The old Pipedrive
   embed had reCAPTCHA. If junk gets through, add Cloudflare Turnstile: one
   widget in the form blocks, one server-side verify call here.

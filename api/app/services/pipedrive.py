@@ -5,7 +5,10 @@ import httpx
 
 
 class PipedriveError(Exception):
-    pass
+    def __init__(self, message: str, *, status_code: int | None = None) -> None:
+        super().__init__(message)
+        # HTTP status of the failing response; None for transport errors.
+        self.status_code = status_code
 
 
 def _error_reason(resp: httpx.Response) -> str:
@@ -70,14 +73,16 @@ class PipedriveClient:
                     continue
                 if resp.status_code >= 400:
                     raise PipedriveError(
-                        f"{method} {path} failed with {resp.status_code}: {_error_reason(resp)}"
+                        f"{method} {path} failed with {resp.status_code}: {_error_reason(resp)}",
+                        status_code=resp.status_code,
                     )
                 try:
                     return resp.json()
                 except ValueError as exc:
                     # 2xx with an empty/non-JSON body (proxy or CDN hiccup)
                     raise PipedriveError(
-                        f"{method} {path}: invalid JSON in {resp.status_code} response"
+                        f"{method} {path}: invalid JSON in {resp.status_code} response",
+                        status_code=resp.status_code,
                     ) from exc
         raise PipedriveError(f"{method} {path}: retries exhausted")  # pragma: no cover
 
@@ -100,11 +105,14 @@ class PipedriveClient:
         phone: str | None = None,
         marketing_status: str | None = None,
         custom_fields: dict[str, Any] | None = None,
+        owner_id: int | None = None,
     ) -> int:
         body: dict[str, Any] = {
             "name": name,
             "emails": [{"value": email, "primary": True, "label": "work"}],
         }
+        if owner_id is not None:
+            body["owner_id"] = owner_id
         if phone:
             body["phones"] = [{"value": phone, "primary": True, "label": "work"}]
         if marketing_status:

@@ -3,6 +3,9 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 
 FieldChoice = Literal["developer", "landowner", "other"]
+# Forms the API accepts; each route stores one of these in Lead.form and the
+# owner map (config) only accepts keys built from them.
+LEAD_FORMS = ("contact", "newsletter", "cpd", "fold")
 
 
 class Attribution(BaseModel):
