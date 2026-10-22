@@ -48,6 +48,6 @@ the same planning authority.
 | Slades Farm | BGS-060325001 | TQ001409 (100 m) | 51.1586, -0.5700 | Waverley | none held; nearest is GU8 4JP (0.3 km) | — |
 
 Slades Farm: registered 88.14 ha, responsible body Harry Ferguson Holdings Limited (same as Rycote,
-Lesnewth, Avon Meadows and Badger Bank). The map pin for Slades should move to the register position
-above; the Bramley placeholder is ~4 km out. Ask Chris for the site's own postcode; GU8 4JP is the
+Lesnewth, Avon Meadows and Badger Bank). The map pin for Slades was moved to the register position
+on 22 Oct 2026 (51.159, -0.569; the Bramley placeholder was ~4 km out). Ask Chris for the site's own postcode; GU8 4JP is the
 nearest postcode to the registered grid reference, not necessarily the farm's address.

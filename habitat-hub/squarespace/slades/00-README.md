@@ -14,14 +14,15 @@ Slades has no blog post yet. Setup order:
    (card + map pin appear automatically).
 
 ## Flags
-- **Pin is APPROXIMATE** (Bramley village area). Get the site postcode from Biofarm
-  and I'll place it exactly — Slades wasn't on the BNG Site Map we pulled postcodes from.
+- **Pin** — moved 22 Oct 2026 to the registered grid reference TQ001409 (51.159, -0.569,
+  Hascombe parish, per register entry BGS-060325001 and its land boundary map). The 23 Sep pin
+  was a Bramley-village placeholder, about 3.8 km north. Re-paste 04 and the hub finder block.
 - **Hub count becomes "6 registered habitat banks"** with Slades added while Avon
   Meadows stays live. The launch copy said 5 (list without Avon). The coverage-stats
-  block also says 5 registered / 1142+ units — actual totals: 6 & 1233 with Avon,
-  5 & 1123 without. **Ask Vix/Chris to settle Avon + confirm the stat numbers.**
-- **Brochure** — `/s/Biofarm-Habitat-Bank-Brochure-Slades-Farm_FINAL.pdf` 404s until
-  the FINAL PDF is uploaded with that exact name.
+  block also says 5 registered / 1142+ units — actual totals: 6 & 1274 with Avon (Slades 350 per final brochure),
+  5 & 1164 without. **Ask Vix/Chris to settle Avon + confirm the stat numbers.**
+- **Brochure** — FINAL is live at `/s/Slades-Farm-Habitat-Bank_Brochure.pdf` (22 Oct 2026). It states
+  **350 units** (the For-Approval draft said 309); blocks 01/04, the finder card and the hub schema and stat band updated to 350. Re-paste 01, 04, 12, 15, finder, sections, schema.
 - **Map boundaries** — Waverley LPA + Wealden Greensand NCA polygons pending (same
   pipeline as the other banks).
 - Wildlife photo spares for stories/gallery: badger, pheasant, grey partridge, hobby,
