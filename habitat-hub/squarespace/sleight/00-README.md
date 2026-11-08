@@ -41,8 +41,8 @@ Notes:
 - Every section is pure HTML wrapped in `<div class="bf-bank">` — edit copy freely;
   it stays styled by the injection. You can also drop **native blocks** between
   sections and they'll match the theme.
-- Content TODOs remain (`data-todo`): real photos, ecology-report + BGS links,
-  related-bank slugs. Brochure PDF is already wired (`/s/Sleight-Farm_Biofarm_BNG.pdf`).
+- Content TODOs remain (`data-todo`): real photos, BGS register link,
+  related-bank slugs. Brochure and bird survey report PDFs are wired (`/s/Sleight-Farm-Habitat-Bank-Brochure.pdf`, `/s/Sleight-Farm-Habitat-Bank_Bird-Survey-Habitat-Management-Report_2025-26.pdf`, 4 Nov 2026).
 
 ## For the next bank (Lesnewth, Avon Meadows, …)
 
