@@ -1,0 +1,18 @@
+/* Print: the page content only, full width, no chrome. */
+@media print {
+  aside,
+  header,
+  [data-print="hide"] {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  .MuiPaper-root {
+    break-inside: avoid;
+  }
+}
