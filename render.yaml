@@ -57,3 +57,33 @@ services:
       #   BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP     (JSON from scripts/setup_pipedrive_fields.py)
       #   BIOFARM_GA4_MEASUREMENT_ID           (G-3MS9TLLZRN)
       #   BIOFARM_GA4_API_SECRET               (GA4 Admin > Data streams > MP API secrets)
+
+  # The marketing dashboard (dashboard/ subdirectory): a Next.js server that
+  # reads the API's /v1/dashboard feed on every page load, server-side only.
+  # Internal tool for a handful of people, so it sits next to the API in the
+  # same region and account. It has no sign-in yet: put access control in
+  # front of the URL (e.g. Cloudflare Access) before sharing it widely.
+  - type: web
+    name: biofarm-dashboard
+    runtime: node
+    rootDir: dashboard
+    region: frankfurt
+    plan: starter
+    buildCommand: npm ci && npm run build
+    # `next start` reads PORT from the environment, which Render sets.
+    startCommand: npm run start
+    # A route of its own, so health checks never cost a feed request.
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Server-side only (no NEXT_PUBLIC_ prefix): where the feed is and the
+      # shared secret, the same value as BIOFARM_DASHBOARD_TOKEN on the API.
+      - key: DASHBOARD_API_URL
+        value: https://biofarm-api.onrender.com
+      - key: DASHBOARD_API_TOKEN
+        sync: false
+      # Baked into the page at build time; only builds "open in Pipedrive" links.
+      - key: NEXT_PUBLIC_PIPEDRIVE_COMPANY_DOMAIN
+        value: biofarm
