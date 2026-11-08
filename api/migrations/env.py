@@ -19,6 +19,7 @@ if config.config_file_name is not None:
 from app.config import Settings
 from app.db import Base
 from app import models  # noqa: F401  (registers tables on Base.metadata)
+from app.mirror import models as mirror_models  # noqa: F401  (the Pipedrive mirror tables)
 
 target_metadata = Base.metadata
 

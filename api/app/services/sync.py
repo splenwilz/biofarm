@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.config import Settings
 from app.models import Lead
 from app.services import ga4
+from app.services.attribution import source_label
 from app.services.pipedrive import PipedriveClient, PipedriveError
 
 logger = logging.getLogger(__name__)
@@ -102,47 +103,78 @@ def _lead_custom_fields(lead: Lead, settings: Settings) -> dict[str, str]:
     }
 
 
-# 4xx codes that can never be about the owner: bad token, billing, wrong URL.
-_NOT_OWNER_RELATED = {401, 402, 404, 429}
+# 4xx codes that can never be about the owner or channel: bad token, billing,
+# wrong URL, rate limit.
+_NOT_FIELD_RELATED = {401, 402, 404, 429}
 
 
-async def _create_with_owner_fallback[T](
-    create: Callable[[int | None], Awaitable[T]],
+async def _create_with_fallbacks[T](
+    create: Callable[[int | None, int | None], Awaitable[T]],
+    *,
     owner_id: int | None,
+    channel: int | None,
     lead: Lead,
     what: str,
 ) -> T:
-    """Run create(owner_id); if Pipedrive answers 4xx while an owner was set,
-    create the record once more without an owner.
+    """Run create(owner_id, channel); if Pipedrive answers 4xx, try again
+    with the optional ids left out, one at a time, until it accepts.
 
-    Pipedrive refuses to assign new items to a deactivated user, and an id
-    that was never valid gets the same treatment. Without this, every lead of
-    that enquiry type would fail silently until someone read the database -
-    a lead owned by the token's user beats a lost lead. The 4xx may have
-    another cause (then the retry fails the same way and the lead is marked
+    Pipedrive refuses to assign new items to a deactivated user, an id that
+    was never valid gets the same treatment, and a `channel` that is not one
+    of the company's configured Source channel options is a 400 too. Without
+    this, a stale setting would fail every lead of that enquiry type silently
+    until someone read the database - a lead missing its owner or channel
+    beats a lost lead. Order: drop the channel first (the newer, more often
+    misconfigured setting), then the owner, then both, so a good value is
+    only lost once everything else has been tried. The 4xx may have another
+    cause (then every attempt fails the same way and the lead is marked
     failed as before), so the warning quotes Pipedrive's own message."""
-    try:
-        return await create(owner_id)
-    except PipedriveError as exc:
-        status = exc.status_code or 0
-        if owner_id is None or not 400 <= status < 500 or status in _NOT_OWNER_RELATED:
-            raise
-        # The 4xx may have nothing to do with the owner (Pipedrive also
-        # answers 400 for e.g. marketing_status without the Campaigns
-        # product, or a bad custom-field value); quote its message first and
-        # let the outcome of the retry say which it was.
-        logger.warning(
-            "Pipedrive rejected the %s of lead %s: %s. The request carried owner %s, "
-            "so retrying once without it; if the retry fails too, the owner is not "
-            "the cause. If it succeeds, check BIOFARM_PIPEDRIVE_OWNER_MAP / OWNER_ID.",
-            what, lead.id, exc, owner_id,
-        )
-        result = await create(None)
-        # Leave a trace on the row: logs expire, and 'synced' alone would hide
-        # a misconfigured owner map. sync_status stays 'synced'.
-        note = f"{what} created without owner {owner_id}: {exc}"
-        lead.sync_error = (f"{lead.sync_error}; {note}" if lead.sync_error else note)[:2000]
+    attempts: list[tuple[int | None, int | None]] = []
+    for combo in ((owner_id, channel), (owner_id, None), (None, channel), (None, None)):
+        if combo not in attempts:
+            attempts.append(combo)
+    last_error: PipedriveError | None = None
+    for index, (owner, chan) in enumerate(attempts):
+        try:
+            result = await create(owner, chan)
+        except PipedriveError as exc:
+            status = exc.status_code or 0
+            is_last = index == len(attempts) - 1
+            if is_last or not 400 <= status < 500 or status in _NOT_FIELD_RELATED:
+                raise
+            next_owner, next_chan = attempts[index + 1]
+            dropping = ", ".join(
+                name
+                for name, had, keeps in (
+                    (f"owner {owner}", owner is not None, next_owner is not None),
+                    (f"channel {chan}", chan is not None, next_chan is not None),
+                )
+                if had and not keeps
+            )
+            # The 4xx may have nothing to do with these ids (Pipedrive also
+            # answers 400 for e.g. marketing_status without the Campaigns
+            # product, or a bad custom-field value); quote its message first
+            # and let the outcome of the retry say which it was.
+            logger.warning(
+                "Pipedrive rejected the %s of lead %s: %s. Retrying without %s; if "
+                "that succeeds, check BIOFARM_PIPEDRIVE_OWNER_MAP / OWNER_ID / "
+                "WEBSITE_CHANNEL; if it fails too, the cause is elsewhere.",
+                what, lead.id, exc, dropping,
+            )
+            last_error = exc
+            continue
+        dropped = [
+            f"owner {owner_id}" if owner is None and owner_id is not None else None,
+            f"channel {channel}" if chan is None and channel is not None else None,
+        ]
+        dropped = [d for d in dropped if d]
+        if dropped:
+            # Leave a trace on the row: logs expire, and 'synced' alone would
+            # hide a misconfigured setting. sync_status stays 'synced'.
+            note = f"{what} created without {' and '.join(dropped)}: {last_error}"
+            lead.sync_error = (f"{lead.sync_error}; {note}" if lead.sync_error else note)[:2000]
         return result
+    raise AssertionError("unreachable: the last attempt raises or returns")
 
 
 async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
@@ -166,8 +198,8 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
         if person_id is None:
             # new persons go to the same owner as the enquiry; existing
             # persons keep whoever the team already assigned
-            person_id = await _create_with_owner_fallback(
-                lambda owner: client.create_person(
+            person_id = await _create_with_fallbacks(
+                lambda owner, _channel: client.create_person(
                     name=lead.name,
                     email=lead.email,
                     phone=lead.phone,
@@ -175,7 +207,7 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
                     custom_fields=_person_custom_fields(lead, settings),
                     owner_id=owner,
                 ),
-                owner_id, lead, "person",
+                owner_id=owner_id, channel=None, lead=lead, what="person",
             )
         elif lead.phone or marketing_status:
             await client.update_person(
@@ -197,15 +229,24 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
                 + settings.pipedrive_form_label_map.get(lead.form, [])
             )
         )
-        lead_id = await _create_with_owner_fallback(
-            lambda owner: client.create_lead(
+        # Source stamping. origin_id = our row id: Pipedrive keeps origin_id
+        # and channel on the deal a lead is converted into, so a deal can be
+        # traced back to this enquiry (there is no lead id on a deal).
+        # channel_id = a readable "source/medium" for the lead list and for
+        # grouping in reporting; the full attribution is in the custom fields.
+        lead_id = await _create_with_fallbacks(
+            lambda owner, channel: client.create_lead(
                 title=title,
                 person_id=person_id,
                 owner_id=owner,
                 label_ids=label_ids or None,
                 custom_fields=_lead_custom_fields(lead, settings),
+                origin_id=lead.id,
+                channel=channel,
+                channel_id=source_label(lead.attribution, lead.first_touch),
             ),
-            owner_id, lead, "lead",
+            owner_id=owner_id, channel=settings.pipedrive_website_channel,
+            lead=lead, what="lead",
         )
         lead.pipedrive_lead_id = lead_id
     await client.create_note(content=build_note_html(lead), lead_id=lead_id)

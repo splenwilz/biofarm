@@ -21,9 +21,12 @@ def make_settings(tmp_path, **overrides) -> Settings:
 
 @pytest.fixture
 def settings(request, tmp_path) -> Settings:
-    # @pytest.mark.settings(key=value, ...) overrides fields for one test
-    marker = request.node.get_closest_marker("settings")
-    overrides = marker.kwargs if marker else {}
+    # @pytest.mark.settings(key=value, ...) overrides fields for one test.
+    # Several markers stack (e.g. a shared `routed` plus a per-test one);
+    # the one closest to the test wins on a clash.
+    overrides: dict = {}
+    for marker in reversed(list(request.node.iter_markers("settings"))):
+        overrides.update(marker.kwargs)
     unknown = set(overrides) - set(Settings.model_fields)
     if unknown:  # Settings has extra="ignore", so a typo would silently no-op
         raise pytest.UsageError(f"@pytest.mark.settings: unknown field(s) {sorted(unknown)}")

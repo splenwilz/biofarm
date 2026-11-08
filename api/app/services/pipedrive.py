@@ -147,12 +147,25 @@ class PipedriveClient:
         owner_id: int | None = None,
         label_ids: list[str] | None = None,
         custom_fields: dict[str, Any] | None = None,
+        origin_id: str | None = None,
+        channel: int | None = None,
+        channel_id: str | None = None,
     ) -> str:
+        """POST /v1/leads (addLeadRequest). `origin_id` and `channel_id` are
+        free strings Pipedrive stores as given; `channel` must be the id of one
+        of the company's configured Source channel options or the API answers
+        400. Keys left out are stored as null, so None means "don't send"."""
         body: dict[str, Any] = {"title": title, "person_id": person_id}
         if owner_id is not None:
             body["owner_id"] = owner_id
         if label_ids:
             body["label_ids"] = label_ids
+        if origin_id:
+            body["origin_id"] = origin_id
+        if channel is not None:
+            body["channel"] = channel
+        if channel_id:
+            body["channel_id"] = channel_id
         # v1 leads take custom-field hashes at the root of the body.
         if custom_fields:
             body.update(custom_fields)

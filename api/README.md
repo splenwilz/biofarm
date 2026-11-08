@@ -86,6 +86,95 @@ just makes it filterable in Pipedrive.
 `marketing_status` is only honoured if the Pipedrive account has the
 **Campaigns add-on**; otherwise Pipedrive ignores the field (harmless).
 
+### Pipedrive mirror (dashboard step 1)
+
+`app/mirror/` pulls the Pipedrive account into our own tables, read-only:
+the reader class has no method but GET, so nothing can be written back.
+Tables (all `pd_`-prefixed, each row keeping the raw API record in `raw`):
+pipelines, stages, deal field definitions (names and option labels behind
+the custom-field hashes and enum ids), users, deals, persons (with their
+Campaigns `marketing_status`), activities, the Leads inbox, deal stage
+history, every deal field change, each person's consent changes
+(`pd_marketing_status_changes`) and per-campaign opens and clicks
+(`pd_campaign_stats`), and one row per import run.
+
+```bash
+uv run python scripts/import_pipedrive.py            # changes since the last good run
+uv run python scripts/import_pipedrive.py --full     # everything, changelogs included
+uv run python scripts/import_pipedrive.py --dry-run  # read and count, write nothing
+```
+
+Every write is an upsert on the Pipedrive id and the history tables have
+natural keys, so running it again creates no duplicates. An incremental run
+reads deals and persons updated since the previous good run's start minus
+ten minutes, plus deals deleted in the last 30 days, then re-reads the
+changelog only of deals whose `update_time` moved. Activities and open leads
+use the same window; archived leads are always read whole (no filter there).
+Paging is by cursor at 500 a page (v2) or start/limit (v1 leads and flow);
+a 429 waits for `x-ratelimit-reset`, a 5xx or network error backs off and
+retries up to five times, any other 4xx fails the run. The token travels in
+the `x-api-token` header and is scrubbed from errors and logs.
+
+Campaigns has no stats endpoint, so newsletter figures come from each
+person's flow (`GET /v1/persons/{id}/flow`, items `marketing_status_change`
+and `marketing_campaign_stat`): one call per person with consent (about
+2,000 of 4,000), four at a time. A person's history is read on a full run,
+when the person was edited since it was last read, and once it is 24 hours
+old, because opens and clicks keep arriving for weeks after a send. That
+is roughly 80k of the 1.08M daily API tokens. Webhooks and a schedule come
+later.
+
+### Dashboard feed (step 3)
+
+`GET /v1/dashboard` is built once per import and kept in memory (keyed by the
+last good import's finish time and the newest website record, since form
+submissions land between imports), gzipped, and the feed queries skip the raw
+API JSON on every row; a page view after an import takes the one rebuild, the
+rest are served from memory. It returns the marketing dashboard's records in its own
+`DashboardData` shape (camelCase JSON): deals, enquiries and the newsletter
+section today; spend, traffic, search and events stay empty until their
+feeds exist. The dashboard's server reads it with
+the shared token in `x-dashboard-token`; the browser never sees the token or
+this endpoint. `app/reporting/` applies the KPI rule: a deal belongs to the
+audience of the pipeline it was created in (found from its stage history, so
+a deal parked in DORMANT or moved to Legal keeps its origin); a Developer
+Pipeline deal is qualified at creation, a Landowner Pipeline deal when it
+first leaves CALL / QUALIFY for another stage of that pipeline.
+
+Enquiries (agreed 8 Nov 2026) come from Pipedrive, so the series reaches back
+to January 2024 rather than to the day our own form went live: every lead in
+the Leads inbox (open and archived; archived ones are marked) plus every deal
+created directly in a marketing pipeline. Left out, with a count per reason
+in the log: deals with origin `Import`; titles matching the test pattern
+("Test Valley" and "Testway" are real places and stay in); records whose UTM
+campaign is a tracking test, or whose person has a test address or domain;
+website sign-ups by people at a staff domain; and newsletter sign-ups, which
+the feed reports by month under `newsletter.signups` instead. A deal
+converted from a lead (`source_lead_id`, which v2 deals return on request)
+is counted once: as the lead, at the lead's date, while the mirror still has
+the lead; Pipedrive deletes converted leads, so a full import marks leads it
+no longer sees as deleted. Each enquiry carries Pipedrive's source channel
+(a word in the title can fix it, e.g. the FBI event batch; website-origin
+records default to Website); the dashboard's KPI config decides which
+channels are inbound and which are outbound / network, the same split as for
+qualified deals. Our own `leads` table adds form, audience, source label,
+campaign and landing page where a record matches by Pipedrive lead id or by
+the origin id we send; without one, the source label is built from the
+record's UTM Source, UTM Medium and Referrer custom fields by the same rules
+(`touch_label`), so tracked website enquiries keep their source wherever the
+feed runs; the team's own records have no form or page and the
+audience "other", because lead labels in this account are campaign tags, not
+audiences. `firstContactAt` is the first done call, email or meeting logged
+against the person after the enquiry (tasks and planned activities do not
+count). The rules are settings (`BIOFARM_ENQUIRY_*`, see below).
+
+Newsletter issues are one row per campaign sent
+(every Campaigns send, not only the monthly newsletter), counting people who
+opened or clicked rather than repeat opens, with unsubscribes the consent
+changes Pipedrive attributes to that campaign; subscribers by month replay
+the consent changes to each month end. `syncedAt` is the last good import's
+finish time.
+
 ### GA4 setup (optional server-side events)
 
 GA4 Admin → Data streams → your stream → Measurement Protocol API secrets →
@@ -103,6 +192,7 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `BIOFARM_PIPEDRIVE_API_TOKEN` | yes | secret; sent as `x-api-token` header |
 | `BIOFARM_PIPEDRIVE_OWNER_ID` | no | fallback Pipedrive user ID for leads the owner map doesn't cover (unset = the API token's user) |
 | `BIOFARM_PIPEDRIVE_OWNER_MAP` | no | JSON: enquiry type -> Pipedrive user ID. Keys are `<form>` or `<form>:<field>` (forms: contact, newsletter, cpd, fold; fields: developer, landowner, other; lower-case); most specific wins. Applied to the lead and to newly created persons. Values are integers (a digit string is accepted). Unknown keys, bad values or malformed JSON are logged as errors and dropped, the service still boots and those leads use the fallback owner. If Pipedrive rejects the owner (deactivated user, wrong id) the record is created without one, a warning is logged and the lead's `sync_error` notes it (status stays `synced`). e.g. `{"contact:developer": 23328240, "contact:landowner": 27433044, "cpd": 123}` |
+| `BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL` | no | option id of "Website" in Pipedrive's **Source channel** deal field (Company settings > Data fields > Deal > Source channel, or the `channel` entry of `GET /v1/dealFields`; `1037` on the Biofarm account). Sent as `channel` on every lead; Pipedrive carries it onto the deal at conversion. Unset = no channel is sent and Sales picks it by hand. A value Pipedrive does not recognise gets a 400, in which case the lead is created without it, a warning is logged and `sync_error` notes it (status stays `synced`), the same way as a rejected owner. Bad shapes are logged and ignored at boot. |
 | `BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS` | no | JSON array of lead label UUIDs, applied to every lead |
 | `BIOFARM_PIPEDRIVE_FORM_LABEL_MAP` | no | JSON: form -> extra label UUIDs, e.g. `{"newsletter": ["uuid"]}` |
 | `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` | no | JSON from the bootstrap script |
@@ -110,10 +200,36 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `BIOFARM_PIPEDRIVE_CLIENT_TYPE_MAP` | no | JSON: form value -> option id, e.g. `{"developer": 531}` |
 | `BIOFARM_GA4_MEASUREMENT_ID` | no | `G-3MS9TLLZRN` |
 | `BIOFARM_GA4_API_SECRET` | no | secret |
+| `BIOFARM_DASHBOARD_TOKEN` | for the dashboard | shared secret the marketing dashboard's server sends as `x-dashboard-token` to `GET /v1/dashboard`; unset = the endpoint answers 503 to everyone |
+| `BIOFARM_MIRROR_IMPORT_MINUTES` | for the dashboard | minutes between Pipedrive mirror imports run inside the web process (`15` on Render); `0` (default) = off. The import runs in-process because a Render cron job cannot reach the service's persistent disk, where the SQLite database lives. One run at a time: the run row in `pd_import_runs` is the lock. A run cancelled by a deploy's SIGTERM closes its row as failed on the way out, the web process closes any row still "running" when it starts, and the standalone script treats a row left "running" for 2 hours as dead |
+| `BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL` | for the dashboard | "Website" option id of the Source channel deal field (1037). Without it website leads, and the deals they are converted into, reach Pipedrive with no Source channel (Pipedrive also drops `channel_id` then); the API warns at boot and the dashboard falls back to origin API / Web Forms = Website |
+| `BIOFARM_PIPEDRIVE_PIPELINE_AUDIENCES` | no | JSON: pipeline id -> `developer` or `landowner`, default `{"3":"developer","7":"developer","2":"landowner","6":"landowner"}` (the two DORMANT pipelines keep their audience) |
+| `BIOFARM_ENQUIRY_EXCLUDED_DEAL_ORIGINS` | no | JSON list of Pipedrive deal origins that are not enquiries, default `["Import"]` |
+| `BIOFARM_ENQUIRY_WEBSITE_ORIGINS` | no | JSON list of origins that mean "came through the website" (default Website channel, form read from the title), default `["WebForms","API"]` |
+| `BIOFARM_ENQUIRY_TEST_CAMPAIGNS` | no | JSON list of UTM campaigns that were tracking tests, default `["tracking-test","go-live-check","field-map","final-check"]` |
+| `BIOFARM_ENQUIRY_TEST_DOMAINS` / `BIOFARM_ENQUIRY_TEST_EMAILS` | yes, for real figures | JSON lists; a person with such an address was the team testing the forms (lower-cased before comparing). Default domains `["biofarm-test.dev"]`, default emails none: the team's own domains and addresses are set in the environment, never in the code, and a value replaces the default (so include `biofarm-test.dev` again) |
+| `BIOFARM_ENQUIRY_STAFF_DOMAINS` | no | JSON list; website sign-ups by people at these domains are staff trying the forms, default `["biofarm.co.uk"]` |
+| `BIOFARM_ENQUIRY_TEST_TITLE_PATTERN` | no | case-insensitive regex for test titles, default `\btest\b(?!\s+valley)` |
+| `BIOFARM_ENQUIRY_NEWSLETTER_TITLE_PATTERN` | no | case-insensitive regex; website records whose title matches are newsletter sign-ups, default `^\s*newsletter` |
+| `BIOFARM_ENQUIRY_CHANNEL_BY_TITLE` | no | JSON object: a whole word in the title -> Source channel label it forces, default `{"FBI":"Trade Show / Event"}` |
+| `BIOFARM_PIPEDRIVE_DEVELOPER_PIPELINE_ID`, `..._LANDOWNER_PIPELINE_ID`, `..._LANDOWNER_QUALIFY_STAGE_ID` | no | the KPI rule's ids, default 3, 2 and 6 |
 | `BIOFARM_AUTO_CREATE_TABLES` | prod: `false` | Alembic owns the schema in prod |
 | `BIOFARM_RATE_LIMIT` | no | default `5/minute` per IP |
 | `BIOFARM_MIN_FILL_SECONDS` | no | spam fill-time threshold, default 3 |
 | `BIOFARM_CORS_ORIGINS` | no | JSON array; defaults to biofarm.co.uk |
+
+## What every lead carries (source stamping)
+
+Besides the title, person, owner, labels and attribution custom fields, each
+lead is created with the three source fields of Pipedrive's `addLeadRequest`:
+
+| Field | Value | Why |
+|---|---|---|
+| `origin_id` | this service's lead row id (UUID) | Pipedrive keeps `origin_id` on the deal a lead is converted into and has no lead id on deals, so this is the join key from a deal back to the enquiry |
+| `channel` | `BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL` | the Source channel Sales used to pick by hand; set automatically so website-sourced deals are never mis-tagged |
+| `channel_id` | `source/medium` from `app/services/attribution.py` | a readable sub-source for the lead list and reporting: UTM source/medium, else the paid click id (`google/cpc`, `bing/cpc`, `facebook/social`), else `<referrer host>/referral`, else `direct`; last touch, falling back to first touch |
+
+Pipedrive's own `origin` is always `API` for these leads and cannot be set.
 
 ## Known limitations & future improvements
 

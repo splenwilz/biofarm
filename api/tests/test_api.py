@@ -9,8 +9,8 @@ from sqlalchemy import text as sqltext
 
 from app.config import Settings
 from app.main import create_app
-from app.schemas import LEAD_FORMS
 from app.models import Lead
+from app.schemas import LEAD_FORMS
 from tests.conftest import make_settings
 
 BASE = "https://biofarm.pipedrive.com"
@@ -859,3 +859,170 @@ def test_env_json_owner_map_parses(monkeypatch):
     )
     s = Settings(_env_file=None)
     assert s.pipedrive_owner_map == {"contact:developer": 23328240, "cpd": 111}
+
+
+# ---- source stamping: origin_id, channel, channel_id on every lead ----------
+
+stamped = pytest.mark.settings(pipedrive_website_channel=1037)
+
+
+def _lead_body(routes, call=-1) -> dict:
+    return json.loads(routes["lead"].calls[call].request.content)
+
+
+@stamped
+@respx.mock
+async def test_lead_carries_origin_channel_and_source_label(client):
+    routes = mock_pipedrive_happy_path()
+    r = await client.post(
+        "/v1/leads/contact",
+        json={
+            "name": "Sam",
+            "email": "sam@example.com",
+            "attribution": {"utm_source": "bing", "utm_medium": "cpc", "msclkid": "abc"},
+        },
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    body = _lead_body(routes)
+    # our row id goes out as origin_id: it survives lead -> deal conversion,
+    # so a deal can be traced back to the enquiry without a Pipedrive lead id
+    assert body["origin_id"] == lead.id
+    assert body["channel"] == 1037
+    assert body["channel_id"] == "bing/cpc"
+
+
+@stamped
+@respx.mock
+async def test_direct_visit_is_labelled_direct_and_first_touch_is_used(client):
+    routes = mock_pipedrive_happy_path()
+    await client.post(
+        "/v1/leads/newsletter",
+        json={"name": "Pat", "email": "pat@example.com", "first_touch": {"gclid": "x"}},
+    )
+    assert _lead_body(routes)["channel_id"] == "google/cpc"
+    routes["lead"].calls.reset()
+    await client.post("/v1/leads/newsletter", json={"name": "Lee", "email": "lee@example.com"})
+    assert _lead_body(routes)["channel_id"] == "direct"
+
+
+@respx.mock
+async def test_without_website_channel_setting_only_channel_is_omitted(client):
+    routes = mock_pipedrive_happy_path()
+    await client.post(
+        "/v1/leads/contact",
+        json={"name": "Sam", "email": "sam@example.com", "attribution": {"utm_source": "x"}},
+    )
+    body = _lead_body(routes)
+    assert "channel" not in body
+    assert body["channel_id"] == "x"
+    assert body["origin_id"]
+
+
+def _reject_when(key: str, ok: httpx.Response):
+    def handler(request):
+        if key in json.loads(request.content):
+            return httpx.Response(400, json={"success": False, "error": f"{key} invalid"})
+        return ok
+
+    return handler
+
+
+_LEAD_OK = httpx.Response(201, json={"success": True, "data": {"id": "lead-uuid-1"}})
+
+
+@stamped
+@routed
+@respx.mock
+async def test_rejected_channel_retries_without_channel_but_keeps_owner(client, caplog):
+    routes = mock_pipedrive_happy_path()
+    routes["lead"].mock(side_effect=_reject_when("channel", _LEAD_OK))
+    r = await client.post(
+        "/v1/leads/contact",
+        json={"name": "Dev", "email": "dev@example.com", "fields": ["developer"]},
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.sync_status == "synced"
+    assert routes["lead"].call_count == 2
+    first, second = _lead_body(routes, 0), _lead_body(routes, 1)
+    assert first["channel"] == 1037 and first["owner_id"] == 23328240
+    assert "channel" not in second and second["owner_id"] == 23328240
+    # the cheap string fields are never the cause of a 400, so they stay
+    assert second["origin_id"] == lead.id and second["channel_id"] == "direct"
+    assert "channel 1037" in caplog.text and "channel invalid" in caplog.text
+    assert lead.sync_error and "lead created without channel 1037" in lead.sync_error
+
+
+@stamped
+@routed
+@respx.mock
+async def test_rejected_owner_keeps_a_good_channel(client):
+    routes = mock_pipedrive_happy_path()
+    routes["lead"].mock(side_effect=_reject_when("owner_id", _LEAD_OK))
+    await client.post(
+        "/v1/leads/contact",
+        json={"name": "Dev", "email": "dev@example.com", "fields": ["developer"]},
+    )
+    lead = await get_single_lead(client)
+    assert lead.sync_status == "synced"
+    # (owner, channel) -> (owner, none) -> (none, channel): the channel is only
+    # dropped for good once both it and the owner have been tried without
+    assert routes["lead"].call_count == 3
+    last = _lead_body(routes)
+    assert "owner_id" not in last and last["channel"] == 1037
+    assert "lead created without owner 23328240" in lead.sync_error
+    assert "channel" not in lead.sync_error.split("lead created")[1]
+
+
+@stamped
+@routed
+@respx.mock
+async def test_both_rejected_ends_with_neither_and_records_both(client):
+    routes = mock_pipedrive_happy_path()
+
+    def handler(request):
+        body = json.loads(request.content)
+        if "owner_id" in body or "channel" in body:
+            return httpx.Response(400, json={"success": False, "error": "nope"})
+        return _LEAD_OK
+
+    routes["lead"].mock(side_effect=handler)
+    await client.post(
+        "/v1/leads/contact",
+        json={"name": "Dev", "email": "dev@example.com", "fields": ["developer"]},
+    )
+    lead = await get_single_lead(client)
+    assert lead.sync_status == "synced"
+    assert routes["lead"].call_count == 4
+    assert "lead created without owner 23328240 and channel 1037" in lead.sync_error
+
+
+@stamped
+@routed
+@respx.mock
+async def test_server_error_is_not_retried_without_channel(client):
+    routes = mock_pipedrive_happy_path()
+    routes["lead"].mock(return_value=httpx.Response(500, json={"error": "boom"}))
+    await client.post(
+        "/v1/leads/contact",
+        json={"name": "Dev", "email": "dev@example.com", "fields": ["developer"]},
+    )
+    lead = await get_single_lead(client)
+    assert lead.sync_status == "failed"
+    # the client retries 5xx on its own (max_retries); the fallback adds none
+    assert all("channel" in _lead_body(routes, i) for i in range(routes["lead"].call_count))
+
+
+def test_boot_warns_when_the_website_channel_is_not_configured(tmp_path, caplog):
+    """Without it every website lead, and every deal converted from one, reaches
+    Pipedrive with no Source channel and the dashboard cannot attribute it."""
+    from tests.conftest import make_settings
+
+    with caplog.at_level("WARNING"):
+        create_app(make_settings(tmp_path))
+    assert "BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL" in " ".join(r.getMessage() for r in caplog.records)
+    caplog.clear()
+    with caplog.at_level("WARNING"):
+        create_app(make_settings(tmp_path, pipedrive_website_channel=1037))
+    assert "BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL" not in " ".join(r.getMessage() for r in caplog.records)

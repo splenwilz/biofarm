@@ -16,6 +16,9 @@ services:
     # https scheme. Client IPs for rate limiting come from the edge-set
     # True-Client-IP header (see routes/leads.py), NOT from X-Forwarded-For,
     # whose leftmost entry is client-forgeable.
+    # One uvicorn process, no --workers: the Pipedrive mirror import and the
+    # dashboard payload cache live in the process (see api/README.md), so more
+    # workers would mean more schedulers and more caches.
     startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
     healthCheckPath: /healthz
     autoDeployTrigger: commit
@@ -41,6 +44,12 @@ services:
         sync: false
       - key: BIOFARM_PIPEDRIVE_API_TOKEN
         sync: false
+      # For the marketing dashboard (see api/README.md, "Dashboard feed"):
+      #   BIOFARM_DASHBOARD_TOKEN              (shared secret the dashboard's server sends; generate, never commit)
+      #   BIOFARM_MIRROR_IMPORT_MINUTES=15     (the Pipedrive mirror import runs inside this process; a cron
+      #                                         job cannot reach the disk this SQLite database lives on)
+      #   BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL=1037 (without it website leads and their deals have no Source channel)
+      #   BIOFARM_ENQUIRY_TEST_DOMAINS / BIOFARM_ENQUIRY_TEST_EMAILS (the team's own test addresses, JSON lists)
       # Optional - set in the dashboard when ready:
       #   BIOFARM_PIPEDRIVE_OWNER_ID           (fallback user id for leads the owner map doesn't cover)
       #   BIOFARM_PIPEDRIVE_OWNER_MAP          (JSON: "<form>" or "<form>:<field>" -> user id, see api/README.md)

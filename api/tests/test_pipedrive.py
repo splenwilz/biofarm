@@ -188,3 +188,41 @@ async def test_client_error_raises_without_retry(pd):
     with pytest.raises(PipedriveError):
         await pd.create_lead(title="t", person_id=1)
     assert route.call_count == 1
+
+
+@respx.mock
+async def test_create_lead_stamps_origin_and_channel(pd):
+    route = respx.post(f"{BASE}/api/v1/leads").mock(
+        return_value=httpx.Response(
+            201, json={"success": True, "data": {"id": "adf21080-0e10-11eb-879b-05d71fb426ec"}}
+        )
+    )
+    await pd.create_lead(
+        title="Website enquiry - Jane",
+        person_id=42,
+        origin_id="our-lead-uuid",
+        channel=1037,
+        channel_id="bing/cpc",
+    )
+    body = json.loads(route.calls.last.request.content)
+    # names and types per the official addLeadRequest schema (v1 OpenAPI):
+    # origin_id string, channel integer, channel_id string
+    assert body["origin_id"] == "our-lead-uuid"
+    assert body["channel"] == 1037
+    assert body["channel_id"] == "bing/cpc"
+
+
+@respx.mock
+async def test_create_lead_omits_source_keys_when_not_given(pd):
+    route = respx.post(f"{BASE}/api/v1/leads").mock(
+        return_value=httpx.Response(
+            201, json={"success": True, "data": {"id": "adf21080-0e10-11eb-879b-05d71fb426ec"}}
+        )
+    )
+    await pd.create_lead(title="t", person_id=1)
+    body = json.loads(route.calls.last.request.content)
+    # the schema says an omitted key is set to null; sending an explicit null
+    # for `channel` would be the same, but an explicit wrong value is a 400
+    assert "origin_id" not in body
+    assert "channel" not in body
+    assert "channel_id" not in body

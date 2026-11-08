@@ -1,19 +1,22 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from limits import parse
 from limits.aio.storage import MemoryStorage
 from limits.aio.strategies import MovingWindowRateLimiter
-from sqlalchemy import event
 from sqlalchemy.engine import make_url
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.config import Settings
-from app.db import Base
+from app.db import Base, make_engine
+from app.mirror.schedule import import_once, run_periodically, start_clean
+from app.routes.dashboard import router as dashboard_router
 from app.routes.leads import router as leads_router
-
 
 MAX_BODY_BYTES = 64 * 1024
 
@@ -32,29 +35,41 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 " or a Postgres URL in production"
             )
 
+    if settings.pipedrive_enabled and settings.pipedrive_website_channel is None:
+        logging.getLogger("app").warning(
+            "BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL is not set: website leads (and the deals they become) reach "
+            "Pipedrive with no Source channel, so the dashboard cannot attribute them. Set it to the "
+            "'Website' option id of the Source channel deal field (1037 on the Biofarm account)."
+        )
+
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        engine = create_async_engine(settings.database_url)
-        if engine.dialect.name == "sqlite":
-            # Production SQLite (persistent disk): WAL lets a reader and writer
-            # coexist, and busy_timeout makes a second writer wait instead of
-            # failing instantly with 'database is locked' when a request commit
-            # overlaps a background-task commit.
-            @event.listens_for(engine.sync_engine, "connect")
-            def _set_sqlite_pragmas(dbapi_conn, _record):
-                cursor = dbapi_conn.cursor()
-                cursor.execute("PRAGMA journal_mode=WAL")
-                cursor.execute("PRAGMA busy_timeout=5000")
-                cursor.close()
-
+        engine = make_engine(settings.database_url)  # SQLite pragmas (WAL, busy_timeout) live in make_engine
         app.state.engine = engine
         app.state.sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
         if settings.auto_create_tables:
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
+        # The Pipedrive mirror import runs in this process on a timer when
+        # configured (see Settings.mirror_import_minutes). First run after a
+        # minute so a deploy settles before the API budget is spent.
+        app.state.import_task = None
+        if settings.mirror_import_minutes > 0 and settings.pipedrive_enabled:
+            await start_clean(app.state.sessionmaker)
+            app.state.import_task = asyncio.create_task(
+                run_periodically(import_once(app.state.sessionmaker, settings), every=settings.mirror_import_minutes * 60),
+                name="pipedrive-mirror-import",
+            )
         try:
             yield
         finally:
+            task = app.state.import_task
+            if task is not None:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    logging.getLogger("app.mirror").debug("import schedule stopped")
             await engine.dispose()
 
     app = FastAPI(
@@ -70,6 +85,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.rate_limiter = MovingWindowRateLimiter(MemoryStorage())
     app.state.rate_limit_item = parse(settings.rate_limit)
 
+    # The dashboard payload is about a megabyte of JSON per page view.
+    app.add_middleware(GZipMiddleware, minimum_size=500)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -95,6 +112,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return await call_next(request)
 
     app.include_router(leads_router)
+    app.include_router(dashboard_router)
 
     @app.get("/healthz")
     async def healthz() -> dict:
