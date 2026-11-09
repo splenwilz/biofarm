@@ -134,6 +134,7 @@ export type FormKey = EnquiryForm | "none";
 
 export const FORM_LABEL: Record<FormKey, string> = {
   contact: "Contact form",
+  landowner: "Landowner page form",
   newsletter: "Newsletter sign-up",
   cpd: "CPD booking",
   fold: "Fold enquiry",
@@ -141,7 +142,7 @@ export const FORM_LABEL: Record<FormKey, string> = {
 };
 
 /** The rows of the by-form table, in order. Newsletter sign-ups are not enquiries, so they have no row. */
-const FORM_ROWS: readonly FormKey[] = ["contact", "cpd", "fold", "none"];
+const FORM_ROWS: readonly FormKey[] = ["contact", "landowner", "cpd", "fold", "none"];
 
 export interface FormRow {
   form: FormKey;

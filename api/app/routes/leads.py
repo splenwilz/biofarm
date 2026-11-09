@@ -9,6 +9,7 @@ from app.schemas import (
     ContactSubmission,
     CpdSubmission,
     FoldSubmission,
+    LandownerSubmission,
     LeadSubmissionBase,
     NewsletterSubmission,
 )
@@ -189,6 +190,36 @@ def _fold_message(submission: FoldSubmission) -> str:
         lines.append("")
         lines.append(submission.message)
     return "\n".join(lines)
+
+
+@router.post("/landowner", status_code=202)
+async def submit_landowner(
+    submission: LandownerSubmission,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    lead = Lead(
+        form="landowner",
+        name=submission.name,
+        email=submission.email,
+        phone=submission.phone,
+        message=submission.message,
+        # The page is for landowners: sets the Client Type person field on
+        # NEW persons, and lets the owner map route by "landowner".
+        fields=["landowner"],
+        newsletter_opt_in=submission.newsletter_opt_in,
+        page=submission.page,
+        attribution=submission.attribution.model_dump(exclude_none=True)
+        if submission.attribution
+        else None,
+        first_touch=submission.first_touch.model_dump(exclude_none=True)
+        if submission.first_touch
+        else None,
+        ga_client_id=submission.ga_client_id,
+        ga_session_id=submission.ga_session_id,
+    )
+    return await _accept_lead(submission, lead, request, background_tasks, session)
 
 
 @router.post("/fold", status_code=202)

@@ -81,7 +81,7 @@ describe("landingPages and enquiriesByForm", () => {
   it("counts enquiries per form with readable labels, the team's own Pipedrive records last", () => {
     const inbound = data.enquiries.filter((e) => e.channel !== null && kpiConfig.inboundChannels.includes(e.channel));
     const rows = enquiriesByForm(inbound, [DEMO_LAST_MONTH]);
-    expect(rows.map((r) => r.form)).toEqual(["contact", "cpd", "fold", "none"]);
+    expect(rows.map((r) => r.form)).toEqual(["contact", "landowner", "cpd", "fold", "none"]);
     expect(rows.find((r) => r.form === "cpd")!.label).toBe("CPD booking");
     expect(rows.find((r) => r.form === "none")!.label).toBe("Logged in Pipedrive by the team");
     expect(rows.reduce((s, r) => s + r.count, 0)).toBe(report.headline.enquiries);

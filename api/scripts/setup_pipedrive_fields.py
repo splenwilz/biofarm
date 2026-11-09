@@ -1,5 +1,7 @@
 """One-off bootstrap: create the attribution custom fields in Pipedrive and
-print the JSON for the BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP env var.
+print the JSON for the BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP env var, plus the
+BIOFARM_PIPEDRIVE_NEWSLETTER_* values read from the team's existing
+"Newsletter Sign Up" field (never created here - the old web forms made it).
 
 Leads inherit deal custom fields, so these are created via the Deal Fields API.
 
@@ -30,6 +32,32 @@ FIELDS = {
 }
 
 
+NEWSLETTER_FIELD = "Newsletter Sign Up"
+NEWSLETTER_OPTIONS = {"Opted In": "opted_in", "Opted Out": "opted_out"}
+
+
+def newsletter_settings(fields: list[dict]) -> list[str]:
+    """The env lines for the Newsletter Sign Up field, from GET /dealFields
+    data, or one line saying why there are none."""
+    field = next((f for f in fields if f.get("field_name") == NEWSLETTER_FIELD), None)
+    if field is None:
+        return [f"{NEWSLETTER_FIELD} field not found in Pipedrive; leave BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD unset"]
+    labels = {o.get("label"): o.get("id") for o in field.get("options") or []}
+    option_map = {key: labels[label] for label, key in NEWSLETTER_OPTIONS.items() if label in labels}
+    if len(option_map) != len(NEWSLETTER_OPTIONS):
+        found = ", ".join(str(label) for label in labels) or "none"
+        return [
+            (
+                f"{NEWSLETTER_FIELD} field {field['field_code']} has no 'Opted In' / 'Opted Out' options "
+                f"(found: {found}); set the option map by hand"
+            )
+        ]
+    return [
+        f"BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD={field['field_code']}",
+        f"BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP={json.dumps(option_map)}",
+    ]
+
+
 def main() -> None:
     domain = os.environ.get("PIPEDRIVE_COMPANY_DOMAIN")
     token = os.environ.get("PIPEDRIVE_API_TOKEN")
@@ -42,7 +70,8 @@ def main() -> None:
         existing = {}
         resp = client.get(f"{base}/api/v2/dealFields", params={"limit": 500})
         resp.raise_for_status()
-        for field in resp.json().get("data") or []:
+        all_fields = resp.json().get("data") or []
+        for field in all_fields:
             if field.get("field_name"):
                 existing[field["field_name"]] = (
                     field["field_code"],
@@ -74,6 +103,8 @@ def main() -> None:
 
     print("\nSet this on the Render service:")
     print(f"BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP={json.dumps(field_map)}")
+    for line in newsletter_settings(all_fields):
+        print(line)
 
 
 if __name__ == "__main__":

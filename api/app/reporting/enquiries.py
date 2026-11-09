@@ -95,6 +95,9 @@ class Candidate:
     converted: bool = False
     # The visit as Pipedrive's UTM Source, UTM Medium and Referrer fields recorded it.
     touch: Mapping[str, object] = field(default_factory=dict)
+    # Pipedrive's free-text channel_id: the web form's name on a WebForms record
+    # (kept on the deal it becomes), our source label on a record our API made.
+    form_name: str | None = None
 
 
 @dataclass(frozen=True)
@@ -155,11 +158,21 @@ def campaign_of(c: Candidate) -> str | None:
     return _clean(c.utm_campaign)
 
 
+# Pipedrive web forms (origin WebForms) whose submissions belong to a website
+# form of ours, by the form name Pipedrive stamps as channel_id. The landowner
+# page's embed ran until November 2026; its records and the tracked form's share
+# one row in the by-form table. The other embeds are the contact form (the title
+# fallback below) or the newsletter (caught by title on both sides).
+_PIPEDRIVE_WEB_FORMS: dict[str, EnquiryForm] = {"Landowner Contact Form": "landowner"}
+
+
 def form_of(c: Candidate, ctx: EnquiryContext) -> EnquiryForm | None:
     if c.website is not None and c.website.form in FORMS:
         return c.website.form  # type: ignore[return-value]
     if c.origin not in ctx.settings.enquiry_website_origins:
         return None
+    if c.origin == "WebForms" and c.form_name in _PIPEDRIVE_WEB_FORMS:
+        return _PIPEDRIVE_WEB_FORMS[c.form_name]
     title = c.title or ""
     if ctx.newsletter_title.search(title):
         return "newsletter"
@@ -167,6 +180,8 @@ def form_of(c: Candidate, ctx: EnquiryContext) -> EnquiryForm | None:
         return "cpd"
     if re.match(r"\s*fold\b", title, re.IGNORECASE):
         return "fold"
+    if re.match(r"\s*landowner enquiry\b", title, re.IGNORECASE):
+        return "landowner"  # our API's title; the old embed's "Landowner Web Enquiry" stays a contact form
     return "contact"
 
 
@@ -277,14 +292,14 @@ def candidates_from(
             utm_campaign=_custom(lead.custom_fields, utm_campaign_code) or (_custom(deal.custom_fields, utm_campaign_code) if deal else None),
             landing_page=_custom(lead.custom_fields, landing_page_code) or (_custom(deal.custom_fields, landing_page_code) if deal else None),
             website=website_records.get(lead.id) or (website_records.get(lead.origin_id) if lead.origin_id else None),
-            touch=touch(lead, deal),
+            touch=touch(lead, deal), form_name=lead.channel_id or (deal.channel_id if deal else None),
         ))
     for deal, audience in deals:
         if deal.add_time is None or (deal.source_lead_id and deal.source_lead_id in live_leads):
             continue
         out.append(Candidate(
             kind="deal", id=str(deal.id), title=deal.title, created_at=deal.add_time, origin=deal.origin, channel_id=deal.channel,
-            person_id=deal.person_id, archived=False, audience=audience, converted=bool(deal.source_lead_id), touch=touch(deal),
+            person_id=deal.person_id, archived=False, audience=audience, converted=bool(deal.source_lead_id), touch=touch(deal), form_name=deal.channel_id,
             utm_campaign=_custom(deal.custom_fields, utm_campaign_code), landing_page=_custom(deal.custom_fields, landing_page_code),
             website=(website_records.get(deal.origin_id) if deal.origin_id else None) or (website_records.get(deal.source_lead_id) if deal.source_lead_id else None),
         ))

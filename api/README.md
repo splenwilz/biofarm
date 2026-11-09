@@ -7,7 +7,7 @@ which blocked GA4 conversion tracking and lost UTM/gclid lead-source data.
 
 ## How a submission flows
 
-1. `POST /v1/leads/contact` or `POST /v1/leads/newsletter` (JSON, CORS-locked to biofarm.co.uk).
+1. `POST /v1/leads/contact`, `/newsletter`, `/cpd`, `/fold` or `/landowner` (JSON, CORS-locked to biofarm.co.uk). One route per website form; the route fixes the form name Pipedrive titles and reporting use.
 2. Validation (Pydantic) → spam checks (honeypot + minimum fill time + per-IP rate limit).
 3. The lead is committed to the database **first** - the DB is the source of
    truth (SQLite on a persistent disk in production, swappable for Postgres via
@@ -15,7 +15,7 @@ which blocked GA4 conversion tracking and lost UTM/gclid lead-source data.
    Response: `202 {"status":"accepted","id":...}`.
 4. A background task then:
    - finds-or-creates the Person in Pipedrive (API v2), setting `marketing_status=subscribed` on newsletter opt-in;
-   - creates a Lead (API v1 - leads have no v2) with attribution custom fields;
+   - creates a Lead (API v1 - leads have no v2) with attribution custom fields and, from a form that asked, the "Newsletter Sign Up" field (Opted In / Opted Out, as the old embeds wrote it; see `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD`);
    - pins a Note with the message + attribution breakdown;
    - optionally fires a GA4 Measurement Protocol event (`generate_lead_server`).
 5. Sync outcome is recorded on the row: `synced | failed | skipped_spam | disabled`.
@@ -79,7 +79,7 @@ PIPEDRIVE_COMPANY_DOMAIN=biofarm PIPEDRIVE_API_TOKEN=xxx \
 ```
 
 Creates the UTM/attribution custom fields (leads inherit deal fields) and
-prints the `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` value to set on the service.
+prints the `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` value to set on the service. It also prints the `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD` / `_OPTION_MAP` values read from the existing "Newsletter Sign Up" field.
 Without it, attribution still lands in the pinned note and our DB - the map
 just makes it filterable in Pipedrive.
 
@@ -191,13 +191,15 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `BIOFARM_PIPEDRIVE_COMPANY_DOMAIN` | yes | `{domain}.pipedrive.com` |
 | `BIOFARM_PIPEDRIVE_API_TOKEN` | yes | secret; sent as `x-api-token` header |
 | `BIOFARM_PIPEDRIVE_OWNER_ID` | no | fallback Pipedrive user ID for leads the owner map doesn't cover (unset = the API token's user) |
-| `BIOFARM_PIPEDRIVE_OWNER_MAP` | no | JSON: enquiry type -> Pipedrive user ID. Keys are `<form>` or `<form>:<field>` (forms: contact, newsletter, cpd, fold; fields: developer, landowner, other; lower-case); most specific wins. Applied to the lead and to newly created persons. Values are integers (a digit string is accepted). Unknown keys, bad values or malformed JSON are logged as errors and dropped, the service still boots and those leads use the fallback owner. If Pipedrive rejects the owner (deactivated user, wrong id) the record is created without one, a warning is logged and the lead's `sync_error` notes it (status stays `synced`). e.g. `{"contact:developer": 23328240, "contact:landowner": 27433044, "cpd": 123}` |
+| `BIOFARM_PIPEDRIVE_OWNER_MAP` | no | JSON: enquiry type -> Pipedrive user ID. Keys are `<form>` or `<form>:<field>` (forms: contact, newsletter, cpd, fold, landowner; fields: developer, landowner, other; lower-case); most specific wins. Applied to the lead and to newly created persons. Values are integers (a digit string is accepted). Unknown keys, bad values or malformed JSON are logged as errors and dropped, the service still boots and those leads use the fallback owner. If Pipedrive rejects the owner (deactivated user, wrong id) the record is created without one, a warning is logged and the lead's `sync_error` notes it (status stays `synced`). e.g. `{"contact:developer": 23328240, "contact:landowner": 27433044, "cpd": 123}`. The landowner page form (`landowner`) sets the landowner field itself, so it routes by the `landowner` key (or `landowner:landowner`), never by `contact:landowner`; without a key it falls to the global owner |
 | `BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL` | no | option id of "Website" in Pipedrive's **Source channel** deal field (Company settings > Data fields > Deal > Source channel, or the `channel` entry of `GET /v1/dealFields`; `1037` on the Biofarm account). Sent as `channel` on every lead; Pipedrive carries it onto the deal at conversion. Unset = no channel is sent and Sales picks it by hand. A value Pipedrive does not recognise gets a 400, in which case the lead is created without it, a warning is logged and `sync_error` notes it (status stays `synced`), the same way as a rejected owner. Bad shapes are logged and ignored at boot. |
 | `BIOFARM_PIPEDRIVE_LEAD_LABEL_IDS` | no | JSON array of lead label UUIDs, applied to every lead |
 | `BIOFARM_PIPEDRIVE_FORM_LABEL_MAP` | no | JSON: form -> extra label UUIDs, e.g. `{"newsletter": ["uuid"]}` |
 | `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` | no | JSON from the bootstrap script |
 | `BIOFARM_PIPEDRIVE_CLIENT_TYPE_FIELD` | no | "Client Type" person-field hash; set on newly created persons only |
 | `BIOFARM_PIPEDRIVE_CLIENT_TYPE_MAP` | no | JSON: form value -> option id, e.g. `{"developer": 531}` |
+| `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD` | no | "Newsletter Sign Up" lead field hash (an option field; leads inherit deal fields). Set on every lead from a form that asks about the newsletter - contact and landowner (Opted In or Opted Out from the tick-box), newsletter (Opted In) - as the old Pipedrive embeds did; the CPD and Fold forms never ask, so their leads leave it empty |
+| `BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP` | no | JSON: `{"opted_in": <option id>, "opted_out": <option id>}`, the field's option ids from `GET /v1/dealFields` |
 | `BIOFARM_GA4_MEASUREMENT_ID` | no | `G-3MS9TLLZRN` |
 | `BIOFARM_GA4_API_SECRET` | no | secret |
 | `BIOFARM_DASHBOARD_TOKEN` | for the dashboard | shared secret the marketing dashboard's server sends as `x-dashboard-token` to `GET /v1/dashboard`; unset = the endpoint answers 503 to everyone |
@@ -205,7 +207,7 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL` | for the dashboard | "Website" option id of the Source channel deal field (1037). Without it website leads, and the deals they are converted into, reach Pipedrive with no Source channel (Pipedrive also drops `channel_id` then); the API warns at boot and the dashboard falls back to origin API / Web Forms = Website |
 | `BIOFARM_PIPEDRIVE_PIPELINE_AUDIENCES` | no | JSON: pipeline id -> `developer` or `landowner`, default `{"3":"developer","7":"developer","2":"landowner","6":"landowner"}` (the two DORMANT pipelines keep their audience) |
 | `BIOFARM_ENQUIRY_EXCLUDED_DEAL_ORIGINS` | no | JSON list of Pipedrive deal origins that are not enquiries, default `["Import"]` |
-| `BIOFARM_ENQUIRY_WEBSITE_ORIGINS` | no | JSON list of origins that mean "came through the website" (default Website channel, form read from the title), default `["WebForms","API"]` |
+| `BIOFARM_ENQUIRY_WEBSITE_ORIGINS` | no | JSON list of origins that mean "came through the website" (default Website channel; form read from the title, except that a Pipedrive web form named `Landowner Contact Form` - the landowner page's embed until November 2026 - counts as the `landowner` form so the by-form table stays in one row across the switch), default `["WebForms","API"]` |
 | `BIOFARM_ENQUIRY_TEST_CAMPAIGNS` | no | JSON list of UTM campaigns that were tracking tests, default `["tracking-test","go-live-check","field-map","final-check"]` |
 | `BIOFARM_ENQUIRY_TEST_DOMAINS` / `BIOFARM_ENQUIRY_TEST_EMAILS` | yes, for real figures | JSON lists; a person with such an address was the team testing the forms (lower-cased before comparing). Default domains `["biofarm-test.dev"]`, default emails none: the team's own domains and addresses are set in the environment, never in the code, and a value replaces the default (so include `biofarm-test.dev` again) |
 | `BIOFARM_ENQUIRY_STAFF_DOMAINS` | no | JSON list; website sign-ups by people at these domains are staff trying the forms, default `["biofarm.co.uk"]` |

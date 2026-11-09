@@ -235,6 +235,43 @@ async def test_fold_endpoint(client):
     assert lead.sync_status == "synced"
 
 
+@respx.mock
+async def test_landowner_endpoint(client):
+    """The landowner page's form: the old Pipedrive embed's questions (name, email,
+    phone, message, newsletter) with the landowner field implied by the page."""
+    routes = mock_pipedrive_happy_path()
+    r = await client.post(
+        "/v1/leads/landowner",
+        json={
+            "name": "Dan",
+            "email": "dan@example.com",
+            "phone": "07700 900000",
+            "message": "We own c.6ha near Stafford.",
+            "newsletter_opt_in": True,
+            "page": "/landowners",
+        },
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.form == "landowner"
+    assert lead.fields == ["landowner"]
+    assert lead.phone == "07700 900000"
+    assert lead.message == "We own c.6ha near Stafford."
+    assert lead.newsletter_opt_in is True
+    assert lead.sync_status == "synced"
+    body = json.loads(routes["lead"].calls.last.request.content)
+    assert body["title"] == "Landowner enquiry - Dan"
+
+
+@respx.mock
+async def test_landowner_requires_name_and_email_only(client):
+    mocks = mock_pipedrive_happy_path()  # the accepted submission syncs in the background
+    assert (await client.post("/v1/leads/landowner", json={"email": "dan@example.com"})).status_code == 422
+    assert (await client.post("/v1/leads/landowner", json={"name": "Dan"})).status_code == 422
+    assert (await client.post("/v1/leads/landowner", json={"name": "Dan", "email": "dan@example.com"})).status_code == 202
+    assert mocks["lead"].called
+
+
 async def test_fold_requires_habitat_bank_and_location(client):
     r = await client.post("/v1/leads/fold", json={"name": "Ed", "email": "ed@example.com"})
     assert r.status_code == 422
@@ -399,6 +436,32 @@ async def test_client_type_mapped_onto_new_person(tmp_path):
 
 
 @respx.mock
+async def test_newsletter_choice_is_written_on_the_lead_like_the_old_embeds_did(tmp_path):
+    settings = make_settings(
+        tmp_path,
+        pipedrive_newsletter_field="828536aaee0d0eb3ff3f033e925eb4320eaab7d9",
+        pipedrive_newsletter_option_map={"opted_in": 1120, "opted_out": 1121},
+    )
+    app = create_app(settings)
+    routes = mock_pipedrive_happy_path()
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            ac.app = app
+            for path, payload in (
+                ("/v1/leads/landowner", {"name": "Dan", "email": "dan@example.com", "newsletter_opt_in": False}),
+                ("/v1/leads/cpd", {"name": "Dan", "email": "dan@example.com", "company": "Acme"}),
+            ):
+                r = await ac.post(path, json=payload)
+                assert r.status_code == 202
+            # both background syncs have run once the lifespan closes
+    bodies = [json.loads(c.request.content) for c in routes["lead"].calls]
+    assert [b["title"] for b in bodies] == ["Landowner enquiry - Dan", "CPD session request - Dan"]
+    assert bodies[0]["828536aaee0d0eb3ff3f033e925eb4320eaab7d9"] == 1121  # the box was shown and left unticked
+    assert "828536aaee0d0eb3ff3f033e925eb4320eaab7d9" not in bodies[1]  # the CPD form never asks
+
+
+@respx.mock
 async def test_ga4_server_event_fires_when_configured(tmp_path):
     settings = make_settings(tmp_path, ga4_measurement_id="G-TEST", ga4_api_secret="sec")
     app = create_app(settings)
@@ -485,6 +548,29 @@ async def test_fold_form_mapping_beats_its_hardcoded_landowner_field(client):
     # fold sets fields=["landowner"], but there is no "fold:landowner" key,
     # so the "fold" entry applies - not contact's landowner owner
     assert _owner_in(routes, "lead") == 222
+
+
+@routed
+@respx.mock
+async def test_landowner_form_falls_back_to_the_global_owner_without_its_own_key(client):
+    routes = mock_pipedrive_happy_path()
+    r = await client.post("/v1/leads/landowner", json={"name": "L", "email": "l@example.com"})
+    assert r.status_code == 202
+    await get_single_lead(client)
+    # fields=["landowner"] but no "landowner:landowner" or "landowner" key: the
+    # contact form's landowner owner must NOT apply, so Render needs a "landowner" key
+    assert _owner_in(routes, "lead") == 999
+
+
+@pytest.mark.settings(pipedrive_owner_map={**OWNER_MAP, "landowner": 22104303}, pipedrive_owner_id=999)
+@respx.mock
+async def test_landowner_form_routes_by_its_own_key(client):
+    routes = mock_pipedrive_happy_path()
+    r = await client.post("/v1/leads/landowner", json={"name": "L", "email": "l@example.com"})
+    assert r.status_code == 202
+    await get_single_lead(client)
+    assert _owner_in(routes, "lead") == 22104303
+    assert _owner_in(routes, "person") == 22104303
 
 
 @routed
@@ -832,6 +918,7 @@ async def test_every_route_stores_a_known_form(client):
         "newsletter": {"name": "B", "email": "b@example.com"},
         "cpd": {"name": "C", "email": "c@example.com", "company": "Acme"},
         "fold": {"name": "D", "email": "d@example.com", "habitat_bank": "X", "location": "Y"},
+        "landowner": {"name": "E", "email": "e@example.com"},
     }
     for form, payload in payloads.items():
         r = await client.post(f"/v1/leads/{form}", json=payload)

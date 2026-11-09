@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 FieldChoice = Literal["developer", "landowner", "other"]
 # Forms the API accepts; each route stores one of these in Lead.form and the
 # owner map (config) only accepts keys built from them.
-LEAD_FORMS = ("contact", "newsletter", "cpd", "fold")
+LEAD_FORMS = ("contact", "newsletter", "cpd", "fold", "landowner")
 
 
 class Attribution(BaseModel):
@@ -68,6 +68,16 @@ class CpdSubmission(LeadSubmissionBase):
     fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
     team_size: TeamSize | None = None
     message: str | None = Field(default=None, max_length=5000)
+
+
+class LandownerSubmission(LeadSubmissionBase):
+    """The landowner page's form: the old Pipedrive embed's questions (name,
+    email, phone, message, newsletter) with no field chips - the page itself
+    says landowner, so the route fixes fields=["landowner"]."""
+
+    phone: str | None = Field(default=None, max_length=50)
+    message: str | None = Field(default=None, max_length=5000)
+    newsletter_opt_in: bool = False
 
 
 class FoldSubmission(LeadSubmissionBase):

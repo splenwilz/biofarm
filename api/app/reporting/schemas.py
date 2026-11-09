@@ -22,7 +22,7 @@ class Wire(BaseModel):
 Pipeline = Literal["developer", "landowner"]
 Channel = Literal["Website", "Info email inbox", "Campaigns / Outreach", "Linkedin", "Trade Show / Event", "Introducer", "Existing Network", "Marketplace"]
 DealStatus = Literal["open", "won", "lost"]
-EnquiryForm = Literal["contact", "newsletter", "cpd", "fold"]
+EnquiryForm = Literal["contact", "newsletter", "cpd", "fold", "landowner"]
 Audience = Literal["developer", "landowner", "other"]
 
 

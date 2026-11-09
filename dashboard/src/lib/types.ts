@@ -51,7 +51,7 @@ export interface Deal {
   checks?: Partial<Record<QualificationCheckId, boolean>>;
 }
 
-export type EnquiryForm = "contact" | "newsletter" | "cpd" | "fold";
+export type EnquiryForm = "contact" | "newsletter" | "cpd" | "fold" | "landowner";
 export type Audience = "developer" | "landowner" | "other";
 
 /**

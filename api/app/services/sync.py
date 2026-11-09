@@ -89,18 +89,33 @@ def resolve_owner_id(lead: Lead, settings: Settings) -> int | None:
     return settings.pipedrive_owner_id
 
 
-def _lead_custom_fields(lead: Lead, settings: Settings) -> dict[str, str]:
+# Forms that put the newsletter question to the visitor: a tick-box on the
+# contact and landowner forms, the newsletter form itself. The CPD and Fold
+# forms never ask, so their leads say nothing either way - "Opted Out" for a
+# question that was never put would be false.
+_FORMS_ASKING_ABOUT_NEWSLETTER = frozenset({"contact", "landowner", "newsletter"})
+
+
+def _lead_custom_fields(lead: Lead, settings: Settings) -> dict[str, str | int]:
     merged: dict[str, str] = {}
     # first touch fills gaps, last touch wins
     for data in (lead.first_touch or {}, lead.attribution or {}):
         for key, value in data.items():
             if value:
                 merged[key] = value
-    return {
+    fields: dict[str, str | int] = {
         field_hash: merged[key]
         for key, field_hash in settings.pipedrive_lead_field_map.items()
         if merged.get(key)
     }
+    # The "Newsletter Sign Up" option field, as the old embeds wrote it: the
+    # option id (an integer, which is how Pipedrive stores and returns it).
+    if settings.pipedrive_newsletter_field and lead.form in _FORMS_ASKING_ABOUT_NEWSLETTER:
+        choice = "opted_in" if lead.newsletter_opt_in else "opted_out"
+        option_id = settings.pipedrive_newsletter_option_map.get(choice)
+        if option_id is not None:
+            fields[settings.pipedrive_newsletter_field] = option_id
+    return fields
 
 
 # 4xx codes that can never be about the owner or channel: bad token, billing,
@@ -222,6 +237,7 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
             "newsletter": f"Newsletter signup - {lead.name}",
             "cpd": f"CPD session request - {lead.name}",
             "fold": f"Fold enquiry - {lead.name}",
+            "landowner": f"Landowner enquiry - {lead.name}",
         }.get(lead.form, f"Website lead - {lead.name}")
         label_ids = list(
             dict.fromkeys(

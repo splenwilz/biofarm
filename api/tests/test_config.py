@@ -118,3 +118,40 @@ def test_entries_dropped_from_an_enquiry_setting_are_logged(monkeypatch, caplog)
     assert s.enquiry_test_campaigns == ["x"] and s.enquiry_channel_by_title == {}
     messages = " ".join(r.getMessage() for r in caplog.records)
     assert "BIOFARM_ENQUIRY_TEST_CAMPAIGNS" in messages and "BIOFARM_ENQUIRY_CHANNEL_BY_TITLE" in messages
+
+
+def test_newsletter_option_map_parses_from_json_env_and_coerces_digit_strings(monkeypatch):
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD", "newshash")
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP", '{"opted_in": "1120", "opted_out": 1121}')
+    s = Settings(_env_file=None)
+    assert s.pipedrive_newsletter_field == "newshash"
+    assert s.pipedrive_newsletter_option_map == {"opted_in": 1120, "opted_out": 1121}
+
+
+def test_a_malformed_newsletter_option_map_is_logged_and_ignored_not_fatal(monkeypatch, caplog):
+    # a bad paste on Render must never take every form on the site offline
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP", '{"opted_in": 1120, "opted_out": 1121')
+    assert Settings(_env_file=None).pipedrive_newsletter_option_map == {}
+    assert "BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP" in caplog.text and "JSON" in caplog.text
+    caplog.clear()
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP", "[1120, 1121]")
+    assert Settings(_env_file=None).pipedrive_newsletter_option_map == {}
+    assert "JSON object" in caplog.text
+    caplog.clear()
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP", '{"optedin": 1120, "opted_out": "no", "opted_in": 1120}')
+    assert Settings(_env_file=None).pipedrive_newsletter_option_map == {"opted_in": 1120}
+    assert "'optedin'" in caplog.text and "'opted_out'" in caplog.text
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP", "")
+    assert Settings(_env_file=None).pipedrive_newsletter_option_map == {}
+
+
+def test_an_incomplete_newsletter_setting_warns_at_boot(caplog):
+    Settings(_env_file=None, pipedrive_newsletter_field="newshash", pipedrive_newsletter_option_map={"opted_in": 1120})
+    assert "BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP" in caplog.text and "opted_out" in caplog.text
+    caplog.clear()
+    Settings(_env_file=None, pipedrive_newsletter_option_map={"opted_in": 1120, "opted_out": 1121})
+    assert "BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD" in caplog.text
+    caplog.clear()
+    Settings(_env_file=None, pipedrive_newsletter_field="newshash", pipedrive_newsletter_option_map={"opted_in": 1120, "opted_out": 1121})
+    Settings(_env_file=None)
+    assert "NEWSLETTER" not in caplog.text

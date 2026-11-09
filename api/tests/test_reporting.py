@@ -234,7 +234,20 @@ class TestEnquiryRules:
     def test_form_is_read_from_the_title_of_website_records_only(self):
         assert derive(cand(title="CPD session request - Jo"), ectx()).form == "cpd"
         assert derive(cand(title="Fold enquiry - Jo"), ectx()).form == "fold"
-        assert derive(cand(title="Landowner Web Enquiry Rob", origin="WebForms"), ectx()).form == "contact"
+        assert derive(cand(title="Landowner enquiry - Jo"), ectx()).form == "landowner"  # the landowner page's tracked form
+        assert derive(cand(title="Landowner Web Enquiry Rob", origin="WebForms"), ectx()).form == "contact"  # a web form the mirror has no form name for
+
+    def test_the_old_landowner_embed_is_the_landowner_form_by_its_pipedrive_form_name(self):
+        # Pipedrive stamps a web form's name on the lead (and on the deal it becomes) as channel_id.
+        # The team renames titles freely, so the form name, not the title, decides; it keeps the
+        # by-form table in one row across the switch from the embed to the tracked form.
+        assert derive(cand(title="Landowner Web Enquiry Rob", origin="WebForms", form_name="Landowner Contact Form"), ectx()).form == "landowner"
+        assert derive(cand(kind="deal", id="7", title="Land at Green Lane", origin="WebForms", form_name="Landowner Contact Form"), ectx()).form == "landowner"
+        assert derive(cand(title="Developer Web Enquiry Rob", origin="WebForms", form_name="Developer Contact Form"), ectx()).form == "contact"
+        assert derive(cand(title="FBI: Mark", origin="WebForms", form_name="Contact us"), ectx()).form == "contact"
+        # only Pipedrive web forms carry a form name there; on our own leads channel_id is the source label
+        assert derive(cand(title="Website enquiry - Jo", origin="API", form_name="google/cpc"), ectx()).form == "contact"
+        assert derive(cand(title="Heath Farm", origin="ManuallyCreated", channel_id=1136, form_name="Landowner Contact Form"), ectx()).form is None
         assert derive(cand(title="Heath Farm", origin="ManuallyCreated", channel_id=1136), ectx()).form is None
 
     def test_imported_deals_are_not_enquiries(self):
@@ -288,6 +301,14 @@ class TestCandidates:
         converted = deal(id=9, source_lead_id="L1", add_time=T, channel=1136)
         out = candidates_from([lead], [(converted, "developer")], {})
         assert [(c.kind, c.id, c.created_at, c.channel_id, c.audience) for c in out] == [("lead", "L1", T - 48 * H, 1134, "developer")]
+
+    def test_the_web_form_name_comes_from_the_lead_or_from_the_deal_it_became(self):
+        lead = mlead("L1", origin="WebForms", channel_id="Landowner Contact Form")
+        assert candidates_from([lead], [], {})[0].form_name == "Landowner Contact Form"
+        converted = deal(id=9, source_lead_id="L1", origin="WebForms", channel_id="Landowner Contact Form")
+        assert candidates_from([mlead("L1", origin="WebForms", channel_id=None)], [(converted, "landowner")], {})[0].form_name == "Landowner Contact Form"
+        assert candidates_from([], [(converted, "landowner")], {})[0].form_name == "Landowner Contact Form"
+        assert candidates_from([mlead("L2")], [], {})[0].form_name is None
 
     def test_a_converted_lead_pipedrive_has_deleted_is_counted_as_the_deal_marked_converted(self):
         out = candidates_from([], [(deal(id=9, source_lead_id="gone"), "developer"), (deal(id=10), "developer")], {})

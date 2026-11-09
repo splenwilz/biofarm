@@ -3,7 +3,14 @@ import logging
 import re
 from typing import Annotated, Any, get_args
 
-from pydantic import AliasChoices, Field, SecretStr, ValidationInfo, field_validator
+from pydantic import (
+    AliasChoices,
+    Field,
+    SecretStr,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 from app.schemas import LEAD_FORMS, FieldChoice
@@ -20,6 +27,10 @@ _OWNER_KEY_HELP = (
     f"keys are '<form>' or '<form>:<field>' (forms: {', '.join(LEAD_FORMS)}; "
     f"fields: {', '.join(get_args(FieldChoice))}; lower-case)"
 )
+
+
+# The two answers the "Newsletter Sign Up" lead field records (see sync).
+_NEWSLETTER_CHOICES = ("opted_in", "opted_out")
 
 
 def _as_positive_int(value: Any) -> int | None:
@@ -100,6 +111,12 @@ class Settings(BaseSettings):
     # Only applied when creating a NEW person - never overwrites existing contacts.
     pipedrive_client_type_field: str | None = None
     pipedrive_client_type_map: dict[str, int] = {}
+    # "Newsletter Sign Up" lead field (an option field; leads inherit deal
+    # fields): field hash + {"opted_in": option id, "opted_out": option id}.
+    # Written on every lead from a form that asks about the newsletter, as the
+    # old Pipedrive embeds did, so the team's Pipedrive filters keep working.
+    pipedrive_newsletter_field: str | None = None
+    pipedrive_newsletter_option_map: Annotated[dict[str, int], NoDecode] = {}
 
     ga4_measurement_id: str | None = None
     ga4_api_secret: SecretStr | None = None
@@ -183,6 +200,53 @@ class Settings(BaseSettings):
                 (info.field_name or "").upper(), type(v).__name__, len(str(v)),
             )
         return value
+
+    @field_validator("pipedrive_newsletter_option_map", mode="before")
+    @classmethod
+    def _newsletter_option_map_lenient(cls, v: Any) -> dict[str, int]:
+        """Like the owner map: a bad paste in an optional setting is logged
+        and dropped, never a failed boot (pydantic-settings would otherwise
+        raise on malformed JSON before any validator runs - hence NoDecode)."""
+        name = "BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP"
+        if v is None or v == "":
+            return {}
+        if isinstance(v, str):
+            try:
+                v = json.loads(v)
+            except ValueError as exc:
+                logger.error("%s is not valid JSON (%s); ignoring it - the Newsletter Sign Up field is not written", name, exc)
+                return {}
+        if not isinstance(v, dict):
+            logger.error("%s must be a JSON object, got %s; ignoring it", name, type(v).__name__)
+            return {}
+        out: dict[str, int] = {}
+        for key, value in v.items():
+            if key not in _NEWSLETTER_CHOICES:
+                logger.error("%s: dropping unknown key %r; keys are %s", name, key, " and ".join(repr(c) for c in _NEWSLETTER_CHOICES))
+                continue
+            option_id = _as_positive_int(value)
+            if option_id is None:
+                logger.error("%s[%r] is not a positive integer option id (got %s); dropping it", name, key, type(value).__name__)
+                continue
+            out[key] = option_id
+        return out
+
+    @model_validator(mode="after")
+    def _newsletter_field_is_set_up_whole(self) -> "Settings":
+        """Half a setting writes nothing (or only one of the two answers) in
+        silence; say so at boot."""
+        missing = [c for c in _NEWSLETTER_CHOICES if c not in self.pipedrive_newsletter_option_map]
+        if self.pipedrive_newsletter_field and missing:
+            logger.warning(
+                "BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD is set but BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP lacks %s, "
+                "so the Newsletter Sign Up field is not written for that answer", " and ".join(missing),
+            )
+        elif self.pipedrive_newsletter_option_map and not self.pipedrive_newsletter_field:
+            logger.warning(
+                "BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP is set but BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD is not: "
+                "the Newsletter Sign Up field is not written"
+            )
+        return self
 
     @field_validator("pipedrive_owner_map", mode="before")
     @classmethod
