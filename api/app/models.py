@@ -30,6 +30,8 @@ class Lead(Base):
     newsletter_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
     # contact form's "Where did you hear about us?": a schemas.HeardAbout key, or NULL
     heard_about: Mapped[str | None] = mapped_column(String(30))
+    # their own words when heard_about is "other", else NULL
+    heard_about_other: Mapped[str | None] = mapped_column(String(200))
 
     page: Mapped[str | None] = mapped_column(String(512))
     attribution: Mapped[dict | None] = mapped_column(JsonCol)

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!--
+  BIOFARM — /contact  VARIATION 1 "editorial split, hairline fields" (built 9 Nov 2026)
+
+  WHAT THIS IS: the live /contact page with its green "Get in touch" section redesigned around our
+  own form (the fields of habitat-hub/squarespace/contact-form-INLINE.html, same names and copy).
+  The other sections (Let's talk, Address / Email / Careers, newsletter, Your success is ours too)
+  are stand-ins for the live Squarespace sections so the new section can be judged in context.
+
+  THE SECTION: statement, then the office address and email (both as on the live page) on the
+  left, the form on the right. Fields are hairline
+  underlines on the green, not white boxes; the audience choice is outlined pills; the pill button
+  sits on the closing row with the privacy note. Choosing "Other" under "Where did you hear about
+  us?" reveals the "Where was that?" box (same behaviour as the live block).
+
+  Design language = the staged pages (web/variations/bng-cpd-v7-merged.html):
+    type      RATI_v2 H1 98.6/1.23 · H2 44.2/1.41 · H4 26/1.47 · Inter 17/1.8 body
+    grounds   cream #F7F8F3 · white · green #71977A (black text on green) · black #111
+    buttons   black pill RATI on light and green · cream pill on black
+  Fonts load from the site CDN (RATI_v2) and Google Fonts (Inter); open the file in a browser.
+  The form here is a visual stand-in: it does not post. Wire-up = the live block's script.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>V1 editorial · Contact | Biofarm</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  @font-face{font-family:'RATI_v2';
+    src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2'),
+        url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b088163d1f94c51715/1763739824273/BauhausRatiDisplay-ExtraLight_v2.woff') format('woff');
+    font-weight:300;font-display:swap;}
+
+  :root{
+    --cream:#F7F8F3; --white:#fff; --green:#71977A; --black:#111; --ink:#111;
+    --rati:'RATI_v2',Georgia,'Times New Roman',serif;
+    --inter:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    --gutter:clamp(24px,7vw,109px); --max:1350px;
+    --h1:clamp(52px,6.3vw,98.6px); --h2:clamp(34px,2.82vw,44.2px); --h3:clamp(28px,2.24vw,35.1px); --h4:clamp(22px,1.66vw,26px);
+    --big:clamp(20px,1.66vw,26px);
+    --hair:rgba(17,17,17,.35);
+  }
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--inter);font-weight:300;font-size:17px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:clip;}
+  *,*::before,*::after{box-sizing:border-box;}
+  img{display:block;max-width:100%;}
+
+  /* header (prototype — the live page inherits the real nav) */
+  .hdr{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s;}
+  .hdr.scrolled{background:rgba(247,248,243,.97);}
+  .hdr .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px clamp(24px,3vw,46px);}
+  .hdr .logo img{height:32px;}
+  .hdr ul{list-style:none;display:flex;align-items:center;gap:30px;margin:0;padding:0;}
+  .hdr ul a{text-decoration:none;color:var(--ink);font-size:15px;font-weight:400;letter-spacing:.06em;text-transform:uppercase;}
+  .hdr ul a.navpill{background:var(--black);color:#fff;border-radius:300px;padding:12px 26px;font-family:var(--rati);font-size:17px;letter-spacing:.02em;text-transform:none;white-space:nowrap;}
+  @media(max-width:940px){.hdr ul li:not(:last-child){display:none;}}
+
+  /* type */
+  h1,h2,h3,h4{font-family:var(--rati);font-weight:300;margin:0;letter-spacing:0;}
+  h1{font-size:var(--h1);line-height:1.23;}
+  h2{font-size:var(--h2);line-height:1.41;}
+  h3{font-size:var(--h3);line-height:1.44;}
+  h4{font-size:var(--h4);line-height:1.47;}
+  p{margin:0 0 1rem;}
+  .eyebrow{font-family:var(--inter);font-weight:500;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);margin:0;}
+  a.inl{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:300px;padding:0 34px;min-height:58px;line-height:1.2;white-space:nowrap;border:0;cursor:pointer;transition:background .25s,color .25s;}
+  .btn.primary{font-family:var(--rati);font-weight:300;font-size:19px;letter-spacing:.03em;background:var(--black);color:var(--cream);}
+  .btn.primary:hover{background:#2a2a2a;}
+  .btn.cream{font-family:var(--rati);font-weight:300;font-size:19px;letter-spacing:.03em;background:var(--cream);color:var(--black);}
+  .btn.cream:hover{background:#fff;}
+
+  /* layout */
+  .wrap{max-width:calc(var(--max) + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter);}
+  .sec{position:relative;padding-block:clamp(88px,9vw,140px);}
+  .cream{background:var(--cream);}
+  .white{background:var(--white);}
+  .green{background:var(--green);color:var(--black);}
+  .black{background:var(--black);color:#fff;}
+  .fade{opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s ease;}
+  .fade.in{opacity:1;transform:none;}
+  @media(prefers-reduced-motion:reduce){.fade{opacity:1;transform:none;transition:none;}}
+
+  /* ================= 1 · Let's talk (cream) ================= */
+  .letstalk{padding-top:clamp(150px,18vw,230px);padding-bottom:clamp(60px,6vw,90px);}
+
+  /* ================= 2 · Get in touch (green) — VARIATION 1 ================= */
+  .contact .topline{display:flex;justify-content:space-between;align-items:baseline;gap:24px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--hair);margin-bottom:clamp(44px,5vw,72px);}
+  .contact .topline a{color:inherit;text-decoration:underline;text-underline-offset:4px;}
+  .contact .split{display:grid;grid-template-columns:5fr 7fr;column-gap:clamp(48px,7vw,110px);row-gap:56px;align-items:start;}
+  .contact h2{font-size:clamp(38px,3.6vw,56px);line-height:1.12;max-width:14ch;margin-bottom:.5em;text-wrap:balance;}
+  .contact .lead{font-size:var(--big);line-height:1.6;max-width:30ch;}
+  .contact dl{margin:40px 0 0;padding-top:24px;border-top:1px solid var(--hair);display:grid;grid-template-columns:auto 1fr;gap:10px 28px;font-size:16px;line-height:1.6;}
+  .contact dt{font-weight:500;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding-top:5px;}
+  .contact dd{margin:0;}
+
+  .form{display:flex;flex-direction:column;gap:36px;}
+  .form .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px 32px;}
+  .form .two>div{display:flex;flex-direction:column;justify-content:flex-end;} /* fields line up even when a label wraps */
+  .form .full{grid-column:1 / -1;}
+  .form label.lbl,.form legend.lbl{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin:0 0 6px;padding:0;}
+  .form input,.form select,.form textarea{display:block;width:100%;font:inherit;font-size:20px;line-height:1.3;font-weight:300;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--ink);border-radius:0;padding:10px 0 12px;outline:none;}
+  .form input::placeholder,.form textarea::placeholder{color:rgba(17,17,17,.7);}
+  .form input:focus,.form select:focus,.form textarea:focus{border-bottom-width:2px;padding-bottom:11px;}
+  .form select{appearance:none;-webkit-appearance:none;padding-right:28px;cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23111' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 2px center;background-size:12px;}
+  .form textarea{min-height:64px;resize:vertical;}
+  .form fieldset{margin:0;padding:0;border:0;min-width:0;}
+  .form .field[hidden]{display:none;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+  .chips label{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border:1px solid var(--ink);border-radius:300px;font-size:15px;font-weight:400;line-height:1;cursor:pointer;transition:background .2s,color .2s;}
+  .chips input{position:absolute;opacity:0;width:1px;height:1px;}
+  .chips label:has(input:checked){background:var(--ink);color:var(--cream);}
+  .chips label:has(input:focus-visible){outline:2px solid var(--ink);outline-offset:3px;}
+  .radios{display:flex;gap:28px;flex-wrap:wrap;margin-top:6px;}
+  .radios label{display:inline-flex;align-items:center;gap:10px;min-height:44px;font-size:16px;cursor:pointer;}
+  .radios input{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin:0;border:1px solid var(--ink);border-radius:50%;background:transparent;padding:0;}
+  .radios input:checked{box-shadow:inset 0 0 0 4px var(--green);background:var(--ink);}
+  .form .legend-text{font-size:15px;line-height:1.5;margin:0 0 4px;padding:0;}
+  .form .closing{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding-top:8px;}
+  .form .note-txt{font-size:13px;line-height:1.5;max-width:40ch;margin:0;}
+  .form .status{display:none;font-size:17px;margin:0;}
+  .form.sent .status{display:block;}
+  .form.sent .closing .btn{opacity:.5;pointer-events:none;}
+
+  /* ================= 3 · Address / Email / Careers (cream) ================= */
+  .details .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px clamp(32px,5vw,80px);}
+  .details h4{margin-bottom:.4em;}
+  .details p{margin:0;}
+  .details a{color:inherit;text-decoration:none;border-bottom:1px solid var(--green);}
+
+  /* ================= 4 · Newsletter (black) ================= */
+  .news .inner{display:grid;grid-template-columns:1.1fr .9fr;gap:40px clamp(40px,6vw,110px);align-items:center;}
+  .news h2{max-width:16ch;margin-bottom:.4em;}
+  .news p{color:rgba(255,255,255,.8);max-width:46ch;}
+  .news .row{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch;}
+  .news input{flex:1 1 240px;min-height:58px;font:inherit;font-size:17px;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.5);border-radius:300px;padding:0 24px;outline:none;}
+  .news input::placeholder{color:rgba(255,255,255,.6);}
+  .news small{display:block;margin-top:14px;font-size:13px;color:rgba(255,255,255,.6);}
+  .news small a{color:inherit;}
+
+  /* ================= 5 · Your success is ours too (black) ================= */
+  .success{border-top:1px solid rgba(255,255,255,.14);}
+  .success h2{margin-bottom:1.2em;}
+  .success .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px clamp(32px,5vw,80px);}
+  .success h4{color:var(--green);margin-bottom:.3em;}
+  .success p{color:rgba(255,255,255,.8);margin:0;}
+
+  .note{background:var(--black);color:rgba(255,255,255,.6);font-size:12px;letter-spacing:.04em;padding:26px var(--gutter);text-align:center;border-top:1px solid rgba(255,255,255,.14);}
+  .note a{color:inherit;}
+
+  @media(max-width:900px){
+    .contact .split,.news .inner{grid-template-columns:1fr;}
+    .details .three,.success .three{grid-template-columns:1fr;}
+    .form .two{grid-template-columns:1fr;gap:30px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <nav class="nav" aria-label="Primary">
+    <a class="logo" href="https://www.biofarm.co.uk/" aria-label="Biofarm home">
+      <img src="https://images.squarespace-cdn.com/content/v1/6818f9d9bff1414041f33bf3/c7573182-d51f-41b5-a896-77f06f8d5496/Asset+10LOGO.png?format=1500w" alt="Biofarm" />
+    </a>
+    <ul>
+      <li><a href="https://www.biofarm.co.uk/developers">Partners +</a></li>
+      <li><a href="https://www.biofarm.co.uk/about">About</a></li>
+      <li><a href="https://www.biofarm.co.uk/stories">Stories</a></li>
+      <li><a href="https://www.biofarm.co.uk/contact">Contact</a></li>
+      <li><a class="navpill" href="https://www.biofarm.co.uk/contact">Start Your Journey</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <section class="sec cream letstalk">
+    <div class="wrap"><h1 class="fade">Let’s talk</h1></div>
+  </section>
+
+  <section class="sec green contact" id="get-in-touch">
+    <div class="wrap">
+      <div class="topline fade">
+        <span class="eyebrow">Get in touch</span>
+      </div>
+      <div class="split">
+        <div class="fade">
+          <h2>Want to see how BNG fits into your world?</h2>
+          <p class="lead">Tell us a bit about you and your project and we’ll pave the right path forward.</p>
+          <dl>
+            <dt>Address</dt><dd>LABS Hawley Wharf, 1 Water Lane, London, NW1 8NZ</dd>
+            <dt>Email</dt><dd><a class="inl" href="mailto:info@biofarm.co.uk">info@biofarm.co.uk</a></dd>
+          </dl>
+        </div>
+
+        <form class="form fade" id="contact-form" novalidate>
+          <div class="two">
+            <div><label class="lbl" for="f-name">Name *</label><input id="f-name" name="name" type="text" required maxlength="200" autocomplete="name" /></div>
+            <div><label class="lbl" for="f-email">Email *</label><input id="f-email" name="email" type="email" required maxlength="320" autocomplete="email" /></div>
+            <div><label class="lbl" for="f-phone">Phone (optional)</label><input id="f-phone" name="phone" type="tel" maxlength="50" autocomplete="tel" /></div>
+            <div><label class="lbl" for="f-heard">Where did you hear about us? (optional)</label>
+              <select id="f-heard" name="heard_about">
+                <option value="">Please choose</option>
+                <option value="search">Search engine</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="referral">Recommended by someone</option>
+                <option value="event">Event or trade show</option>
+                <option value="newsletter">Biofarm newsletter</option>
+                <option value="press">Press or article</option>
+                <option value="marketplace">BNG marketplace or listing site</option>
+                <option value="ai">AI assistant (like ChatGPT)</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="full field" id="f-heard-other-field" hidden>
+              <label class="lbl" for="f-heard-other">Tell us where (optional)</label>
+              <input id="f-heard-other" name="heard_about_other" type="text" maxlength="200" autocomplete="off" />
+            </div>
+          </div>
+
+          <fieldset>
+            <legend class="lbl">I am a... *</legend>
+            <div class="chips">
+              <label><input type="checkbox" name="fields" value="developer" />Developer</label>
+              <label><input type="checkbox" name="fields" value="planning_consultant" />Planning consultant</label>
+              <label><input type="checkbox" name="fields" value="ecologist" />Ecologist</label>
+              <label><input type="checkbox" name="fields" value="landowner" />Landowner</label>
+              <label><input type="checkbox" name="fields" value="other" />Other</label>
+            </div>
+          </fieldset>
+
+          <div><label class="lbl" for="f-msg">Your message (optional)</label><textarea id="f-msg" name="message" rows="2" maxlength="5000"></textarea></div>
+
+          <fieldset>
+            <legend class="legend-text">Please plant me on the newsletter list - I accept the <a class="inl" href="https://www.biofarm.co.uk/privacy-policy">Privacy Policy</a> *</legend>
+            <div class="radios">
+              <label><input type="radio" name="newsletter" value="yes" required />Yes please</label>
+              <label><input type="radio" name="newsletter" value="no" />No thank you</label>
+            </div>
+          </fieldset>
+
+          <div class="closing">
+            <p class="note-txt">Required fields are marked with *. We never ask for sensitive information through this form.</p>
+            <button class="btn primary" type="submit">Send message</button>
+          </div>
+          <p class="status" role="status">Thank you - message received. We’ll pave the right path forward and get back to you shortly.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec cream details">
+    <div class="wrap">
+      <div class="three fade">
+        <div><h4>Address</h4><p>LABS Hawley Wharf,<br />1 Water Lane,<br />London, NW1 8NZ</p></div>
+        <div><h4>Email</h4><p>Get in touch<br /><a href="mailto:info@biofarm.co.uk">info@biofarm.co.uk</a></p></div>
+        <div><h4>Careers</h4><p>Explore open roles on <a href="https://www.linkedin.com/company/biofarmuk/">LinkedIn</a>, or reach out by email.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec black news">
+    <div class="wrap">
+      <div class="inner fade">
+        <div>
+          <h2>Sign up to hear stories from the ground</h2>
+          <p>You can expect opinion pieces, habitat updates, impact reports, events and other tales from the field.</p>
+        </div>
+        <form onsubmit="return false">
+          <div class="row">
+            <label for="nl-email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Email address</label>
+            <input id="nl-email" type="email" placeholder="Email address" />
+            <button class="btn cream" type="submit">Sign up</button>
+          </div>
+          <small>By signing up you agree to receive our newsletter and accept the <a href="https://www.biofarm.co.uk/privacy-policy">Privacy Policy</a>. Unsubscribe any time.</small>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec black success">
+    <div class="wrap">
+      <h2 class="fade">Your success is ours too</h2>
+      <div class="three fade">
+        <div><h4>Secure investment</h4><p>We ring-fence funds to protect your investment and habitats.</p></div>
+        <div><h4>Leave your own legacy</h4><p>Shape the landscape in a way that truly matters.</p></div>
+        <div><h4>Pushing for progress</h4><p>More than responding to policy, we have a seat at the table.</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="note">
+  Prototype for <a href="https://www.biofarm.co.uk/contact">biofarm.co.uk/contact</a> &mdash; variation 1 of 3. The live page inherits the real site header &amp; footer; the form here is a visual stand-in for the Code Block in habitat-hub/squarespace/contact-form-INLINE.html.
+</footer>
+
+<script>
+  (function(){
+    var h=document.getElementById('hdr');
+    addEventListener('scroll',function(){h.classList.toggle('scrolled',scrollY>40);},{passive:true});
+    var els=document.querySelectorAll('.fade');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
+    else{
+      var io=new IntersectionObserver(function(entries){
+        entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+      },{rootMargin:'0px 0px -8% 0px',threshold:.06});
+      els.forEach(function(e){io.observe(e);});
+    }
+    /* "Other" reveals the box, as in the live block; focus stays on the dropdown */
+    var heard=document.getElementById('f-heard'), box=document.getElementById('f-heard-other-field');
+    heard.addEventListener('change',function(){var other=heard.value==='other';box.hidden=!other;if(!other){document.getElementById('f-heard-other').value='';}});
+    /* prototype only: show the success state; the live block posts to the lead API */
+    var f=document.getElementById('contact-form');
+    f.addEventListener('submit',function(e){e.preventDefault();if(f.checkValidity()){f.classList.add('sent');}else{f.reportValidity();}});
+  })();
+</script>
+</body>
+</html>

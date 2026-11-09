@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact form — design variations · Biofarm</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    @font-face{font-family:'RATI_v2';
+      src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');
+      font-weight:300;font-display:swap;}
+    :root{ --cream:#F7F8F3; --ink:#111; --green:#71977A; --muted:#5b5f57; --hairline:rgba(17,17,17,.14);
+      --font-display:'RATI_v2','Inter',Georgia,serif; --font-body:'Inter',-apple-system,Arial,sans-serif; }
+    *,*::before,*::after{box-sizing:border-box;}
+    body{margin:0;font-family:var(--font-body);font-weight:300;color:var(--ink);background:var(--cream);line-height:1.6;font-size:17px;-webkit-font-smoothing:antialiased;}
+    a{color:inherit;}
+    h1,h2,h3{font-family:var(--font-display);font-weight:300;letter-spacing:0;line-height:1.15;margin:0 0 .35em;}
+    h1{font-size:clamp(2.4rem,5vw,3.6rem);}
+    h2{font-size:clamp(1.6rem,2.6vw,2.2rem);margin-top:64px;padding-top:24px;border-top:1px solid var(--hairline);}
+    .wrap{max-width:1080px;margin:0 auto;padding:clamp(40px,6vw,80px) clamp(20px,5vw,48px);}
+    .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:500;color:var(--ink);margin:0 0 1rem;}
+    .intro{max-width:62ch;color:var(--muted);font-size:1.1rem;}
+    .meta-row{display:flex;flex-wrap:wrap;gap:8px 22px;margin:22px 0 8px;font-size:.95rem;}
+    .meta-row b{font-weight:500;}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:40px;}
+    .card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--hairline);text-decoration:none;transition:border-color .2s;}
+    .card:hover{border-color:var(--ink);}
+    .card__swatch{height:150px;background:var(--green);color:var(--ink);padding:22px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;border-bottom:1px solid var(--hairline);}
+    .card__swatch.side{flex-direction:row;align-items:flex-end;gap:16px;}
+    .card__swatch .col{flex:1;display:flex;flex-direction:column;gap:6px;}
+    .card__swatch .line{height:1px;background:rgba(17,17,17,.45);}
+    .card__swatch .line.short{width:55%;}
+    .card__swatch .box{height:30px;background:var(--cream);border:1px solid rgba(17,17,17,.28);border-radius:3px;}
+    .card__swatch .sentence{font-family:var(--font-display);font-size:22px;line-height:1.3;margin:0;}
+    .card__swatch .sentence u{text-decoration:none;border-bottom:1px solid var(--ink);padding:0 10px;}
+    .card__swatch .big{font-family:var(--font-display);font-size:30px;line-height:1;margin:0;}
+    .card__swatch .ring{width:14px;height:14px;border:1px solid var(--ink);border-radius:50%;display:inline-block;vertical-align:middle;margin-right:8px;}
+    .card__swatch .ring.on{background:var(--ink);box-shadow:inset 0 0 0 3px var(--green);}
+    .card__swatch .rowline{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;border-bottom:1px solid rgba(17,17,17,.45);padding:4px 0;}
+    .card__body{padding:22px 24px 26px;display:flex;flex-direction:column;gap:8px;flex:1;}
+    .tag{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted);}
+    .card__body h3{margin:.1em 0 0;font-size:1.5rem;}
+    .card__desc{color:var(--muted);font-size:.98rem;margin:0;flex:1;}
+    .btn{display:inline-block;font-family:var(--font-display);font-size:16px;text-decoration:none;padding:12px 24px;border-radius:300px;background:var(--ink);color:#fff;margin-top:14px;align-self:flex-start;}
+    .note{margin-top:40px;padding:18px 22px;background:#fff;border:1px solid var(--hairline);font-size:.95rem;color:var(--muted);}
+    .note b{color:var(--ink);font-weight:500;}
+    @media(max-width:860px){.grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">Biofarm · the enquiry form on /contact and /about</p>
+    <h1>Design variations</h1>
+    <p class="intro">The form grew two questions (&ldquo;I am a&hellip;&rdquo; with five roles, and &ldquo;Where did you hear about us?&rdquo; with an Other box), so it needed a fresh layout. Below: two directions for the green &ldquo;Get in touch&rdquo; section. Same fields in both. The rest of each page is a stand-in for the live sections so the new one can be judged in context.</p>
+    <div class="meta-row">
+      <span><b>Fonts:</b> RATI_v2 from the site CDN, Inter from Google</span>
+      <span><b>Palette:</b> cream, white, green with black text, black</span>
+      <span><b>Forms:</b> visual stand-ins, they do not post</span>
+    </div>
+
+        <div class="grid">
+      <a class="card" href="contact-v1-editorial.html">
+        <div class="card__swatch"><div class="line"></div><div class="line short"></div><div class="line"></div></div>
+        <div class="card__body">
+          <span class="tag">Contact · variation 1</span>
+          <h3>Editorial split</h3>
+          <p class="card__desc">Statement, address and email on the left, the form on the right. Hairline underline fields on the green instead of boxes; outlined pills for the roles. Closest to the rest of the site&rsquo;s plain columns over rules.</p>
+          <span class="btn">Open</span>
+        </div>
+      </a>
+      <a class="card" href="contact-v2-centred.html">
+        <div class="card__swatch"><div class="box"></div><div class="box"></div></div>
+        <div class="card__body">
+          <span class="tag">Contact · variation 2</span>
+          <h3>Centred statement</h3>
+          <p class="card__desc">&ldquo;Let&rsquo;s talk.&rdquo; set large and centred, a hairline, then the form in two columns on cream fields with small-caps labels and quiet hints. The easiest to rebuild in Squarespace as it stands.</p>
+          <span class="btn">Open</span>
+        </div>
+      </a>
+    </div>
+
+
+    <div class="note">
+      <b>To choose:</b> open both, then say which. The fields, wording and tracking are identical underneath; only the layout differs. The About page&rsquo;s &ldquo;Let&rsquo;s talk&rdquo; section takes the same block.
+    </div>
+  </div>
+</body>
+</html>

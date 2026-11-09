@@ -1,5 +1,8 @@
-<!-- CONTACT FORM v1.1 - /contact (and the same section reused on /about), green section (replaces the main Pipedrive embed).
+<!-- CONTACT FORM v1.3 - /contact (and the same section reused on /about), green section (replaces the main Pipedrive embed).
      v1.1 adds "Where did you hear about us?" (optional dropdown; the answer keys match app/schemas.py HeardAbout).
+     v1.2: choosing "Other" reveals a text box for their own words (sent as heard_about_other).
+     v1.3: "I am a..." grows to Developer / Planning consultant / Ecologist / Landowner / Other (keys match
+     app/schemas.py FieldChoice; the old values are unchanged); the heard-about list is the agreed nine.
      Paste into a Code Block where the "Get in touch" embed currently sits.
      Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
 <style>
@@ -9,6 +12,7 @@
   .bf-form label,.bf-form legend{display:block;font-size:.95rem;margin:0 0 6px;color:#212121;}
   .bf-form .req{color:#212121;}
   .bf-field{margin:0 0 18px;}
+  .bf-field[hidden]{display:none;}
   .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 14px;}
   .bf-form select{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 40px 12px 14px;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23212121' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;cursor:pointer;}
   .bf-form textarea{min-height:120px;resize:vertical;}
@@ -50,10 +54,12 @@
       <input type="tel" id="bfPhone" name="phone" maxlength="50" autocomplete="tel">
     </div>
     <fieldset>
-      <legend>What field are you in? <span class="req">*</span></legend>
+      <legend>I am a... <span class="req">*</span></legend>
       <div class="bf-chips">
-        <label><input type="checkbox" name="fields" value="developer">I'm a developer</label>
-        <label><input type="checkbox" name="fields" value="landowner">I'm a landowner</label>
+        <label><input type="checkbox" name="fields" value="developer">Developer</label>
+        <label><input type="checkbox" name="fields" value="planning_consultant">Planning consultant</label>
+        <label><input type="checkbox" name="fields" value="ecologist">Ecologist</label>
+        <label><input type="checkbox" name="fields" value="landowner">Landowner</label>
         <label><input type="checkbox" name="fields" value="other">Other</label>
       </div>
     </fieldset>
@@ -61,14 +67,20 @@
       <label for="bfHeardAbout">Where did you hear about us? (optional)</label>
       <select id="bfHeardAbout" name="heard_about">
         <option value="">Please choose</option>
-        <option value="google">Google search</option>
+        <option value="search">Search engine</option>
         <option value="linkedin">LinkedIn</option>
         <option value="referral">Recommended by someone</option>
         <option value="event">Event or trade show</option>
         <option value="newsletter">Biofarm newsletter</option>
-        <option value="press">Press or an article</option>
+        <option value="press">Press or article</option>
+        <option value="marketplace">BNG marketplace or listing site</option>
+        <option value="ai">AI assistant (like ChatGPT)</option>
         <option value="other">Other</option>
       </select>
+    </div>
+    <div class="bf-field" id="bfHeardOtherField" hidden>
+      <label for="bfHeardOther">Tell us where (optional)</label>
+      <input type="text" id="bfHeardOther" name="heard_about_other" maxlength="200" autocomplete="off">
     </div>
     <div class="bf-field">
       <label for="bfMessage">Your Message (optional)</label>
@@ -101,6 +113,15 @@
 
   // wake a sleeping backend while the visitor is still typing
   try { fetch(API_BASE + '/healthz').catch(function () {}); } catch (e) {}
+
+  // "Other" opens a box for their own words; any other answer hides and empties it.
+  // Focus stays on the dropdown (WCAG 3.2.2: changing a control must not move focus).
+  var heardOtherField = document.getElementById('bfHeardOtherField');
+  form.heard_about.addEventListener('change', function () {
+    var other = form.heard_about.value === 'other';
+    heardOtherField.hidden = !other;
+    if (!other) form.heard_about_other.value = '';
+  });
 
   form.addEventListener('focusin', function () {
     if (!startedAt) startedAt = Date.now();
@@ -161,6 +182,7 @@
       fields: fields,
       message: form.message.value.trim() || null,
       heard_about: form.heard_about.value || null,
+      heard_about_other: form.heard_about.value === 'other' ? (form.heard_about_other.value.trim().slice(0, 200) || null) : null,
       newsletter_opt_in: newsletter.value === 'yes',
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,

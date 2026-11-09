@@ -212,6 +212,57 @@ async def test_heard_about_is_optional_and_must_be_one_of_the_offered_answers(cl
         assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about=bad))).status_code == 422, bad
 
 
+@respx.mock
+async def test_contact_other_keeps_their_own_words_and_puts_them_in_the_note(client):
+    mocks = mock_pipedrive_happy_path()
+    r = await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="other", heard_about_other="  A talk at  Groundswell <b>2026</b> "))
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.heard_about == "other"
+    assert lead.heard_about_other == "A talk at  Groundswell <b>2026</b>"  # trimmed, otherwise as typed
+    note = json.loads(mocks["note"].calls.last.request.content)["content"]
+    assert "<p><b>Heard about us</b>: Other (A talk at  Groundswell &lt;b&gt;2026&lt;/b&gt;)</p>" in note
+
+
+@respx.mock
+async def test_their_own_words_only_travel_with_the_other_answer(client):
+    mock_pipedrive_happy_path()
+    # "Other" with only spaces typed is still a fine answer, stored as no words
+    r = await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="other", heard_about_other="   "))
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.heard_about == "other" and lead.heard_about_other is None
+    for blank in (None, ""):
+        assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="other", heard_about_other=blank))).status_code == 202, repr(blank)
+    # words without "Other" selected are refused, so stray text cannot ride in on another answer
+    for chosen in ("linkedin", None):
+        r = await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about=chosen, heard_about_other="from a friend"))
+        assert r.status_code == 422, chosen
+    # and the box has a limit
+    assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="other", heard_about_other="x" * 201))).status_code == 422
+    assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="other", heard_about_other="x" * 200))).status_code == 202
+
+
+@respx.mock
+async def test_contact_accepts_the_new_roles_and_names_them_in_the_note(client):
+    mocks = mock_pipedrive_happy_path()
+    r = await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, fields=["planning_consultant", "ecologist"], heard_about="ai"))
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.fields == ["planning_consultant", "ecologist"]
+    assert lead.heard_about == "ai"
+    note = json.loads(mocks["note"].calls.last.request.content)["content"]
+    assert "<p><b>Field</b>: Planning consultant, Ecologist</p>" in note
+    assert "<p><b>Heard about us</b>: AI assistant (like ChatGPT)</p>" in note
+
+
+@respx.mock
+async def test_the_old_google_answer_is_gone_and_search_took_its_place(client):
+    mock_pipedrive_happy_path()
+    assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="google"))).status_code == 422
+    assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="search"))).status_code == 202
+
+
 def test_note_html_leaves_the_heard_about_line_out_when_not_answered():
     from app.models import Lead
     from app.services.sync import build_note_html
@@ -219,6 +270,10 @@ def test_note_html_leaves_the_heard_about_line_out_when_not_answered():
     assert "Heard about us" not in build_note_html(Lead(form="contact", name="J", email="j@example.com", fields=[]))
     assert "<p><b>Heard about us</b>: Event or trade show</p>" in build_note_html(
         Lead(form="contact", name="J", email="j@example.com", fields=[], heard_about="event"))
+    assert "<p><b>Heard about us</b>: Other</p>" in build_note_html(
+        Lead(form="contact", name="J", email="j@example.com", fields=[], heard_about="other"))
+    assert "<p><b>Heard about us</b>: Other (Radio 4)</p>" in build_note_html(
+        Lead(form="contact", name="J", email="j@example.com", fields=[], heard_about="other", heard_about_other="Radio 4"))
 
 
 def test_note_html_keeps_line_breaks():
