@@ -1,32 +1,53 @@
-<!-- LANDOWNER FORM v1 - /landowners, green "Chat to Chris" section (replaces the
+<!-- LANDOWNER FORM v2 - /landowners, green "Chat to Chris" section (replaces the
      Landowner Contact Form Pipedrive embed, webforms.pipedrive.com/f/6Ovk4bAi...).
-     Same questions as that embed: name, email, phone, message, newsletter. No
-     "what field are you in" chips - the page is for landowners, the API sets it.
+     Same questions as that embed: name, email, phone (with a country-code
+     picker: compact flag + code button, a searchable list below it the width
+     of the phone row, fixed height, same in every browser; UK first), message,
+     newsletter. No "what field are you in" chips -
+     the page is for landowners, the API sets it. Sized in px to the embed's
+     proportions (14px labels, 36px inputs, square corners, full-width button,
+     muted footer notes) so the site's fluid base font does not inflate it.
      Paste into the Code Block where the embed sits.
      Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
 <style>
   @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
-  .bf-form{max-width:560px;margin:0 auto;color:#212121;}
-  .bf-form h3{margin:0 0 22px;color:#212121;} /* typography inherited from the site theme */
-  .bf-form label,.bf-form legend{display:block;font-size:.95rem;margin:0 0 6px;color:#212121;}
+  .bf-form{max-width:490px;margin:0;color:#212121;font-size:14px;line-height:1.4;} /* the embed's width, flush left in its column */
+  .bf-form h3{margin:0 0 14px;font-size:24px;line-height:1.2;color:#212121;} /* typeface inherited from the site theme, size pinned */
+  .bf-form label,.bf-form legend{display:block;font-size:14px;line-height:1.4;margin:0 0 5px;color:#212121;}
   .bf-form .req{color:#212121;}
   .bf-field{margin:0 0 18px;}
-  .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 14px;}
-  .bf-form textarea{min-height:120px;resize:vertical;}
-  .bf-form input:focus,.bf-form textarea:focus{outline:none;border-color:#212121;box-shadow:0 0 0 3px rgba(33,33,33,.22);}
+  .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{box-sizing:border-box;font-family:inherit;font-size:14px;line-height:1.4;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.2);border-radius:3px;}
+  .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{width:100%;padding:7px 10px;}
+  .bf-form textarea{min-height:96px;resize:vertical;}
+  .bf-phone{position:relative;display:flex;gap:8px;}
+  .bf-phone input[type=tel]{flex:1 1 auto;min-width:0;}
+  .bf-form input:focus,.bf-form textarea:focus{outline:none;border-color:#212121;box-shadow:0 0 0 2px rgba(33,33,33,.22);}
+  /* country-code picker: a compact button, a panel the width of the whole phone row */
+  .bf-dial-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 9px;font-family:inherit;font-size:14px;line-height:1;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.2);border-radius:3px;cursor:pointer;white-space:nowrap;}
+  .bf-dial-btn:focus-visible{outline:none;border-color:#212121;box-shadow:0 0 0 2px rgba(33,33,33,.22);}
+  .bf-form .bf-phone .bf-dial-search:focus{outline:none;box-shadow:inset 0 -2px 0 #212121;}
+  .bf-dial-btn svg{width:12px;height:12px;flex:0 0 12px;}
+  .bf-dial-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:50;background:#fff;border:1px solid rgba(33,33,33,.2);border-radius:3px;box-shadow:0 8px 24px rgba(0,0,0,.16);}
+  .bf-dial-panel[hidden]{display:none;}
+  .bf-form .bf-phone .bf-dial-search{display:block;width:100%;box-sizing:border-box;margin:0;padding:8px 10px;font-family:inherit;font-size:14px;color:#212121;background:#fff;border:0;border-bottom:1px solid rgba(33,33,33,.12);border-radius:3px 3px 0 0;}
+  .bf-dial-list{position:relative;list-style:none;margin:0;padding:4px 0;max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .bf-dial-list li{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:14px;line-height:1.4;color:#212121;cursor:pointer;}
+  .bf-dial-list li .bf-dial-flag{flex:0 0 1.4em;}
+  .bf-dial-list li .bf-dial-num{margin-left:auto;color:rgba(33,33,33,.6);}
+  .bf-dial-list li.bf-active{background:rgba(33,33,33,.08);}
+  .bf-dial-list li[aria-selected=true]{font-weight:600;}
+  .bf-dial-list .bf-dial-empty{padding:8px 10px;font-size:14px;color:rgba(33,33,33,.6);cursor:default;}
   .bf-form fieldset{border:none;margin:0 0 18px;padding:0;}
-  .bf-chips{display:flex;flex-wrap:wrap;gap:10px;}
-  .bf-chips label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:.92rem;padding:9px 16px;border-radius:20px;background:transparent;border:1px solid rgba(33,33,33,.35);color:#212121;cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
-  .bf-chips input{position:absolute;opacity:0;pointer-events:none;}
-  .bf-chips label:has(input:checked){background:#212121;border-color:#212121;color:#fff;}
-  .bf-chips label:has(input:focus-visible){box-shadow:0 0 0 3px rgba(33,33,33,.25);}
-  .bf-radios label{display:flex;align-items:center;gap:10px;margin:0 0 8px;cursor:pointer;}
-  .bf-radios input{accent-color:#212121;width:18px;height:18px;}
-  .bf-form .bf-btn{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;background:#212121;color:#fff;border:1.5px solid #212121;border-radius:25px;padding:14px 34px;cursor:pointer;transition:background-color .3s;}
+  .bf-radios label{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:14px;cursor:pointer;}
+  .bf-radios input{accent-color:#212121;width:18px;height:18px;margin:0;flex:0 0 18px;}
+  .bf-form .bf-btn{display:block;width:100%;font-family:inherit;font-size:15px;line-height:1;background:#212121;color:#fff;border:1px solid #212121;border-radius:3px;padding:12px 20px;cursor:pointer;transition:background-color .3s;}
   .bf-form .bf-btn:hover{background:#3a3a3a;}
   .bf-form .bf-btn[disabled]{opacity:.6;cursor:wait;}
-  .bf-note{font-size:.8rem;color:rgba(33,33,33,.72);margin-top:14px;}
-  .bf-status{margin-top:14px;font-size:.95rem;min-height:1.4em;}
+  .bf-notes{margin-top:14px;font-size:13px;line-height:1.4;color:rgba(33,33,33,.62);}
+  .bf-notes p{margin:0 0 6px;}
+  .bf-notes a{color:inherit;}
+  .bf-status{margin:10px 0 0;font-size:14px;}
+  .bf-status:empty{margin:0;height:0;overflow:hidden;} /* no gap under the button until there is something to say; stays in the page so the live region still announces */
   .bf-status.err{color:#4A1414;}
   .bf-done{text-align:center;padding:40px 0;}
   .bf-done h3{color:#212121;margin:0 0 10px;}
@@ -48,7 +69,18 @@
     </div>
     <div class="bf-field">
       <label for="bfPhone">Phone (optional)</label>
-      <input type="tel" id="bfPhone" name="phone" maxlength="50" autocomplete="tel">
+      <div class="bf-phone">
+        <button type="button" class="bf-dial-btn" id="bfDialBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="bfDialList" aria-label="Country code: United Kingdom +44">
+          <span id="bfDialFlag" aria-hidden="true">&#x1F1EC;&#x1F1E7;</span><span id="bfDialCode">+44</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <input type="hidden" name="dial" id="bfDialValue" value="+44">
+        <div class="bf-dial-panel" id="bfDialPanel" hidden>
+          <input type="text" class="bf-dial-search" id="bfDialSearch" role="combobox" aria-expanded="true" aria-controls="bfDialList" aria-autocomplete="list" aria-label="Search country" placeholder="Search country" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <ul class="bf-dial-list" id="bfDialList" role="listbox" aria-label="Country code"></ul>
+        </div>
+        <input type="tel" id="bfPhone" name="phone" maxlength="30" autocomplete="tel-national" inputmode="tel">
+      </div>
     </div>
     <div class="bf-field">
       <label for="bfMessage">Your Message (optional)</label>
@@ -65,7 +97,11 @@
     </div>
     <button type="submit" class="bf-btn" id="bfSubmit">Submit</button>
     <p class="bf-status" id="bfStatus" role="status" aria-live="polite"></p>
-    <p class="bf-note">Required fields are marked with *. We never ask for sensitive information through this form.</p>
+    <div class="bf-notes">
+      <p>Required fields are marked with *</p>
+      <p>Never share sensitive information (bank details, passwords) through this form.</p>
+      <p>Your details are used to reply to you and, if you opt in, for the newsletter. See our <a href="/privacy-policy">Privacy Policy</a>.</p>
+    </div>
   </form>
 </div>
 
@@ -109,6 +145,122 @@
     return any ? out : null;
   }
 
+  // ---- country-code picker --------------------------------------------------
+  // [region, name, dial code]: every ISO 3166 country/territory with a dialling
+  // code (libphonenumber), plus Kosovo; UK first, Ireland second, then A-Z.
+  var COUNTRIES = [["GB","United Kingdom",44],["IE","Ireland",353],["AF","Afghanistan",93],["AX","Åland Islands",358],["AL","Albania",355],["DZ","Algeria",213],["AS","American Samoa",1],["AD","Andorra",376],["AO","Angola",244],["AI","Anguilla",1],["AG","Antigua and Barbuda",1],["AR","Argentina",54],["AM","Armenia",374],["AW","Aruba",297],["AU","Australia",61],["AT","Austria",43],["AZ","Azerbaijan",994],["BS","Bahamas",1],["BH","Bahrain",973],["BD","Bangladesh",880],["BB","Barbados",1],["BY","Belarus",375],["BE","Belgium",32],["BZ","Belize",501],["BJ","Benin",229],["BM","Bermuda",1],["BT","Bhutan",975],["BO","Bolivia",591],["BQ","Bonaire, Sint Eustatius and Saba",599],["BA","Bosnia and Herzegovina",387],["BW","Botswana",267],["BR","Brazil",55],["IO","British Indian Ocean Territory",246],["BN","Brunei Darussalam",673],["BG","Bulgaria",359],["BF","Burkina Faso",226],["BI","Burundi",257],["CV","Cabo Verde",238],["KH","Cambodia",855],["CM","Cameroon",237],["CA","Canada",1],["KY","Cayman Islands",1],["CF","Central African Republic",236],["TD","Chad",235],["CL","Chile",56],["CN","China",86],["CX","Christmas Island",61],["CC","Cocos (Keeling) Islands",61],["CO","Colombia",57],["KM","Comoros",269],["CG","Congo",242],["CD","Congo, The Democratic Republic of the",243],["CK","Cook Islands",682],["CR","Costa Rica",506],["CI","Côte d'Ivoire",225],["HR","Croatia",385],["CU","Cuba",53],["CW","Curaçao",599],["CY","Cyprus",357],["CZ","Czechia",420],["DK","Denmark",45],["DJ","Djibouti",253],["DM","Dominica",1],["DO","Dominican Republic",1],["EC","Ecuador",593],["EG","Egypt",20],["SV","El Salvador",503],["GQ","Equatorial Guinea",240],["ER","Eritrea",291],["EE","Estonia",372],["SZ","Eswatini",268],["ET","Ethiopia",251],["FK","Falkland Islands (Malvinas)",500],["FO","Faroe Islands",298],["FJ","Fiji",679],["FI","Finland",358],["FR","France",33],["GF","French Guiana",594],["PF","French Polynesia",689],["GA","Gabon",241],["GM","Gambia",220],["GE","Georgia",995],["DE","Germany",49],["GH","Ghana",233],["GI","Gibraltar",350],["GR","Greece",30],["GL","Greenland",299],["GD","Grenada",1],["GP","Guadeloupe",590],["GU","Guam",1],["GT","Guatemala",502],["GG","Guernsey",44],["GN","Guinea",224],["GW","Guinea-Bissau",245],["GY","Guyana",592],["HT","Haiti",509],["VA","Holy See (Vatican City State)",39],["HN","Honduras",504],["HK","Hong Kong",852],["HU","Hungary",36],["IS","Iceland",354],["IN","India",91],["ID","Indonesia",62],["IR","Iran",98],["IQ","Iraq",964],["IM","Isle of Man",44],["IL","Israel",972],["IT","Italy",39],["JM","Jamaica",1],["JP","Japan",81],["JE","Jersey",44],["JO","Jordan",962],["KZ","Kazakhstan",7],["KE","Kenya",254],["KI","Kiribati",686],["XK","Kosovo",383],["KW","Kuwait",965],["KG","Kyrgyzstan",996],["LA","Laos",856],["LV","Latvia",371],["LB","Lebanon",961],["LS","Lesotho",266],["LR","Liberia",231],["LY","Libya",218],["LI","Liechtenstein",423],["LT","Lithuania",370],["LU","Luxembourg",352],["MO","Macao",853],["MG","Madagascar",261],["MW","Malawi",265],["MY","Malaysia",60],["MV","Maldives",960],["ML","Mali",223],["MT","Malta",356],["MH","Marshall Islands",692],["MQ","Martinique",596],["MR","Mauritania",222],["MU","Mauritius",230],["YT","Mayotte",262],["MX","Mexico",52],["FM","Micronesia",691],["MD","Moldova",373],["MC","Monaco",377],["MN","Mongolia",976],["ME","Montenegro",382],["MS","Montserrat",1],["MA","Morocco",212],["MZ","Mozambique",258],["MM","Myanmar",95],["NA","Namibia",264],["NR","Nauru",674],["NP","Nepal",977],["NL","Netherlands",31],["NC","New Caledonia",687],["NZ","New Zealand",64],["NI","Nicaragua",505],["NE","Niger",227],["NG","Nigeria",234],["NU","Niue",683],["NF","Norfolk Island",672],["KP","North Korea",850],["MK","North Macedonia",389],["MP","Northern Mariana Islands",1],["NO","Norway",47],["OM","Oman",968],["PK","Pakistan",92],["PW","Palau",680],["PS","Palestine",970],["PA","Panama",507],["PG","Papua New Guinea",675],["PY","Paraguay",595],["PE","Peru",51],["PH","Philippines",63],["PL","Poland",48],["PT","Portugal",351],["PR","Puerto Rico",1],["QA","Qatar",974],["RE","Réunion",262],["RO","Romania",40],["RU","Russian Federation",7],["RW","Rwanda",250],["BL","Saint Barthélemy",590],["SH","Saint Helena, Ascension and Tristan da Cunha",290],["KN","Saint Kitts and Nevis",1],["LC","Saint Lucia",1],["MF","Saint Martin (French part)",590],["PM","Saint Pierre and Miquelon",508],["VC","Saint Vincent and the Grenadines",1],["WS","Samoa",685],["SM","San Marino",378],["ST","Sao Tome and Principe",239],["SA","Saudi Arabia",966],["SN","Senegal",221],["RS","Serbia",381],["SC","Seychelles",248],["SL","Sierra Leone",232],["SG","Singapore",65],["SX","Sint Maarten (Dutch part)",1],["SK","Slovakia",421],["SI","Slovenia",386],["SB","Solomon Islands",677],["SO","Somalia",252],["ZA","South Africa",27],["KR","South Korea",82],["SS","South Sudan",211],["ES","Spain",34],["LK","Sri Lanka",94],["SD","Sudan",249],["SR","Suriname",597],["SJ","Svalbard and Jan Mayen",47],["SE","Sweden",46],["CH","Switzerland",41],["SY","Syria",963],["TW","Taiwan",886],["TJ","Tajikistan",992],["TZ","Tanzania",255],["TH","Thailand",66],["TL","Timor-Leste",670],["TG","Togo",228],["TK","Tokelau",690],["TO","Tonga",676],["TT","Trinidad and Tobago",1],["TN","Tunisia",216],["TR","Türkiye",90],["TM","Turkmenistan",993],["TC","Turks and Caicos Islands",1],["TV","Tuvalu",688],["UG","Uganda",256],["UA","Ukraine",380],["AE","United Arab Emirates",971],["US","United States",1],["UY","Uruguay",598],["UZ","Uzbekistan",998],["VU","Vanuatu",678],["VE","Venezuela",58],["VN","Vietnam",84],["VG","Virgin Islands, British",1],["VI","Virgin Islands, U.S.",1],["WF","Wallis and Futuna",681],["EH","Western Sahara",212],["YE","Yemen",967],["ZM","Zambia",260],["ZW","Zimbabwe",263]];
+  var dialBtn = document.getElementById('bfDialBtn');
+  var dialFlag = document.getElementById('bfDialFlag');
+  var dialCode = document.getElementById('bfDialCode');
+  var dialValue = document.getElementById('bfDialValue');
+  var dialPanel = document.getElementById('bfDialPanel');
+  var dialSearch = document.getElementById('bfDialSearch');
+  var dialList = document.getElementById('bfDialList');
+  var dialSelected = 'GB';
+  var dialActive = -1;      // index into dialShown
+  var dialShown = [];       // the countries currently listed (after filtering)
+
+  function flagOf(region) { // regional indicator pair; Windows shows the two letters instead
+    return String.fromCodePoint(0x1F1E6 + region.charCodeAt(0) - 65, 0x1F1E6 + region.charCodeAt(1) - 65);
+  }
+  function renderDialList(filter) {
+    var q = (filter || '').trim().toLowerCase();
+    dialShown = COUNTRIES.filter(function (c) {
+      return !q || c[1].toLowerCase().indexOf(q) !== -1 || ('+' + c[2]).indexOf(q) !== -1 || String(c[2]).indexOf(q) === 0;
+    });
+    dialList.textContent = '';
+    if (!dialShown.length) {
+      var none = document.createElement('li');
+      none.className = 'bf-dial-empty'; none.textContent = 'No country matches'; none.setAttribute('aria-disabled', 'true');
+      dialList.appendChild(none); dialActive = -1; dialSearch.removeAttribute('aria-activedescendant');
+      return;
+    }
+    dialShown.forEach(function (c, i) {
+      var li = document.createElement('li');
+      li.id = 'bfDialOpt-' + c[0]; li.setAttribute('role', 'option'); li.dataset.index = i;
+      li.setAttribute('aria-selected', c[0] === dialSelected ? 'true' : 'false');
+      var flag = document.createElement('span'); flag.className = 'bf-dial-flag'; flag.setAttribute('aria-hidden', 'true'); flag.textContent = flagOf(c[0]);
+      var name = document.createElement('span'); name.textContent = c[1];
+      var num = document.createElement('span'); num.className = 'bf-dial-num'; num.textContent = '+' + c[2];
+      li.appendChild(flag); li.appendChild(name); li.appendChild(num);
+      dialList.appendChild(li);
+    });
+    var sel = dialShown.findIndex(function (c) { return c[0] === dialSelected; });
+    setDialActive(sel >= 0 ? sel : 0, true);
+  }
+  function setDialActive(i, center) {
+    var items = dialList.querySelectorAll('[role=option]');
+    if (!items.length) return;
+    if (i < 0) i = 0; if (i >= items.length) i = items.length - 1;
+    if (dialActive >= 0 && items[dialActive]) items[dialActive].classList.remove('bf-active');
+    dialActive = i;
+    items[i].classList.add('bf-active');
+    dialSearch.setAttribute('aria-activedescendant', items[i].id);
+    scrollDialListTo(items[i], center);
+  }
+  // Scroll the list box only. scrollIntoView would also scroll every ancestor,
+  // the page included (MDN), so opening the picker could jump the page.
+  function scrollDialListTo(li, center) {
+    var top = li.offsetTop, h = li.offsetHeight, view = dialList.clientHeight, at = dialList.scrollTop;
+    if (center) dialList.scrollTop = Math.max(0, top - (view - h) / 2);
+    else if (top < at) dialList.scrollTop = top;
+    else if (top + h > at + view) dialList.scrollTop = top + h - view;
+  }
+  function chooseDial(c) {
+    dialSelected = c[0];
+    dialValue.value = '+' + c[2];
+    dialFlag.textContent = flagOf(c[0]);
+    dialCode.textContent = '+' + c[2];
+    dialBtn.setAttribute('aria-label', 'Country code: ' + c[1] + ' +' + c[2]);
+  }
+  function openDial() {
+    dialPanel.hidden = false;
+    dialBtn.setAttribute('aria-expanded', 'true');
+    dialSearch.value = '';
+    renderDialList('');
+    dialSearch.focus();
+  }
+  function closeDial(refocus) {
+    if (dialPanel.hidden) return;
+    dialPanel.hidden = true;
+    dialBtn.setAttribute('aria-expanded', 'false');
+    if (refocus) dialBtn.focus();
+  }
+  dialBtn.addEventListener('click', function () { dialPanel.hidden ? openDial() : closeDial(true); });
+  dialSearch.addEventListener('input', function () { renderDialList(dialSearch.value); });
+  dialSearch.addEventListener('keydown', function (ev) {
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); setDialActive(dialActive + 1); }
+    else if (ev.key === 'ArrowUp') { ev.preventDefault(); setDialActive(dialActive - 1); }
+    else if (ev.key === 'Home') { ev.preventDefault(); setDialActive(0); }
+    else if (ev.key === 'End') { ev.preventDefault(); setDialActive(dialShown.length - 1); }
+    else if (ev.key === 'Enter') { ev.preventDefault(); if (dialActive >= 0 && dialShown[dialActive]) { chooseDial(dialShown[dialActive]); closeDial(true); } }
+    else if (ev.key === 'Escape') { ev.preventDefault(); closeDial(true); }
+    else if (ev.key === 'Tab') { closeDial(false); }
+  });
+  dialList.addEventListener('mousedown', function (ev) { ev.preventDefault(); }); // keep focus in the search box
+  dialList.addEventListener('click', function (ev) {
+    var li = ev.target.closest ? ev.target.closest('[role=option]') : null;
+    if (!li) return;
+    chooseDial(dialShown[Number(li.dataset.index)]);
+    closeDial(true);
+  });
+  document.addEventListener('click', function (ev) {
+    if (!dialPanel.hidden && !dialPanel.contains(ev.target) && ev.target !== dialBtn && !dialBtn.contains(ev.target)) closeDial(false);
+  });
+
+  // "+44 7700 900123": the picked dial code plus the number, the trunk zero
+  // dropped (07700 -> 7700). A number typed with its own + is sent as is.
+  // In these countries the leading 0 is part of the number, not a trunk prefix
+  // (libphonenumber 9.0.43: no national prefix and numbers start with 0), so it stays.
+  var KEEPS_LEADING_ZERO = { IT: 1, VA: 1, CI: 1, BJ: 1, CG: 1 };
+  function phoneValue() {
+    var raw = form.phone.value.trim().replace(/\s+/g, ' ');
+    if (!raw) return null;
+    if (raw.charAt(0) === '+') return raw.slice(0, 50);
+    var local = KEEPS_LEADING_ZERO[dialSelected] ? raw : raw.replace(/^0+/, '');
+    return (form.dial.value + ' ' + (local || raw)).slice(0, 50);
+  }
+
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     statusEl.className = 'bf-status';
@@ -130,7 +282,7 @@
     var payload = {
       name: form.name.value.trim(),
       email: form.email.value.trim(),
-      phone: form.phone.value.trim() || null,
+      phone: phoneValue(),
       message: form.message.value.trim() || null,
       newsletter_opt_in: newsletter.value === 'yes',
       website: form.website.value, // honeypot

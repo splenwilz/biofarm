@@ -23,6 +23,11 @@ def test_migrated_sqlite_schema_accepts_inserts(tmp_path, monkeypatch):
     db.commit()
     created_at = db.execute("SELECT created_at FROM leads WHERE id='t1'").fetchone()[0]
     assert created_at  # server default evaluated by SQLite
+    # the leads table matches the model, column for column (a forgotten migration fails here, not in production)
+    from app import models  # noqa: F401
+    from app.db import Base
+    columns = {row[1] for row in db.execute("PRAGMA table_info(leads)")}
+    assert columns == set(Base.metadata.tables["leads"].columns.keys())
 
 
 def test_migrated_schema_has_the_pipedrive_mirror_tables(tmp_path, monkeypatch):
@@ -44,6 +49,6 @@ def test_migrated_schema_has_the_pipedrive_mirror_tables(tmp_path, monkeypatch):
         columns = {row[1] for row in db.execute(f"PRAGMA table_info({table})")}
         assert columns == set(Base.metadata.tables[table].columns.keys()), table
 
-    command.downgrade(Config(str(ALEMBIC_INI)), "-3")
+    command.downgrade(Config(str(ALEMBIC_INI)), "1bbbed35dc39")  # back to the leads-only schema, whatever sits above the mirror revisions
     remaining = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     assert not (expected & remaining)

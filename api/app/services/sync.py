@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.config import Settings
 from app.models import Lead
+from app.schemas import HEARD_ABOUT_LABELS
 from app.services import ga4
 from app.services.attribution import source_label
 from app.services.pipedrive import PipedriveClient, PipedriveError
@@ -36,6 +37,9 @@ def build_note_html(lead: Lead) -> str:
         parts.append(f"<p><b>Message</b><br>{body}</p>")
     if lead.fields:
         parts.append(f"<p><b>Field</b>: {html.escape(', '.join(lead.fields))}</p>")
+    if lead.heard_about:
+        label = HEARD_ABOUT_LABELS.get(lead.heard_about, lead.heard_about)
+        parts.append(f"<p><b>Heard about us</b>: {html.escape(label)}</p>")
     rows: list[str] = []
     for source_name, data in (("Last touch", lead.attribution), ("First touch", lead.first_touch)):
         if not data:

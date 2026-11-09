@@ -1,4 +1,5 @@
-<!-- CONTACT FORM v1 - /contact, green section (replaces the main Pipedrive embed).
+<!-- CONTACT FORM v1.1 - /contact (and the same section reused on /about), green section (replaces the main Pipedrive embed).
+     v1.1 adds "Where did you hear about us?" (optional dropdown; the answer keys match app/schemas.py HeardAbout).
      Paste into a Code Block where the "Get in touch" embed currently sits.
      Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
 <style>
@@ -9,8 +10,9 @@
   .bf-form .req{color:#212121;}
   .bf-field{margin:0 0 18px;}
   .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 14px;}
+  .bf-form select{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 40px 12px 14px;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23212121' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;cursor:pointer;}
   .bf-form textarea{min-height:120px;resize:vertical;}
-  .bf-form input:focus,.bf-form textarea:focus{outline:none;border-color:#212121;box-shadow:0 0 0 3px rgba(33,33,33,.22);}
+  .bf-form input:focus,.bf-form textarea:focus,.bf-form select:focus{outline:none;border-color:#212121;box-shadow:0 0 0 3px rgba(33,33,33,.22);}
   .bf-form fieldset{border:none;margin:0 0 18px;padding:0;}
   .bf-chips{display:flex;flex-wrap:wrap;gap:10px;}
   .bf-chips label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:.92rem;padding:9px 16px;border-radius:20px;background:transparent;border:1px solid rgba(33,33,33,.35);color:#212121;cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
@@ -55,6 +57,19 @@
         <label><input type="checkbox" name="fields" value="other">Other</label>
       </div>
     </fieldset>
+    <div class="bf-field">
+      <label for="bfHeardAbout">Where did you hear about us? (optional)</label>
+      <select id="bfHeardAbout" name="heard_about">
+        <option value="">Please choose</option>
+        <option value="google">Google search</option>
+        <option value="linkedin">LinkedIn</option>
+        <option value="referral">Recommended by someone</option>
+        <option value="event">Event or trade show</option>
+        <option value="newsletter">Biofarm newsletter</option>
+        <option value="press">Press or an article</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
     <div class="bf-field">
       <label for="bfMessage">Your Message (optional)</label>
       <textarea id="bfMessage" name="message" maxlength="5000"></textarea>
@@ -145,6 +160,7 @@
       phone: form.phone.value.trim() || null,
       fields: fields,
       message: form.message.value.trim() || null,
+      heard_about: form.heard_about.value || null,
       newsletter_opt_in: newsletter.value === 'yes',
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,

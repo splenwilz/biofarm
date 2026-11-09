@@ -71,3 +71,11 @@ def test_newsletter_submission_single_field():
     assert s.field == "landowner"
     with pytest.raises(ValidationError):
         NewsletterSubmission(name="J", email="j@e.com", field="alien")
+
+
+def test_the_heard_about_answers_each_have_a_label():
+    from typing import get_args
+
+    from app.schemas import HEARD_ABOUT_LABELS, HeardAbout
+    assert set(HEARD_ABOUT_LABELS) == set(get_args(HeardAbout))
+    assert all(HEARD_ABOUT_LABELS[k] for k in HEARD_ABOUT_LABELS)

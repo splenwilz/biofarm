@@ -43,11 +43,27 @@ class LeadSubmissionBase(BaseModel):
     first_touch: Attribution | None = None
 
 
+# "Where did you hear about us?" on the contact form: the stored value -> the
+# label the form shows and the Pipedrive note repeats. Keys are what the form
+# submits; change a label freely, add a key here and in the form together.
+HeardAbout = Literal["google", "linkedin", "referral", "event", "newsletter", "press", "other"]
+HEARD_ABOUT_LABELS: dict[str, str] = {
+    "google": "Google search",
+    "linkedin": "LinkedIn",
+    "referral": "Recommended by someone",
+    "event": "Event or trade show",
+    "newsletter": "Biofarm newsletter",
+    "press": "Press or an article",
+    "other": "Other",
+}
+
+
 class ContactSubmission(LeadSubmissionBase):
     phone: str | None = Field(default=None, max_length=50)
     fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
     message: str | None = Field(default=None, max_length=5000)
     newsletter_opt_in: bool = False
+    heard_about: HeardAbout | None = None
 
 
 class NewsletterSubmission(LeadSubmissionBase):

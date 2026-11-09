@@ -16,7 +16,7 @@ which blocked GA4 conversion tracking and lost UTM/gclid lead-source data.
 4. A background task then:
    - finds-or-creates the Person in Pipedrive (API v2), setting `marketing_status=subscribed` on newsletter opt-in;
    - creates a Lead (API v1 - leads have no v2) with attribution custom fields and, from a form that asked, the "Newsletter Sign Up" field (Opted In / Opted Out, as the old embeds wrote it; see `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD`);
-   - pins a Note with the message + attribution breakdown;
+   - pins a Note with the message, the ticked fields, the contact form's "Where did you hear about us?" answer (`heard_about`, also kept on the row) and the attribution breakdown;
    - optionally fires a GA4 Measurement Protocol event (`generate_lead_server`).
 5. Sync outcome is recorded on the row: `synced | failed | skipped_spam | disabled`.
    Failed rows keep the error and can be re-synced later.

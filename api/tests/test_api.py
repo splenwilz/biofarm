@@ -191,6 +191,36 @@ async def test_cpd_without_fields_is_accepted_and_sets_no_client_type(client):
     assert "custom_fields" not in person_body
 
 
+@respx.mock
+async def test_contact_stores_where_they_heard_about_us_and_tells_pipedrive(client):
+    mocks = mock_pipedrive_happy_path()
+    r = await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="linkedin"))
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.heard_about == "linkedin"
+    note = json.loads(mocks["note"].calls.last.request.content)["content"]
+    assert "<p><b>Heard about us</b>: LinkedIn</p>" in note
+
+
+@respx.mock
+async def test_heard_about_is_optional_and_must_be_one_of_the_offered_answers(client):
+    mock_pipedrive_happy_path()
+    r = await client.post("/v1/leads/contact", json=CONTACT_PAYLOAD)
+    assert r.status_code == 202
+    assert (await get_single_lead(client)).heard_about is None
+    for bad in ("facebook", "", "LinkedIn", 3):
+        assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about=bad))).status_code == 422, bad
+
+
+def test_note_html_leaves_the_heard_about_line_out_when_not_answered():
+    from app.models import Lead
+    from app.services.sync import build_note_html
+
+    assert "Heard about us" not in build_note_html(Lead(form="contact", name="J", email="j@example.com", fields=[]))
+    assert "<p><b>Heard about us</b>: Event or trade show</p>" in build_note_html(
+        Lead(form="contact", name="J", email="j@example.com", fields=[], heard_about="event"))
+
+
 def test_note_html_keeps_line_breaks():
     from app.models import Lead
     from app.services.sync import build_note_html
