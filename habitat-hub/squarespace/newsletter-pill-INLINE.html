@@ -1,0 +1,172 @@
+<!-- NEWSLETTER SIGNUP v2.1 "PILL" - home page (/), GREEN (#71977A) band, "Sign up to hear
+     stories from the ground"; same API logic as newsletter-form-INLINE.html.
+     Dark-on-green per the brand contrast rules and the site's form convention.
+     Layout: 2x2 pills - Name | Email on the first row, field dropdown | Sign up
+     on the second, consent line centered beneath. CENTERED: put the heading +
+     intro as centered text blocks above in a GREEN section, then this Code
+     Block below them. Stacks to a single column on mobile.
+     v2.1 (11 Nov 2026): recovered from the live home page (the source was not in the repo) and given the
+     dataLayer pipedrive_form_submit push the Contact/About newsletter block already makes, so the GTM
+     conversion tags see home-page sign-ups; everything else is byte-for-byte the live block.
+     Paste into the Code Block on the home page where the current pill form sits.
+     Posts to https://biofarm-api.onrender.com. -->
+<style>
+  @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
+  .bf-nlp{width:100%;max-width:880px;margin:0 auto;color:#212121;}
+  .bf-nlp .bf-consent{grid-column:1 / -1;text-align:center;}
+  .bf-nlp .bf-status{grid-column:1 / -1;text-align:center;}
+  .bf-nlp form{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .bf-nlp input[type=text],.bf-nlp input[type=email],.bf-nlp select{
+    width:100%;box-sizing:border-box;height:60px;font-family:inherit;font-size:14.5px;color:#212121;
+    background:transparent;border:1px solid rgba(33,33,33,.5);border-radius:100px;padding:0 26px;}
+  .bf-nlp input::placeholder{color:rgba(33,33,33,.55);}
+  .bf-nlp select{appearance:none;-webkit-appearance:none;color:rgba(33,33,33,.75);background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23212121' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 24px center;}
+  .bf-nlp select option{color:#212121;background:#fff;}
+  .bf-nlp input:focus,.bf-nlp select:focus{outline:none;border-color:#212121;box-shadow:0 0 0 3px rgba(33,33,33,.12);}
+  .bf-nlp .bf-btn{width:100%;height:60px;font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;background:#212121;color:#F5F6F1;border:1.5px solid #212121;border-radius:100px;cursor:pointer;transition:background-color .3s;}
+  .bf-nlp .bf-btn:hover{background:#000;}
+  .bf-nlp .bf-btn[disabled]{opacity:.6;cursor:wait;}
+  .bf-nlp .bf-consent{font-size:.78rem;color:rgba(33,33,33,.65);margin:4px 0 0;}
+  .bf-nlp .bf-consent a{color:#212121;}
+  .bf-nlp .bf-status{font-size:.95rem;min-height:1.4em;margin:0;}
+  .bf-nlp .bf-status.err{color:#8B1A1A;}
+  .bf-nlp .bf-done h4{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:1.6rem;color:#212121;margin:0 0 8px;}
+  .bf-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
+  @media (max-width:640px){.bf-nlp form{grid-template-columns:1fr;}}
+</style>
+
+<div class="bf-nlp" id="bfNlp">
+  <noscript><p style="color:#212121;">This form needs JavaScript. Please enable it, or contact us by email instead.</p></noscript>
+  <form id="bfNlpForm" method="post" novalidate>
+    <input type="text" id="bfNlpName" name="name" required maxlength="200" autocomplete="name"
+           placeholder="Your name" aria-label="Name">
+    <input type="email" id="bfNlpEmail" name="email" required maxlength="320" autocomplete="email"
+           placeholder="Your email address" aria-label="Email">
+    <select id="bfNlpField" name="field" required aria-label="What field are you in?">
+      <option value="" selected disabled>What field are you in?</option>
+      <option value="developer">I'm a developer</option>
+      <option value="landowner">I'm a landowner</option>
+      <option value="other">Other</option>
+    </select>
+    <button type="submit" class="bf-btn" id="bfNlpSubmit">SIGN UP</button>
+    <div class="bf-hp" aria-hidden="true">
+      <label for="bfNlpWebsite">Website</label>
+      <input type="text" id="bfNlpWebsite" name="website" tabindex="-1" autocomplete="off">
+    </div>
+    <p class="bf-consent">By signing up you agree to receive our newsletter and accept the <a href="/privacy-policy">Privacy Policy</a>. Unsubscribe any time.</p>
+    <p class="bf-status" id="bfNlpStatus" role="status" aria-live="polite"></p>
+  </form>
+</div>
+
+<script>
+(function () {
+  var API_BASE = 'https://biofarm-api.onrender.com';
+  var GA_ID = 'G-3MS9TLLZRN';
+
+  var form = document.getElementById('bfNlpForm');
+  var statusEl = document.getElementById('bfNlpStatus');
+  var btn = document.getElementById('bfNlpSubmit');
+  var startedAt = null;
+
+  try { fetch(API_BASE + '/healthz').catch(function () {}); } catch (e) {}
+
+  form.addEventListener('focusin', function () {
+    if (!startedAt) startedAt = Date.now();
+  }, { once: true });
+
+  var gaIds = {};
+  if (typeof gtag === 'function') {
+    try {
+      gtag('get', GA_ID, 'client_id', function (v) { gaIds.client_id = v; });
+      gtag('get', GA_ID, 'session_id', function (v) { gaIds.session_id = String(v); });
+    } catch (e) {}
+  }
+
+  function readJSON(store, key) {
+    try { return JSON.parse(store.getItem(key)) || null; } catch (e) { return null; }
+  }
+  function legacyUTM() {
+    var out = {}, any = false;
+    try {
+      ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
+        var v = sessionStorage.getItem(k);
+        if (v) { out[k] = v.slice(0, 255); any = true; }
+      });
+    } catch (e) { /* storage blocked */ }
+    return any ? out : null;
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    statusEl.className = 'bf-status';
+    statusEl.textContent = '';
+
+    if (!form.name.value.trim() || !/.+@.+\..+/.test(form.email.value)) {
+      statusEl.className = 'bf-status err';
+      statusEl.textContent = 'Please add your name and a valid email address.';
+      return;
+    }
+    if (!form.field.value) {
+      statusEl.className = 'bf-status err';
+      statusEl.textContent = 'Please tell us what field you are in.';
+      return;
+    }
+
+    var payload = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      field: form.field.value,
+      website: form.website.value, // honeypot
+      fill_ms: startedAt ? Date.now() - startedAt : null,
+      page: location.pathname,
+      attribution: readJSON(sessionStorage, 'bf_attr_last') || legacyUTM(),
+      first_touch: readJSON(localStorage, 'bf_attr_first'),
+      ga_client_id: gaIds.client_id || null,
+      ga_session_id: gaIds.session_id || null
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Signing up…';
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 30000);
+
+    fetch(API_BASE + '/v1/leads/newsletter', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    }).then(function (resp) {
+      clearTimeout(timer);
+      if (resp.status === 429) throw new Error('rate');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      // Same dataLayer event the old Pipedrive iframe listener pushed and the
+      // Contact/About newsletter block pushes - keeps the GTM conversion tags
+      // (Google Ads, LinkedIn, Microsoft UET) firing for home-page sign-ups too.
+      // Same formId as that block: the retired newsletter embed's.
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'pipedrive_form_submit',
+        formId: 'bXB8kiAaKayRiYweFIOdpcgYOh1sjnQWCEig455HPVhwCzSw6U3JcgT8ddfJzInGdZ',
+        formUUID: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())
+      });
+      if (typeof gtag === 'function') {
+        gtag('event', 'generate_lead', { lead_source: 'website_newsletter_form' });
+      }
+      var wrap = document.getElementById('bfNlp');
+      wrap.innerHTML =
+        '<div class="bf-done" role="status" tabindex="-1"><h4>You&rsquo;re planted on the list.</h4>' +
+        '<p>Stories from the ground, straight to your inbox.</p></div>';
+      var done = wrap.querySelector('.bf-done');
+      if (done) done.focus();
+    }).catch(function (err) {
+      clearTimeout(timer);
+      btn.disabled = false;
+      btn.textContent = 'Sign up';
+      statusEl.className = 'bf-status err';
+      statusEl.textContent = err && err.message === 'rate'
+        ? 'A few too many attempts - please wait a minute and try again.'
+        : 'Something went wrong - please try again in a moment.';
+    });
+  });
+})();
+</script>

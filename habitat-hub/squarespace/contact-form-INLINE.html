@@ -1,57 +1,105 @@
-<!-- CONTACT FORM v1.3 - /contact (and the same section reused on /about), green section (replaces the main Pipedrive embed).
-     v1.1 adds "Where did you hear about us?" (optional dropdown; the answer keys match app/schemas.py HeardAbout).
-     v1.2: choosing "Other" reveals a text box for their own words (sent as heard_about_other).
-     v1.3: "I am a..." grows to Developer / Planning consultant / Ecologist / Landowner / Other (keys match
-     app/schemas.py FieldChoice; the old values are unchanged); the heard-about list is the agreed nine.
-     Paste into a Code Block where the "Get in touch" embed currently sits.
+<!-- CONTACT FORM v2.0 - /contact, green "Get in touch" section (replaces the main Pipedrive embed).
+     Design: web/variations/contact-v2-centred.html, chosen by Vix 11 Nov 2026: centred statement, a hairline,
+     then the form in two columns on cream fields with small-caps labels; the newsletter choice and the
+     Submit pill share the closing row. The prototype's "Let's talk." heading is left out because the page's
+     own H1 above the green section already says it (11 Nov).
+     The eyebrow, statement and form all live in this one block, so the section needs no other blocks:
+     paste it into the Code Block where the "Get in touch" embed currently sits and delete any heading
+     text block left over from the old layout.
+     Fields, names, keys and copy are v1.3's (five "I am a" roles, nine heard-about answers, "Other" box).
+     /about uses about-form-INLINE.html instead (same script, side-by-side layout).
      Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
 <style>
   @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
-  .bf-form{max-width:560px;margin:0 auto;color:#212121;}
-  .bf-form h3{margin:0 0 22px;color:#212121;} /* typography inherited from the site theme */
-  .bf-form label,.bf-form legend{display:block;font-size:.95rem;margin:0 0 6px;color:#212121;}
+  .bf-contact{max-width:940px;margin:0 auto;color:#212121;font-size:17px;display:flex;flex-direction:column;align-items:center;gap:clamp(36px,4.5vw,56px);}
+  .bf-contact *{box-sizing:border-box;}
+  .bf-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;max-width:800px;}
+  .bf-head .bf-eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;line-height:1.4;margin:0 0 4px;color:#212121;}
+  .bf-head .bf-lead{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:clamp(20px,1.66vw,26px);line-height:1.5;margin:0;color:#212121;text-wrap:balance;}
+  .bf-rule{width:100%;height:1px;background:rgba(17,17,17,.35);}
+  .bf-form{width:100%;margin:0;display:flex;flex-direction:column;gap:30px;}
+  .bf-form label,.bf-form legend{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;line-height:1.4;margin:0 0 10px;padding:0;color:#212121;}
   .bf-form .req{color:#212121;}
-  .bf-field{margin:0 0 18px;}
+  .bf-field{margin:0;}
   .bf-field[hidden]{display:none;}
-  .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 14px;}
-  .bf-form select{width:100%;box-sizing:border-box;font-family:inherit;font-size:1rem;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.14);border-radius:12px;padding:12px 40px 12px 14px;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23212121' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;cursor:pointer;}
+  .bf-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 28px;}
+  .bf-two .bf-field{display:flex;flex-direction:column;justify-content:flex-end;}
+  .bf-two .bf-full{grid-column:1 / -1;}
+  .bf-two .bf-field[hidden]{display:none;}
+  @media(max-width:700px){.bf-two{grid-template-columns:1fr;}}
+  .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea,.bf-form select{display:block;width:100%;min-height:58px;font-family:inherit;font-size:18px;line-height:1.3;font-weight:300;color:#212121;background:#F7F8F3;border:1px solid rgba(17,17,17,.28);border-radius:3px;padding:16px 18px;transition:background .2s,border-color .2s;}
+  .bf-form input::placeholder,.bf-form textarea::placeholder{color:rgba(17,17,17,.5);}
+  .bf-form input:hover,.bf-form textarea:hover,.bf-form select:hover{border-color:rgba(17,17,17,.55);}
+  .bf-form input:focus,.bf-form textarea:focus,.bf-form select:focus{outline:none;background:#fff;border-color:#212121;}
+  .bf-form select{appearance:none;-webkit-appearance:none;padding-right:48px;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23212121' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 18px center;background-size:12px;}
   .bf-form textarea{min-height:120px;resize:vertical;}
-  .bf-form input:focus,.bf-form textarea:focus,.bf-form select:focus{outline:none;border-color:#212121;box-shadow:0 0 0 3px rgba(33,33,33,.22);}
-  .bf-form fieldset{border:none;margin:0 0 18px;padding:0;}
+  .bf-form fieldset{border:none;margin:0;padding:0;min-width:0;}
   .bf-chips{display:flex;flex-wrap:wrap;gap:10px;}
-  .bf-chips label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:.92rem;padding:9px 16px;border-radius:20px;background:transparent;border:1px solid rgba(33,33,33,.35);color:#212121;cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
-  .bf-chips input{position:absolute;opacity:0;pointer-events:none;}
-  .bf-chips label:has(input:checked){background:#212121;border-color:#212121;color:#fff;}
-  .bf-chips label:has(input:focus-visible){box-shadow:0 0 0 3px rgba(33,33,33,.25);}
-  .bf-radios label{display:flex;align-items:center;gap:10px;margin:0 0 8px;cursor:pointer;}
-  .bf-radios input{accent-color:#212121;width:18px;height:18px;}
-  .bf-form .bf-btn{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:18px;line-height:1;background:#212121;color:#fff;border:1.5px solid #212121;border-radius:25px;padding:14px 34px;cursor:pointer;transition:background-color .3s;}
-  .bf-form .bf-btn:hover{background:#3a3a3a;}
+  .bf-chips label{position:relative;display:inline-flex;align-items:center;gap:8px;margin:0;min-height:46px;font-size:15px;font-weight:400;letter-spacing:0;text-transform:none;line-height:1;padding:0 20px;border-radius:300px;background:transparent;border:1px solid rgba(17,17,17,.55);color:#212121;cursor:pointer;transition:background .2s,color .2s,border-color .2s;}
+  .bf-chips label:hover{border-color:#212121;}
+  .bf-chips input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;}
+  .bf-chips label:has(input:checked){background:#212121;border-color:#212121;color:#F7F8F3;}
+  .bf-chips label:has(input:focus-visible){outline:2px solid #212121;outline-offset:3px;}
+  .bf-closing{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap;}
+  .bf-closing fieldset{max-width:560px;}
+  .bf-radios legend{font-size:15px;letter-spacing:0;text-transform:none;font-weight:300;line-height:1.5;margin:0 0 4px;}
+  .bf-radios .bf-radio-row{display:flex;gap:24px;flex-wrap:wrap;}
+  .bf-radios label{display:inline-flex;align-items:center;gap:10px;margin:0;min-height:44px;font-size:15px;letter-spacing:0;text-transform:none;font-weight:300;cursor:pointer;}
+  .bf-radios input{appearance:none;-webkit-appearance:none;width:20px;height:20px;min-height:0;margin:0;border:1px solid #212121;border-radius:50%;background:#F7F8F3;padding:0;}
+  .bf-radios input:checked{box-shadow:inset 0 0 0 4px #F7F8F3;background:#212121;}
+  .bf-form .bf-btn{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:19px;letter-spacing:.03em;line-height:1.2;min-height:58px;background:#212121;color:#F7F8F3;border:0;border-radius:300px;padding:0 38px;cursor:pointer;transition:background-color .3s;}
+  .bf-form .bf-btn:hover{background:#2a2a2a;}
   .bf-form .bf-btn[disabled]{opacity:.6;cursor:wait;}
-  .bf-note{font-size:.8rem;color:rgba(33,33,33,.72);margin-top:14px;}
-  .bf-status{margin-top:14px;font-size:.95rem;min-height:1.4em;}
+  .bf-note{font-size:13px;line-height:1.5;text-align:center;color:#212121;margin:0;}
+  .bf-status{font-size:17px;text-align:center;margin:0;min-height:1.4em;}
+  .bf-status:empty{display:none;}
   .bf-status.err{color:#4A1414;}
-  .bf-done{text-align:center;padding:40px 0;}
+  .bf-done{text-align:center;padding:20px 0;}
   .bf-done h3{color:#212121;margin:0 0 10px;}
   /* honeypot: parked off-screen, invisible to humans, present for bots */
   .bf-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
 </style>
 
-<div class="bf-form" id="bfContact">
-  <h3>Get in touch</h3>
+<div class="bf-contact" id="bfContact">
+  <div class="bf-head">
+    <p class="bf-eyebrow">Get in touch</p>
+    <p class="bf-lead">Want to see how BNG fits into your world? Tell us a bit about you and your project and we&rsquo;ll pave the right path forward.</p>
+  </div>
+  <div class="bf-rule"></div>
   <noscript><p style="color:#212121;">This form needs JavaScript. Please enable it, or contact us by email instead.</p></noscript>
-  <form id="bfContactForm" method="post" novalidate>
-    <div class="bf-field">
-      <label for="bfName">Name <span class="req">*</span></label>
-      <input type="text" id="bfName" name="name" required maxlength="200" autocomplete="name">
-    </div>
-    <div class="bf-field">
-      <label for="bfEmail">Email <span class="req">*</span></label>
-      <input type="email" id="bfEmail" name="email" required maxlength="320" autocomplete="email">
-    </div>
-    <div class="bf-field">
-      <label for="bfPhone">Phone (optional)</label>
-      <input type="tel" id="bfPhone" name="phone" maxlength="50" autocomplete="tel">
+  <form class="bf-form" id="bfContactForm" method="post" novalidate>
+    <div class="bf-two">
+      <div class="bf-field">
+        <label for="bfName">Name <span class="req">*</span></label>
+        <input type="text" id="bfName" name="name" required maxlength="200" autocomplete="name" placeholder="Your name">
+      </div>
+      <div class="bf-field">
+        <label for="bfEmail">Email <span class="req">*</span></label>
+        <input type="email" id="bfEmail" name="email" required maxlength="320" autocomplete="email" placeholder="you@company.co.uk">
+      </div>
+      <div class="bf-field">
+        <label for="bfPhone">Phone (optional)</label>
+        <input type="tel" id="bfPhone" name="phone" maxlength="50" autocomplete="tel" placeholder="+44">
+      </div>
+      <div class="bf-field">
+        <label for="bfHeardAbout">Where did you hear about us? (optional)</label>
+        <select id="bfHeardAbout" name="heard_about">
+          <option value="">Please choose</option>
+          <option value="search">Search engine</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="referral">Recommended by someone</option>
+          <option value="event">Event or trade show</option>
+          <option value="newsletter">Biofarm newsletter</option>
+          <option value="press">Press or article</option>
+          <option value="marketplace">BNG marketplace or listing site</option>
+          <option value="ai">AI assistant (like ChatGPT)</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="bf-field bf-full" id="bfHeardOtherField" hidden>
+        <label for="bfHeardOther">Tell us where (optional)</label>
+        <input type="text" id="bfHeardOther" name="heard_about_other" maxlength="200" autocomplete="off" placeholder="A talk, a colleague, a podcast…">
+      </div>
     </div>
     <fieldset>
       <legend>I am a... <span class="req">*</span></legend>
@@ -64,38 +112,24 @@
       </div>
     </fieldset>
     <div class="bf-field">
-      <label for="bfHeardAbout">Where did you hear about us? (optional)</label>
-      <select id="bfHeardAbout" name="heard_about">
-        <option value="">Please choose</option>
-        <option value="search">Search engine</option>
-        <option value="linkedin">LinkedIn</option>
-        <option value="referral">Recommended by someone</option>
-        <option value="event">Event or trade show</option>
-        <option value="newsletter">Biofarm newsletter</option>
-        <option value="press">Press or article</option>
-        <option value="marketplace">BNG marketplace or listing site</option>
-        <option value="ai">AI assistant (like ChatGPT)</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-    <div class="bf-field" id="bfHeardOtherField" hidden>
-      <label for="bfHeardOther">Tell us where (optional)</label>
-      <input type="text" id="bfHeardOther" name="heard_about_other" maxlength="200" autocomplete="off">
-    </div>
-    <div class="bf-field">
       <label for="bfMessage">Your Message (optional)</label>
-      <textarea id="bfMessage" name="message" maxlength="5000"></textarea>
+      <textarea id="bfMessage" name="message" maxlength="5000" rows="4" placeholder="Where the site is, what stage it’s at, what you need from us…"></textarea>
     </div>
-    <fieldset class="bf-radios">
-      <legend>Please plant me on the newsletter list - I accept the <a href="/privacy-policy" style="color:#212121;">Privacy Policy</a> <span class="req">*</span></legend>
-      <label><input type="radio" name="newsletter" value="yes" required>Yes please</label>
-      <label><input type="radio" name="newsletter" value="no">No thank you</label>
-    </fieldset>
+    <div class="bf-rule"></div>
     <div class="bf-hp" aria-hidden="true">
       <label for="bfWebsite">Website</label>
       <input type="text" id="bfWebsite" name="website" tabindex="-1" autocomplete="off">
     </div>
-    <button type="submit" class="bf-btn" id="bfSubmit">Submit</button>
+    <div class="bf-closing">
+      <fieldset class="bf-radios">
+        <legend>Please plant me on the newsletter list - I accept the <a href="/privacy-policy" style="color:#212121;">Privacy Policy</a> <span class="req">*</span></legend>
+        <div class="bf-radio-row">
+          <label><input type="radio" name="newsletter" value="yes" required>Yes please</label>
+          <label><input type="radio" name="newsletter" value="no">No thank you</label>
+        </div>
+      </fieldset>
+      <button type="submit" class="bf-btn" id="bfSubmit">Submit</button>
+    </div>
     <p class="bf-status" id="bfStatus" role="status" aria-live="polite"></p>
     <p class="bf-note">Required fields are marked with *. We never ask for sensitive information through this form.</p>
   </form>
