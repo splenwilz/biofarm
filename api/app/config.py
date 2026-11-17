@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+from datetime import date, datetime
 from typing import Annotated, Any, get_args
 
 from pydantic import (
@@ -13,7 +14,7 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
-from app.schemas import LEAD_FORMS, FieldChoice
+from app.schemas import LEAD_FORMS, FieldChoice, HeardAbout
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,11 @@ _OWNER_KEY_HELP = (
 
 # The two answers the "Newsletter Sign Up" lead field records (see sync).
 _NEWSLETTER_CHOICES = ("opted_in", "opted_out")
+# The answers the contact form offers to "Where did you hear about us?" (schemas.HeardAbout).
+_HEARD_ABOUT_CHOICES: tuple[str, ...] = get_args(HeardAbout)
+
+# What a GA4 key event can be reported as on the dashboard (reporting/schemas.py ConversionKind).
+_CONVERSION_KINDS = ("enquiry", "newsletter_signup", "email_click")
 
 
 def _as_positive_int(value: Any) -> int | None:
@@ -49,6 +55,35 @@ def _as_positive_int(value: Any) -> int | None:
         except ValueError:
             return None
     return None
+
+
+def _option_map_lenient(name: str, v: Any, choices: tuple[str, ...], what: str) -> dict[str, int]:
+    """A "form answer -> Pipedrive option id" map from the environment. Like
+    the owner map: a bad paste in an optional setting is logged and dropped,
+    never a failed boot (pydantic-settings would otherwise raise on malformed
+    JSON before any validator runs - hence NoDecode on these fields)."""
+    if v is None or v == "":
+        return {}
+    if isinstance(v, str):
+        try:
+            v = json.loads(v)
+        except ValueError as exc:
+            logger.error("%s is not valid JSON (%s); ignoring it - %s is not written", name, exc, what)
+            return {}
+    if not isinstance(v, dict):
+        logger.error("%s must be a JSON object, got %s; ignoring it", name, type(v).__name__)
+        return {}
+    out: dict[str, int] = {}
+    for key, value in v.items():
+        if key not in choices:
+            logger.error("%s: dropping unknown key %r; keys are %s", name, key, ", ".join(repr(c) for c in choices))
+            continue
+        option_id = _as_positive_int(value)
+        if option_id is None:
+            logger.error("%s[%r] is not a positive integer option id (got %s); dropping it", name, key, type(value).__name__)
+            continue
+        out[key] = option_id
+    return out
 
 
 class Settings(BaseSettings):
@@ -117,9 +152,42 @@ class Settings(BaseSettings):
     # old Pipedrive embeds did, so the team's Pipedrive filters keep working.
     pipedrive_newsletter_field: str | None = None
     pipedrive_newsletter_option_map: Annotated[dict[str, int], NoDecode] = {}
+    # "How they heard" lead field (a multiple-option deal field Sales added on
+    # 17 Nov 2026): field hash + form answer -> option id, e.g. {"search": 1261}.
+    # Written on every lead whose form answered the question. Their own words
+    # behind "Other" stay in the pinned note: Pipedrive has no text field for them.
+    pipedrive_heard_about_field: str | None = None
+    pipedrive_heard_about_option_map: Annotated[dict[str, int], NoDecode] = {}
 
     ga4_measurement_id: str | None = None
     ga4_api_secret: SecretStr | None = None
+
+    # ---- Google reporting: Ads, GA4 Data API, Search Console (read-only) --------
+    # The OAuth client and refresh token from scripts/google_auth.py, read with
+    # the plain names that script prints (and with the prefix, like DATABASE_URL).
+    google_client_id: str | None = Field(default=None, validation_alias=AliasChoices("GOOGLE_CLIENT_ID", "BIOFARM_GOOGLE_CLIENT_ID"))
+    google_client_secret: SecretStr | None = Field(default=None, validation_alias=AliasChoices("GOOGLE_CLIENT_SECRET", "BIOFARM_GOOGLE_CLIENT_SECRET"))
+    google_refresh_token: SecretStr | None = Field(default=None, validation_alias=AliasChoices("GOOGLE_REFRESH_TOKEN", "BIOFARM_GOOGLE_REFRESH_TOKEN"))
+    # Google Ads customer id (digits; dashes accepted), GA4 property id (the
+    # number, not the G- measurement id), Search Console property as named
+    # there ("https://www.biofarm.co.uk/" or "sc-domain:biofarm.co.uk").
+    # Each source is pulled only when its id is set.
+    google_ads_customer_id: str | None = Field(default=None, validation_alias=AliasChoices("GOOGLE_ADS_CUSTOMER_ID", "BIOFARM_GOOGLE_ADS_CUSTOMER_ID"))
+    ga4_property_id: str | None = Field(default=None, validation_alias=AliasChoices("GA4_PROPERTY_ID", "BIOFARM_GA4_PROPERTY_ID"))
+    search_console_site_url: str | None = Field(default=None, validation_alias=AliasChoices("SEARCH_CONSOLE_SITE_URL", "BIOFARM_SEARCH_CONSOLE_SITE_URL"))
+    # RE2 regex (Search Console's engine) for queries naming the brand.
+    google_brand_query_pattern: str = r"(?i)bio ?farm"
+    # GA4 key event name -> the dashboard's conversion kind. Names not listed
+    # are stored but not reported (e.g. our own generate_lead, which the
+    # "Contact Form" tag already counts; purchase, which never fires).
+    ga4_key_event_map: Annotated[dict[str, str], NoDecode] = {"Contact Form": "enquiry", "Newsletter Sign Up Form": "newsletter_signup", "E-mail Click": "email_click"}
+    # Minutes between Google imports inside this process; 0 = off. Once a day
+    # is plenty: the data lands days late and each run re-reads a window.
+    google_import_minutes: int = Field(default=0, ge=0)
+    # Days re-read on every run (figures get revised; Search Console lands 2-3
+    # days late) and on the first run with empty tables.
+    google_import_window_days: int = Field(default=35, ge=1)
+    google_backfill_days: int = Field(default=480, ge=1)
 
     # The marketing dashboard reads GET /v1/dashboard with this token in the
     # x-dashboard-token header (a shared secret until sign-in exists). Unset =
@@ -127,13 +195,23 @@ class Settings(BaseSettings):
     dashboard_token: SecretStr = SecretStr("")
     # Which pipelines count as which audience on the dashboard, by Pipedrive
     # pipeline id; a deal created in any other pipeline is not marketing's.
-    pipedrive_pipeline_audiences: dict[int, str] = {3: "developer", 7: "developer", 2: "landowner", 6: "landowner"}
-    # The KPI rule: a deal created in the Developer Pipeline is qualified at
-    # creation; a Landowner Pipeline deal is qualified when it first moves past
-    # CALL / QUALIFY into another stage of that pipeline.
+    # The NSIP Pipeline (10, added 17 Nov 2026) is developer work.
+    pipedrive_pipeline_audiences: dict[int, str] = {3: "developer", 7: "developer", 10: "developer", 2: "landowner", 6: "landowner"}
+    # The KPI rule until 17 Nov 2026: a deal created in the Developer Pipeline
+    # is qualified at creation; a Landowner Pipeline deal is qualified when it
+    # first moves past CALL / QUALIFY into another stage of that pipeline.
     pipedrive_developer_pipeline_id: int = 3
     pipedrive_landowner_pipeline_id: int = 2
     pipedrive_landowner_qualify_stage_id: int = 6
+    # From this date (the day Sales got the field) a deal or an unconverted
+    # lead received on or after it counts as qualified when its "Qualified
+    # Lead?" field says YES, in whichever marketing pipeline, and not
+    # otherwise; the pipeline rule above keeps applying to older records. The
+    # field is found in the mirror by name, the option by label. Empty = the
+    # tick rule is off and the pipeline rule applies to everything.
+    pipedrive_qualified_field_name: str = "Qualified Lead?"
+    pipedrive_qualified_yes_label: str = "YES"
+    pipedrive_qualified_rule_from: date | None = date(2026, 11, 17)
 
     # ---- what counts as an enquiry (agreed 8 Nov 2026) --------------------------
     # An enquiry is every lead in the Leads inbox plus every deal created
@@ -204,48 +282,49 @@ class Settings(BaseSettings):
     @field_validator("pipedrive_newsletter_option_map", mode="before")
     @classmethod
     def _newsletter_option_map_lenient(cls, v: Any) -> dict[str, int]:
-        """Like the owner map: a bad paste in an optional setting is logged
-        and dropped, never a failed boot (pydantic-settings would otherwise
-        raise on malformed JSON before any validator runs - hence NoDecode)."""
-        name = "BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP"
-        if v is None or v == "":
-            return {}
-        if isinstance(v, str):
-            try:
-                v = json.loads(v)
-            except ValueError as exc:
-                logger.error("%s is not valid JSON (%s); ignoring it - the Newsletter Sign Up field is not written", name, exc)
-                return {}
-        if not isinstance(v, dict):
-            logger.error("%s must be a JSON object, got %s; ignoring it", name, type(v).__name__)
-            return {}
-        out: dict[str, int] = {}
-        for key, value in v.items():
-            if key not in _NEWSLETTER_CHOICES:
-                logger.error("%s: dropping unknown key %r; keys are %s", name, key, " and ".join(repr(c) for c in _NEWSLETTER_CHOICES))
-                continue
-            option_id = _as_positive_int(value)
-            if option_id is None:
-                logger.error("%s[%r] is not a positive integer option id (got %s); dropping it", name, key, type(value).__name__)
-                continue
-            out[key] = option_id
-        return out
+        return _option_map_lenient("BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP", v, _NEWSLETTER_CHOICES, "the Newsletter Sign Up field")
+
+    @field_validator("pipedrive_heard_about_option_map", mode="before")
+    @classmethod
+    def _heard_about_option_map_lenient(cls, v: Any) -> dict[str, int]:
+        return _option_map_lenient("BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP", v, _HEARD_ABOUT_CHOICES, "the How they heard field")
+
+    @field_validator("pipedrive_qualified_rule_from", mode="before")
+    @classmethod
+    def _rule_from_lenient(cls, v: Any) -> date | None:
+        """Empty switches the tick rule off. A date that does not parse is
+        logged and the default kept: a bad paste on Render must never take
+        every form on the site offline, and it should not silently change
+        what counts as qualified either."""
+        if v is None or v == "" or isinstance(v, date):
+            return v or None
+        text = str(v).strip()
+        try:
+            return date.fromisoformat(text)
+        except ValueError:
+            pass
+        try:
+            when = datetime.fromisoformat(text)  # a date-time, as pydantic would take it: the day it falls on
+            if (when.hour, when.minute, when.second, when.microsecond) == (0, 0, 0, 0):
+                return when.date()
+        except ValueError:
+            pass
+        default = cls.model_fields["pipedrive_qualified_rule_from"].default
+        logger.error("BIOFARM_PIPEDRIVE_QUALIFIED_RULE_FROM is not a date like 2026-11-17 (got %s of length %d); keeping the default %s", type(v).__name__, len(str(v)), default)
+        return default
 
     @model_validator(mode="after")
-    def _newsletter_field_is_set_up_whole(self) -> "Settings":
-        """Half a setting writes nothing (or only one of the two answers) in
-        silence; say so at boot."""
-        missing = [c for c in _NEWSLETTER_CHOICES if c not in self.pipedrive_newsletter_option_map]
-        if self.pipedrive_newsletter_field and missing:
-            logger.warning(
-                "BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD is set but BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP lacks %s, "
-                "so the Newsletter Sign Up field is not written for that answer", " and ".join(missing),
-            )
-        elif self.pipedrive_newsletter_option_map and not self.pipedrive_newsletter_field:
-            logger.warning(
-                "BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP is set but BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD is not: "
-                "the Newsletter Sign Up field is not written"
-            )
+    def _option_fields_are_set_up_whole(self) -> "Settings":
+        """Half a setting writes nothing (or only some answers) in silence; say so at boot."""
+        for prefix, field_hash, mapping, choices, what in (
+            ("BIOFARM_PIPEDRIVE_NEWSLETTER", self.pipedrive_newsletter_field, self.pipedrive_newsletter_option_map, _NEWSLETTER_CHOICES, "the Newsletter Sign Up field"),
+            ("BIOFARM_PIPEDRIVE_HEARD_ABOUT", self.pipedrive_heard_about_field, self.pipedrive_heard_about_option_map, _HEARD_ABOUT_CHOICES, "the How they heard field"),
+        ):
+            missing = [c for c in choices if c not in mapping]
+            if field_hash and missing:
+                logger.warning("%s_FIELD is set but %s_OPTION_MAP lacks %s, so %s is not written for that answer", prefix, prefix, " and ".join(missing), what)
+            elif mapping and not field_hash:
+                logger.warning("%s_OPTION_MAP is set but %s_FIELD is not: %s is not written", prefix, prefix, what)
         return self
 
     @field_validator("pipedrive_owner_map", mode="before")
@@ -360,3 +439,56 @@ class Settings(BaseSettings):
     @property
     def ga4_enabled(self) -> bool:
         return bool(self.ga4_measurement_id and self.ga4_api_secret)
+
+    @property
+    def google_enabled(self) -> bool:
+        """The three OAuth values and at least one source to pull."""
+        creds = self.google_client_id and self.google_client_secret and self.google_refresh_token
+        return bool(creds and (self.google_ads_customer_id or self.ga4_property_id or self.search_console_site_url))
+
+    @field_validator("google_ads_customer_id", "ga4_property_id", mode="before")
+    @classmethod
+    def _google_numeric_id_lenient(cls, v: Any, info: ValidationInfo) -> str | None:
+        """Digits only, dashes allowed (the Ads UI shows 516-153-2396). Anything
+        else is described and dropped so a pasted measurement id or resource
+        name disables that source instead of failing the boot."""
+        if v is None or v == "":
+            return None
+        digits = str(v).replace("-", "").strip()
+        if not digits.isdecimal():
+            name = {"google_ads_customer_id": "GOOGLE_ADS_CUSTOMER_ID", "ga4_property_id": "GA4_PROPERTY_ID"}[info.field_name or ""]
+            logger.error("%s is not a numeric id (got %s of length %d); ignoring it, that source is not pulled", name, type(v).__name__, len(str(v)))
+            return None
+        return digits
+
+    @field_validator("google_brand_query_pattern", mode="after")
+    @classmethod
+    def _brand_pattern_compiles(cls, v: str) -> str:
+        try:
+            re.compile(v)
+        except re.error as exc:
+            raise ValueError(f"BIOFARM_GOOGLE_BRAND_QUERY_PATTERN is not a valid regex: {exc}") from exc
+        return v
+
+    @field_validator("ga4_key_event_map", mode="before")
+    @classmethod
+    def _key_event_map_lenient(cls, v: Any) -> dict[str, str]:
+        name = "BIOFARM_GA4_KEY_EVENT_MAP"
+        if v is None or v == "":
+            return {}
+        if isinstance(v, str):
+            try:
+                v = json.loads(v)
+            except ValueError as exc:
+                logger.error("%s is not valid JSON (%s); ignoring it - no GA4 key events are reported", name, exc)
+                return {}
+        if not isinstance(v, dict):
+            logger.error("%s must be a JSON object, got %s; ignoring it", name, type(v).__name__)
+            return {}
+        out: dict[str, str] = {}
+        for key, value in v.items():
+            if value not in _CONVERSION_KINDS:
+                logger.error("%s[%r]: dropping unknown kind %r; kinds are %s", name, key, value, ", ".join(_CONVERSION_KINDS))
+                continue
+            out[str(key)] = value
+        return out

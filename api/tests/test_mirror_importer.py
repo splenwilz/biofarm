@@ -335,7 +335,8 @@ async def test_second_run_is_incremental_from_the_last_good_start(sessions, pipe
     assert sent == {since}
     assert pipedrive.persons_route.calls.last.request.url.params["updated_since"] == since
     assert pipedrive.activities_route.calls.last.request.url.params["updated_since"] == since
-    assert pipedrive.leads_route.calls.last.request.url.params["updated_since"] == since
+    # the leads inbox is read whole on every run, so a converted lead is noticed within the run interval
+    assert "updated_since" not in pipedrive.leads_route.calls.last.request.url.params
     assert [c.request.url.path for c in pipedrive.changelog_route.calls] == ["/api/v1/deals/1/changelog"]
     assert counts.deals == 1 and counts.persons == 1 and counts.stage_changes == 1
     async with sessions() as s:
@@ -488,24 +489,34 @@ async def test_deals_carry_the_lead_they_were_converted_from(sessions, pipedrive
         assert (await s.get(MirrorDeal, 1)).source_lead_id is None
 
 
-async def test_full_import_marks_leads_pipedrive_no_longer_returns_as_deleted(sessions, pipedrive):
+async def test_every_import_marks_leads_pipedrive_no_longer_returns_as_deleted(sessions, pipedrive):
     """Pipedrive deletes a lead when it is converted or removed and never lists
-    it again, so only a full read can notice; an incremental read leaves it."""
+    it again. Every run, incremental ones included, reads both inboxes whole
+    and flags what is missing, so a converted lead's deal takes over its
+    enquiry (at the lead's date, with the lead's labels) within the scheduled
+    interval rather than after a manual full import."""
     await do_run(sessions)
     gone, kept = pipedrive.leads[0]["id"], pipedrive.archived_leads[0]["id"]
     pipedrive.leads = []
-    await do_run(sessions, now=T0 + timedelta(hours=1))
-    async with sessions() as s:
-        assert (await s.get(MirrorLead, gone)).is_deleted is False
-    counts = await do_run(sessions, full=True, now=T0 + timedelta(hours=2))
+    counts = await do_run(sessions, now=T0 + timedelta(hours=1))
     async with sessions() as s:
         assert (await s.get(MirrorLead, gone)).is_deleted is True
         assert (await s.get(MirrorLead, kept)).is_deleted is False
     assert counts.leads_deleted == 1
     pipedrive.leads = [lead(gone)]
-    await do_run(sessions, full=True, now=T0 + timedelta(hours=3))
+    await do_run(sessions, now=T0 + timedelta(hours=2))
     async with sessions() as s:
         assert (await s.get(MirrorLead, gone)).is_deleted is False
+
+
+async def test_a_dry_run_reads_the_inboxes_but_flags_nothing(sessions, pipedrive):
+    await do_run(sessions)
+    gone = pipedrive.leads[0]["id"]
+    pipedrive.leads = []
+    counts = await do_run(sessions, dry_run=True, now=T0 + timedelta(hours=1))
+    async with sessions() as s:
+        assert (await s.get(MirrorLead, gone)).is_deleted is False
+    assert counts.leads_deleted == 0
 
 
 async def test_each_deal_changelog_commits_on_its_own(sessions, pipedrive):

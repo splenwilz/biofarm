@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.config import Settings
 from app.models import Lead
-from app.schemas import FIELD_LABELS, HEARD_ABOUT_LABELS
+from app.schemas import FIELD_LABELS, HEARD_ABOUT_LABELS, UNITS_WHEN_LABELS
 from app.services import ga4
 from app.services.attribution import source_label
 from app.services.pipedrive import PipedriveClient, PipedriveError
@@ -42,6 +42,13 @@ def build_note_html(lead: Lead) -> str:
         if lead.heard_about_other:
             label = f"{label} ({lead.heard_about_other})"
         parts.append(f"<p><b>Heard about us</b>: {html.escape(label)}</p>")
+    # the developer questions, only the ones answered
+    if lead.units_needed:
+        parts.append(f"<p><b>Biodiversity units needed</b>: {html.escape(lead.units_needed)}</p>")
+    if lead.site_location:
+        parts.append(f"<p><b>Site location</b>: {html.escape(lead.site_location)}</p>")
+    if lead.units_when:
+        parts.append(f"<p><b>Units needed by</b>: {html.escape(UNITS_WHEN_LABELS.get(lead.units_when, lead.units_when))}</p>")
     rows: list[str] = []
     for source_name, data in (("Last touch", lead.attribution), ("First touch", lead.first_touch)):
         if not data:
@@ -121,6 +128,13 @@ def _lead_custom_fields(lead: Lead, settings: Settings) -> dict[str, str | int]:
         option_id = settings.pipedrive_newsletter_option_map.get(choice)
         if option_id is not None:
             fields[settings.pipedrive_newsletter_field] = option_id
+    # "How they heard": a multiple-option field, which v1 leads take (and
+    # return) as a string of option ids - one answer here. An answer the map
+    # does not cover is left to the note.
+    if settings.pipedrive_heard_about_field and lead.heard_about:
+        option_id = settings.pipedrive_heard_about_option_map.get(lead.heard_about)
+        if option_id is not None:
+            fields[settings.pipedrive_heard_about_field] = str(option_id)
     return fields
 
 

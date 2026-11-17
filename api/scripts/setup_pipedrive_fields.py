@@ -1,7 +1,8 @@
 """One-off bootstrap: create the attribution custom fields in Pipedrive and
 print the JSON for the BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP env var, plus the
-BIOFARM_PIPEDRIVE_NEWSLETTER_* values read from the team's existing
-"Newsletter Sign Up" field (never created here - the old web forms made it).
+BIOFARM_PIPEDRIVE_NEWSLETTER_* and BIOFARM_PIPEDRIVE_HEARD_ABOUT_* values
+read from the team's existing "Newsletter Sign Up" and "How they heard"
+fields (never created here - the old web forms and Sales made them).
 
 Leads inherit deal custom fields, so these are created via the Deal Fields API.
 
@@ -13,8 +14,13 @@ Usage:
 import json
 import os
 import sys
+from pathlib import Path
 
 import httpx
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # run from anywhere; `app` is the project package
+
+from app.schemas import HEARD_ABOUT_LABELS  # noqa: E402
 
 # attribution key -> (Pipedrive field label, field type). referrer and
 # landing_page can be up to 2048 chars, beyond varchar's 255 limit.
@@ -56,6 +62,30 @@ def newsletter_settings(fields: list[dict]) -> list[str]:
         f"BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD={field['field_code']}",
         f"BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP={json.dumps(option_map)}",
     ]
+
+
+HEARD_ABOUT_FIELD = "How they heard"
+
+
+def heard_about_settings(fields: list[dict]) -> list[str]:
+    """The env lines for the "How they heard" field Sales added on 17 Nov
+    2026, matching its options to the contact form's answers by the labels
+    the form shows (schemas.HEARD_ABOUT_LABELS), or one line saying why there
+    are none. An option the field lacks is named: that answer stays in the note."""
+    field = next((f for f in fields if f.get("field_name") == HEARD_ABOUT_FIELD), None)
+    if field is None:
+        return [f"{HEARD_ABOUT_FIELD} field not found in Pipedrive; leave BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD unset"]
+    labels = {o.get("label"): o.get("id") for o in field.get("options") or []}
+    option_map = {key: labels[label] for key, label in HEARD_ABOUT_LABELS.items() if label in labels}
+    lines = [
+        f"BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD={field['field_code']}",
+        f"BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP={json.dumps(option_map)}",
+    ]
+    missing = [label for key, label in HEARD_ABOUT_LABELS.items() if key not in option_map]
+    if missing:
+        found = ", ".join(str(label) for label in labels) or "none"
+        lines.append(f"{HEARD_ABOUT_FIELD} field {field['field_code']} has no option labelled {', '.join(repr(m) for m in missing)} (found: {found}); those answers stay in the note only")
+    return lines
 
 
 def main() -> None:
@@ -103,7 +133,7 @@ def main() -> None:
 
     print("\nSet this on the Render service:")
     print(f"BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP={json.dumps(field_map)}")
-    for line in newsletter_settings(all_fields):
+    for line in newsletter_settings(all_fields) + heard_about_settings(all_fields):
         print(line)
 
 

@@ -1,5 +1,9 @@
 from sqlalchemy import event
+from datetime import UTC, datetime
+
+from sqlalchemy import DateTime
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.types import TypeDecorator
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -23,3 +27,24 @@ def make_engine(database_url: str) -> AsyncEngine:
             cursor.close()
 
     return engine
+
+
+class UtcDateTime(TypeDecorator[datetime]):
+    """A timezone-aware UTC datetime on every backend. Postgres stores
+    timestamptz; SQLite stores naive text, so values come back naive there
+    and are re-labelled UTC on the way out."""
+
+    impl = DateTime(timezone=True)
+    cache_ok = True
+
+    def process_bind_param(self, value: datetime | None, dialect) -> datetime | None:
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            raise ValueError("datetimes must be timezone-aware")
+        return value.astimezone(UTC)
+
+    def process_result_value(self, value: datetime | None, dialect) -> datetime | None:
+        if value is None:
+            return None
+        return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)

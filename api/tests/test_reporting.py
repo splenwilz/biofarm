@@ -10,6 +10,7 @@ from app.db import Base
 from app.mirror.models import (
     Activity,
     CampaignStat,
+    DealChange,
     DealField,
     DealStageHistory,
     ImportRun,
@@ -21,7 +22,7 @@ from app.mirror.models import (
     Stage,
 )
 from app.models import Lead
-from app.reporting.deals import DealContext, derive_deal, load_deals
+from app.reporting.deals import DealContext, derive_deal, load_context, load_deals
 from app.reporting.enquiries import (
     Candidate,
     EnquiryContext,
@@ -174,6 +175,55 @@ class TestOtherCases:
         assert out.pipeline == "landowner" and out.qualified_at == LATER
 
 
+QUAL = "a23a8a7ed1ad5a3224cbd98478feaa3d83d0b02e"
+NOV = datetime(2026, 11, 20, 9, 0, tzinfo=UTC)  # after the tick rule started (17 Nov 2026)
+
+
+def tick_ctx(**over) -> DealContext:
+    return ctx(stage_pipeline={13: 3, 14: 3, 6: 2, 7: 2, 63: 10, 23: 4}, qualified_code=QUAL, qualified_yes=1262, qualified_options={1262: "YES", 1263: "NO"}, **over)
+
+
+class TestTheQualifiedTick:
+    """From 17 Nov 2026 Sales tick "Qualified Lead?" and that decides, in any marketing pipeline."""
+
+    def test_a_developer_deal_from_the_start_date_needs_the_tick(self):
+        yes = derive_deal(deal(add_time=NOV, custom_fields={QUAL: 1262}), [], tick_ctx())
+        assert yes.qualified_at == NOV and yes.qualification_status == "YES"
+        no = derive_deal(deal(add_time=NOV, custom_fields={QUAL: 1263}), [], tick_ctx())
+        assert no.qualified_at is None and no.qualification_status == "NO"
+        blank = derive_deal(deal(add_time=NOV, custom_fields={}), [], tick_ctx())
+        assert blank.qualified_at is None and blank.qualification_status is None
+
+    def test_the_tick_counts_from_the_moment_it_was_made_when_the_changelog_has_it(self):
+        d = deal(pipeline_id=2, stage_id=6, add_time=NOV, custom_fields={QUAL: "1262"})  # v1 reads give the id as text
+        out = derive_deal(d, [], tick_ctx(qualified_ticks={1: NOV + 2 * H}))
+        assert out.pipeline == "landowner" and out.qualified_at == NOV + 2 * H  # still in CALL / QUALIFY: the stage no longer matters
+
+    def test_a_deal_converted_from_a_lead_counts_from_when_the_lead_came_in(self):
+        d = deal(add_time=NOV + 48 * H, custom_fields={QUAL: 1262}, source_lead_id="L9")
+        assert derive_deal(d, [], tick_ctx(), received=NOV).qualified_at == NOV
+
+    def test_a_lead_received_before_the_start_date_keeps_the_pipeline_rule_whenever_it_was_converted(self):
+        d = deal(add_time=NOV, custom_fields={}, source_lead_id="L9")
+        out = derive_deal(d, [], tick_ctx(), received=datetime(2026, 11, 10, tzinfo=UTC))
+        assert out.qualified_at == NOV and out.qualification_status is None  # a developer deal: qualified at creation
+
+    def test_older_deals_keep_the_pipeline_rule(self):
+        assert derive_deal(deal(custom_fields={}), [], tick_ctx()).qualified_at == T
+        assert derive_deal(deal(custom_fields={QUAL: 1263}), [], tick_ctx()).qualified_at == T  # a NO on an old deal changes nothing
+        assert derive_deal(deal(pipeline_id=2, stage_id=6, custom_fields={QUAL: 1262}), [], tick_ctx()).qualified_at is None
+
+    def test_an_nsip_deal_is_developer_work_and_qualifies_on_the_tick(self):
+        out = derive_deal(deal(pipeline_id=10, stage_id=63, add_time=NOV, custom_fields={QUAL: 1262}), [], tick_ctx())
+        assert out.pipeline == "developer" and out.qualified_at == NOV
+        assert derive_deal(deal(pipeline_id=10, stage_id=63, add_time=NOV, custom_fields={}), [], tick_ctx()).qualified_at is None
+
+    def test_without_the_field_in_the_mirror_or_with_the_rule_off_the_pipeline_rule_applies(self):
+        assert derive_deal(deal(add_time=NOV, custom_fields={}), [], ctx()).qualified_at == NOV
+        off = tick_ctx(settings=settings(pipedrive_qualified_rule_from=None))
+        assert derive_deal(deal(add_time=NOV, custom_fields={QUAL: 1263}), [], off).qualified_at == NOV
+
+
 def ectx(**over) -> EnquiryContext:
     # the team's own addresses come from the environment in real runs; set one here
     base = dict(settings=settings(enquiry_test_emails=["tester@example.org"]), channel_labels={1037: "Website", 1041: "Campaigns / Outreach", 1134: "Trade Show / Event", 1136: "Existing Network"},
@@ -309,6 +359,25 @@ class TestCandidates:
         assert candidates_from([mlead("L1", origin="WebForms", channel_id=None)], [(converted, "landowner")], {})[0].form_name == "Landowner Contact Form"
         assert candidates_from([], [(converted, "landowner")], {})[0].form_name == "Landowner Contact Form"
         assert candidates_from([mlead("L2")], [], {})[0].form_name is None
+
+    def test_a_converted_lead_whose_copy_the_mirror_kept_is_the_deal_at_the_leads_date_and_attribution(self):
+        """Pipedrive deletes the lead at conversion; the mirror keeps its copy,
+        flagged deleted. The deal is the enquiry (its id can be qualified) but
+        it keeps the date the person enquired and the lead's attribution, as a
+        live lead would, and the deal fills in only what the lead lacked. The
+        date matters twice: the month it is reported in, and whether it falls
+        inside an event's window."""
+        copy = mlead("L1", is_deleted=True, add_time=T - 30 * 24 * H, origin="API", channel=1134, person_id=777, channel_id="google / cpc", custom_fields={UTM_CAMPAIGN: "ukreiif-2026"})
+        converted = deal(id=9, source_lead_id="L1", add_time=T, origin="ManuallyCreated", channel=None, person_id=None, channel_id=None, custom_fields={})
+        out = candidates_from([copy], [(converted, "landowner")], {}, utm_campaign_code=UTM_CAMPAIGN)
+        assert len(out) == 1
+        c = out[0]
+        assert (c.kind, c.id, c.converted, c.audience) == ("deal", "9", True, "landowner")
+        assert (c.created_at, c.origin, c.channel_id, c.person_id, c.form_name, c.utm_campaign) == (T - 30 * 24 * H, "API", 1134, 777, "google / cpc", "ukreiif-2026")
+        # a copy with no date of its own cannot date the enquiry: the deal's date stands
+        undated = mlead("L2", is_deleted=True, add_time=None)
+        out = candidates_from([undated], [(deal(id=10, source_lead_id="L2", add_time=T), "landowner")], {})
+        assert [(c.id, c.created_at) for c in out] == [("10", T)]
 
     def test_a_converted_lead_pipedrive_has_deleted_is_counted_as_the_deal_marked_converted(self):
         out = candidates_from([], [(deal(id=9, source_lead_id="gone"), "developer"), (deal(id=10), "developer")], {})
@@ -502,6 +571,63 @@ async def test_load_deals_reads_the_mirror(sessions):
     assert by_id["1"].qualified_at == T and by_id["1"].campaign == "spring-push"
     assert by_id["2"].qualified_at == T and by_id["2"].channel == "Existing Network" and by_id["2"].pipeline == "developer"
     assert by_id["3"].qualified_at == LATER and by_id["3"].pipeline == "landowner" and by_id["3"].channel is None
+
+
+async def test_from_the_start_date_the_mirror_supplies_the_field_the_tick_and_the_leads_date(sessions):
+    await seed(sessions)
+    async with sessions() as s:
+        s.add_all([
+            DealField(field_code=QUAL, name="Qualified Lead?", field_type="enum", is_custom=True, options=[{"id": 1262, "label": "YES"}, {"id": 1263, "label": "NO"}], raw={}, fetched_at=T),
+            Pipeline(id=10, name="NSIP Pipeline", raw={}, fetched_at=T), Stage(id=63, pipeline_id=10, name="QUALIFIED OPPORTUNITY", raw={}, fetched_at=T),
+            deal(id=11, add_time=NOV, custom_fields={QUAL: 1262}),  # ticked at creation
+            deal(id=12, add_time=NOV, custom_fields={QUAL: 1262}),  # ticked two hours later, says the changelog
+            DealChange(id="c12", deal_id=12, changed_at=NOV + 2 * H, field_key=QUAL, old_value=None, new_value="1262", raw={}),
+            deal(id=13, add_time=NOV, custom_fields={}),  # a developer deal nobody ticked
+            deal(id=14, add_time=NOV + 48 * H, custom_fields={QUAL: 1262}, source_lead_id="L14"),  # converted from a lead received earlier
+            mlead("L14", is_deleted=True, add_time=NOV + 3 * H),
+            deal(id=15, pipeline_id=10, stage_id=63, add_time=NOV, custom_fields={QUAL: 1262}),
+            mlead("L16", title="Website enquiry - Kim", person_id=None, add_time=NOV + 4 * H, custom_fields={QUAL: 1262}),  # ticked, not converted yet
+            mlead("L17", title="Website enquiry - Lee", add_time=NOV + 5 * H, custom_fields={QUAL: 1263}),
+            mlead("L18", title="Website enquiry - Early", add_time=T + 8 * H, custom_fields={QUAL: 1262}),  # before the rule started
+            mlead("L19", title="Someone - FBI", origin="ManuallyCreated", person_id=None, add_time=NOV + 6 * H, custom_fields={QUAL: 1262}),  # no audience known yet
+            # a ticked lead the mirror still lists although its deal exists (read moments before Sales converted it): the deal is the record
+            mlead("L20", title="Website enquiry - Max", person_id=None, add_time=NOV + 7 * H, custom_fields={QUAL: 1262}),
+            deal(id=16, add_time=NOV + 8 * H, custom_fields={QUAL: 1262}, source_lead_id="L20"),
+            Lead(id="l20", form="contact", name="Max", email="max@example.com", fields=["developer"], pipedrive_person_id=None, pipedrive_lead_id="L20", created_at=NOV + 7 * H),
+            Lead(id="l16", form="contact", name="Kim", email="kim@example.com", fields=["landowner"], pipedrive_person_id=None, pipedrive_lead_id="L16", created_at=NOV + 4 * H),
+        ])
+        await s.commit()
+    async with sessions() as s:
+        data = await build_dashboard_data(s, settings())
+    by_id = {d.id: d for d in data.deals}
+    assert by_id["1"].qualified_at == T and by_id["1"].qualification_status is None  # the old rule for the old deal
+    assert by_id["11"].qualified_at == NOV and by_id["11"].qualification_status == "YES"
+    assert by_id["12"].qualified_at == NOV + 2 * H
+    assert by_id["13"].qualified_at is None
+    assert by_id["14"].qualified_at == NOV + 3 * H
+    assert by_id["15"].pipeline == "developer" and by_id["15"].qualified_at == NOV
+    assert by_id["L16"].model_dump(by_alias=False) == dict(id="L16", pipeline="landowner", channel="Website", created_at=NOV + 4 * H, qualified_at=NOV + 4 * H, status="open",
+                                             source_label="direct", campaign=None, person_id=None, qualification_status="YES")  # the website record, as the enquiry shows it
+    assert "L17" not in by_id and "L18" not in by_id and "L19" not in by_id
+    assert by_id["16"].qualified_at == NOV + 7 * H and "L20" not in by_id  # once, as the deal, from the lead's date
+    assert [e.id for e in data.enquiries if e.id in ("L20", "16")] == ["L20"]
+    assert [e.id for e in data.enquiries if e.id in ("L16", "L17", "L18", "L19")] == ["L18", "L16", "L17", "L19"]  # still enquiries, once each
+    assert data.model_dump(by_alias=True, mode="json")["deals"][-1]["qualificationStatus"] == "YES"
+
+
+async def test_two_fields_with_the_rules_name_are_logged_and_the_first_by_code_is_used(sessions, caplog):
+    await seed(sessions)
+    async with sessions() as s:
+        s.add_all([
+            DealField(field_code="b" * 40, name="Qualified Lead?", field_type="enum", is_custom=True, options=[{"id": 1, "label": "YES"}, {"id": 2, "label": "NO"}], raw={}, fetched_at=T),
+            DealField(field_code=QUAL, name="Qualified Lead?", field_type="enum", is_custom=True, options=[{"id": 1262, "label": "YES"}, {"id": 1263, "label": "NO"}], raw={}, fetched_at=T),
+        ])
+        await s.commit()
+    with caplog.at_level("WARNING"):
+        async with sessions() as s:
+            ctx = await load_context(s, settings())
+    assert ctx.qualified_code == QUAL and ctx.qualified_yes == 1262  # the lowest code wins, as for the other named fields
+    assert "2 deal fields named 'Qualified Lead?'" in caplog.text and QUAL in caplog.text and "b" * 40 in caplog.text
 
 
 async def test_build_dashboard_data_has_the_dashboard_shape(sessions):

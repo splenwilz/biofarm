@@ -320,9 +320,9 @@ async def insert_new(session: AsyncSession, model, rows: list[dict]) -> int:
 
 
 async def mark_missing_leads_deleted(session: AsyncSession, seen_ids: Iterable[str]) -> int:
-    """After a full read of the open and archived inboxes: flag the leads Pipedrive
-    no longer lists, and clear the flag on any it lists again. Returns how many
-    were newly flagged."""
+    """After a whole read of the open and archived inboxes (every run): flag the
+    leads Pipedrive no longer lists, and clear the flag on any it lists again.
+    Returns how many were newly flagged."""
     seen = set(seen_ids)
     rows = (await session.execute(select(MirrorLead.id, MirrorLead.is_deleted))).all()
     gone = [r.id for r in rows if r.id not in seen and not r.is_deleted]
@@ -445,10 +445,13 @@ async def run_import(
         logger.info("persons %d", counts.persons)
 
         counts.activities = await store(Activity, [activity_row(a, now) async for a in reader.pages("/api/v2/activities", since_param(since))])
-        open_leads = [lead_row(x, now) async for x in reader.offset_pages("/api/v1/leads", since_param(since))]
+        # Both inboxes are read whole on every run (about 1,300 leads in Nov 2026): Pipedrive
+        # deletes a converted lead and never lists it again, and the reporting counts its deal
+        # at the lead's date with the lead's labels only once the copy here is flagged.
+        open_leads = [lead_row(x, now) async for x in reader.offset_pages("/api/v1/leads")]
         archived_leads = [lead_row(x, now) async for x in reader.offset_pages("/api/v1/leads/archived")]
         counts.leads = await store(MirrorLead, open_leads) + await store(MirrorLead, archived_leads)
-        if full and not dry_run:
+        if not dry_run:
             seen = [r["id"] for r in open_leads] + [r["id"] for r in archived_leads]
             async with sessions() as session:
                 counts.leads_deleted = await mark_missing_leads_deleted(session, seen)

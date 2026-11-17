@@ -1198,3 +1198,90 @@ def test_boot_warns_when_the_website_channel_is_not_configured(tmp_path, caplog)
     with caplog.at_level("WARNING"):
         create_app(make_settings(tmp_path, pipedrive_website_channel=1037))
     assert "BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL" not in " ".join(r.getMessage() for r in caplog.records)
+
+
+@respx.mock
+async def test_contact_stores_the_three_developer_answers_and_repeats_them_in_the_note(client):
+    mocks = mock_pipedrive_happy_path()
+    r = await client.post("/v1/leads/contact", json=dict(
+        CONTACT_PAYLOAD, units_needed=" 0.37 habitat + 0.62 hedgerow ", site_location="  Frimley Green, Surrey Heath ", units_when="3_to_12_months"))
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.units_needed == "0.37 habitat + 0.62 hedgerow"
+    assert lead.site_location == "Frimley Green, Surrey Heath"
+    assert lead.units_when == "3_to_12_months"
+    note = json.loads(mocks["note"].calls.last.request.content)["content"]
+    assert "<p><b>Biodiversity units needed</b>: 0.37 habitat + 0.62 hedgerow</p>" in note
+    assert "<p><b>Site location</b>: Frimley Green, Surrey Heath</p>" in note
+    assert "<p><b>Units needed by</b>: 3 to 12 months</p>" in note
+
+
+@respx.mock
+async def test_developer_answers_are_optional_accepted_for_any_role_and_checked(client):
+    mock_pipedrive_happy_path()
+    assert (await client.post("/v1/leads/contact", json=CONTACT_PAYLOAD)).status_code == 202
+    lead = await get_single_lead(client)
+    assert (lead.units_needed, lead.site_location, lead.units_when) == (None, None, None)
+    # a planning consultant or ecologist answering for a developer is still useful
+    assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, fields=["ecologist"], units_needed="about 5", units_when="not_sure"))).status_code == 202
+    for bad in ({"units_when": "soon"}, {"units_when": ""}, {"units_needed": "x" * 101}, {"site_location": "x" * 201}):
+        assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, **bad))).status_code == 422, bad
+    # blanks are stored as nothing, not as empty strings
+    assert (await client.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, units_needed="   ", site_location=""))).status_code == 202
+
+
+def test_note_html_leaves_the_developer_lines_out_when_not_answered():
+    from app.models import Lead
+    from app.services.sync import build_note_html
+
+    bare = build_note_html(Lead(form="contact", name="J", email="j@example.com", fields=["developer"]))
+    assert "units" not in bare.lower() and "Site location" not in bare
+    partial = build_note_html(Lead(form="contact", name="J", email="j@example.com", fields=["developer"], units_when="within_3_months"))
+    assert "<p><b>Units needed by</b>: Within 3 months</p>" in partial
+    assert "Biodiversity units needed" not in partial and "Site location" not in partial
+    escaped = build_note_html(Lead(form="contact", name="J", email="j@example.com", fields=[], site_location="<b>Leeds</b>"))
+    assert "<p><b>Site location</b>: &lt;b&gt;Leeds&lt;/b&gt;</p>" in escaped
+
+
+@respx.mock
+async def test_where_they_heard_about_us_is_written_on_the_lead_once_the_field_exists(tmp_path):
+    # "How they heard" is a multiple-option deal field (leads inherit deal fields); v1 leads
+    # take and return such a field as a string of option ids, "1265" for one answer.
+    settings = make_settings(
+        tmp_path,
+        pipedrive_heard_about_field="f4c890ea7107bf970bd18de2e7227ef216bab0d6",
+        pipedrive_heard_about_option_map={"search": 1261, "linkedin": 1265, "other": 1272},
+    )
+    app = create_app(settings)
+    routes = mock_pipedrive_happy_path()
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            ac.app = app
+            for payload in (
+                dict(CONTACT_PAYLOAD, heard_about="linkedin"),
+                dict(CONTACT_PAYLOAD, heard_about="other", heard_about_other="A talk at Groundswell"),
+                dict(CONTACT_PAYLOAD, heard_about="press"),  # an answer the map does not cover yet
+                CONTACT_PAYLOAD,  # the question was not answered
+            ):
+                assert (await ac.post("/v1/leads/contact", json=payload)).status_code == 202
+    bodies = [json.loads(c.request.content) for c in routes["lead"].calls]
+    assert bodies[0]["f4c890ea7107bf970bd18de2e7227ef216bab0d6"] == "1265"
+    assert bodies[1]["f4c890ea7107bf970bd18de2e7227ef216bab0d6"] == "1272"
+    assert "f4c890ea7107bf970bd18de2e7227ef216bab0d6" not in bodies[2]
+    assert "f4c890ea7107bf970bd18de2e7227ef216bab0d6" not in bodies[3]
+    # their own words behind "Other" still travel in the note (Pipedrive has no text field for them yet)
+    notes = [json.loads(c.request.content)["content"] for c in routes["note"].calls]
+    assert "<p><b>Heard about us</b>: Other (A talk at Groundswell)</p>" in notes[1]
+
+
+@respx.mock
+async def test_without_the_heard_about_setting_the_lead_body_carries_no_such_field(tmp_path):
+    app = create_app(make_settings(tmp_path))
+    routes = mock_pipedrive_happy_path()
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+            ac.app = app
+            assert (await ac.post("/v1/leads/contact", json=dict(CONTACT_PAYLOAD, heard_about="linkedin"))).status_code == 202
+    body = json.loads(routes["lead"].calls.last.request.content)
+    assert not [k for k in body if len(k) == 40]  # no custom-field hash of any kind

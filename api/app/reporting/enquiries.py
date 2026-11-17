@@ -33,8 +33,8 @@ from sqlalchemy.orm import defer
 from app.config import Settings
 from app.mirror.models import Activity, MirrorDeal, MirrorLead, MirrorPerson
 from app.models import Lead
-from app.reporting.deals import DealContext, MarketingDeals, load_marketing_deals
-from app.reporting.schemas import Audience, Channel, EnquiryForm, EnquiryOut
+from app.reporting.deals import DealContext, MarketingDeals, load_marketing_deals, tick_rule_applies
+from app.reporting.schemas import Audience, Channel, DealOut, EnquiryForm, EnquiryOut
 from app.services.attribution import source_label, touch_label
 
 logger = logging.getLogger("app.reporting")
@@ -98,6 +98,11 @@ class Candidate:
     # Pipedrive's free-text channel_id: the web form's name on a WebForms record
     # (kept on the deal it becomes), our source label on a record our API made.
     form_name: str | None = None
+    # A lead's "Qualified Lead?" option label (YES / NO), None when unset.
+    qualification: str | None = None
+    # A live lead whose deal the mirror already holds (read moments before
+    # Sales converted it; the next import flags the lead): the deal is the record.
+    has_deal: bool = False
 
 
 @dataclass(frozen=True)
@@ -262,13 +267,20 @@ def candidates_from(
     utm_campaign_code: str | None = None,
     landing_page_code: str | None = None,
     touch_codes: Mapping[str, str] | None = None,
+    qualified_code: str | None = None,
+    qualified_options: Mapping[int, str] | None = None,
 ) -> list[Candidate]:
     """Every lead the mirror still lists and every marketing deal, each once.
     `deals` are the deals the KPI rule keeps, with the audience of the pipeline
     they were created in. `website_records` is keyed by Pipedrive lead id and
     by our own record id (the origin id we send with a lead). `touch_codes`
     maps utm_source / utm_medium / referrer to the custom field codes that
-    hold them; a converted lead's deal fills in what the lead lacks."""
+    hold them; a converted lead's deal fills in what the lead lacks.
+
+    A lead Pipedrive has deleted at conversion stays in `leads` as the mirror's
+    copy, flagged deleted: the deal it became is the enquiry, with the copy's
+    date and attribution (when the person enquired, not when Sales converted)
+    and the deal filling in what the copy lacked, as for a live lead."""
 
     def touch(*records: MirrorLead | MirrorDeal | None) -> dict[str, object]:
         fields = [r.custom_fields for r in records if r is not None and isinstance(r.custom_fields, dict)]
@@ -278,8 +290,12 @@ def candidates_from(
     converted = {d.source_lead_id: (d, audience) for d, audience in deals if d.source_lead_id}
     out: list[Candidate] = []
     live_leads: set[str] = set()
+    copies: dict[str, MirrorLead] = {}
     for lead in leads:
-        if lead.is_deleted or lead.add_time is None:
+        if lead.is_deleted:
+            copies[lead.id] = lead
+            continue
+        if lead.add_time is None:
             continue
         live_leads.add(lead.id)
         conv = converted.get(lead.id)
@@ -293,17 +309,34 @@ def candidates_from(
             landing_page=_custom(lead.custom_fields, landing_page_code) or (_custom(deal.custom_fields, landing_page_code) if deal else None),
             website=website_records.get(lead.id) or (website_records.get(lead.origin_id) if lead.origin_id else None),
             touch=touch(lead, deal), form_name=lead.channel_id or (deal.channel_id if deal else None),
+            qualification=_option_label(lead.custom_fields, qualified_code, qualified_options), has_deal=deal is not None,
         ))
     for deal, audience in deals:
         if deal.add_time is None or (deal.source_lead_id and deal.source_lead_id in live_leads):
             continue
+        copy = copies.get(deal.source_lead_id) if deal.source_lead_id else None
         out.append(Candidate(
-            kind="deal", id=str(deal.id), title=deal.title, created_at=deal.add_time, origin=deal.origin, channel_id=deal.channel,
-            person_id=deal.person_id, archived=False, audience=audience, converted=bool(deal.source_lead_id), touch=touch(deal), form_name=deal.channel_id,
-            utm_campaign=_custom(deal.custom_fields, utm_campaign_code), landing_page=_custom(deal.custom_fields, landing_page_code),
-            website=(website_records.get(deal.origin_id) if deal.origin_id else None) or (website_records.get(deal.source_lead_id) if deal.source_lead_id else None),
+            kind="deal", id=str(deal.id), title=deal.title, created_at=(copy.add_time if copy is not None and copy.add_time is not None else deal.add_time),
+            origin=(copy.origin if copy is not None else None) or deal.origin,
+            channel_id=copy.channel if copy is not None and copy.channel is not None else deal.channel,
+            person_id=copy.person_id if copy is not None and copy.person_id is not None else deal.person_id,
+            archived=False, audience=audience, converted=bool(deal.source_lead_id), touch=touch(copy, deal),
+            form_name=(copy.channel_id if copy is not None else None) or deal.channel_id,
+            utm_campaign=(_custom(copy.custom_fields, utm_campaign_code) if copy is not None else None) or _custom(deal.custom_fields, utm_campaign_code),
+            landing_page=(_custom(copy.custom_fields, landing_page_code) if copy is not None else None) or _custom(deal.custom_fields, landing_page_code),
+            website=(website_records.get(deal.source_lead_id) if deal.source_lead_id else None)
+            or (website_records.get(copy.origin_id) if copy is not None and copy.origin_id else None)
+            or (website_records.get(deal.origin_id) if deal.origin_id else None),
         ))
     return out
+
+
+def _option_label(fields: object, code: str | None, options: Mapping[int, str] | None) -> str | None:
+    if not code or not options or not isinstance(fields, Mapping):
+        return None
+    value = fields.get(code)
+    text = str(value).strip() if value is not None and not isinstance(value, bool) else ""
+    return options.get(int(text)) if text.isdigit() else None
 
 
 @dataclass
@@ -312,6 +345,9 @@ class EnquiryReport:
     # When each newsletter sign-up came in, for the Newsletter page.
     newsletter_signups: list[datetime]
     excluded: dict[str, int]
+    # Leads Sales ticked "Qualified Lead?" YES on but have not converted yet,
+    # as qualified records under their lead id (the deal they become takes over).
+    qualified_leads: list[DealOut] = field(default_factory=list)
 
 
 async def load_enquiries(session: AsyncSession, settings: Settings, *, deals: tuple[DealContext, MarketingDeals] | None = None) -> EnquiryReport:
@@ -319,7 +355,8 @@ async def load_enquiries(session: AsyncSession, settings: Settings, *, deals: tu
     already has it (the dashboard builds both sections from one read)."""
     ctx_deals, kept = deals if deals is not None else await load_marketing_deals(session, settings)
     marketing_deals: list[tuple[MirrorDeal, Audience]] = [(d, out.pipeline) for d, out in kept]
-    leads = (await session.execute(select(MirrorLead).options(defer(MirrorLead.raw, raiseload=True)).where(MirrorLead.is_deleted.is_(False)))).scalars().all()
+    # Deleted copies included: a converted lead's deal takes its date and attribution from them.
+    leads = (await session.execute(select(MirrorLead).options(defer(MirrorLead.raw, raiseload=True)))).scalars().all()
 
     records: dict[str, Lead] = {}
     for w in (await session.execute(select(Lead).where(Lead.spam_flagged.is_(False)))).scalars():
@@ -340,11 +377,20 @@ async def load_enquiries(session: AsyncSession, settings: Settings, *, deals: tu
 
     enquiries: list[EnquiryOut] = []
     signups: list[datetime] = []
+    qualified_leads: list[DealOut] = []
     excluded: Counter[str] = Counter()
-    for c in candidates_from(leads, marketing_deals, records, utm_campaign_code=ctx_deals.utm_campaign_code, landing_page_code=landing_code, touch_codes=touch_codes):
+    yes_label = ctx_deals.qualified_options.get(ctx_deals.qualified_yes) if ctx_deals.qualified_yes is not None else None
+    for c in candidates_from(leads, marketing_deals, records, utm_campaign_code=ctx_deals.utm_campaign_code, landing_page_code=landing_code, touch_codes=touch_codes,
+                             qualified_code=ctx_deals.qualified_code, qualified_options=ctx_deals.qualified_options):
         result = derive(c, ctx)
         if isinstance(result, EnquiryOut):
             enquiries.append(result)
+            # A ticked lead counts from the day it came in (leads have no changelog); a lead whose
+            # audience nobody knows yet counts once converted, when its pipeline says.
+            if c.kind == "lead" and not c.has_deal and yes_label is not None and c.qualification == yes_label and result.audience != "other" and tick_rule_applies(c.created_at, ctx_deals):
+                qualified_leads.append(DealOut(id=c.id, pipeline=result.audience, channel=result.channel, created_at=c.created_at, qualified_at=c.created_at,
+                                               status="lost" if c.archived else "open", source_label=result.source_label, campaign=result.campaign,
+                                               person_id=result.person_id, qualification_status=yes_label))
         else:
             excluded[result] += 1
             if result == "newsletter":
@@ -352,4 +398,4 @@ async def load_enquiries(session: AsyncSession, settings: Settings, *, deals: tu
     enquiries.sort(key=lambda e: (e.created_at, e.kind, e.id))
     signups.sort()
     logger.info("enquiries %d; left out %s", len(enquiries), dict(excluded) or "nothing")
-    return EnquiryReport(enquiries=enquiries, newsletter_signups=signups, excluded=dict(excluded))
+    return EnquiryReport(enquiries=enquiries, newsletter_signups=signups, excluded=dict(excluded), qualified_leads=qualified_leads)

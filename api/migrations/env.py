@@ -14,12 +14,14 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # Keep the app's own loggers alive: fileConfig would otherwise disable every logger that already exists.
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 from app.config import Settings
 from app.db import Base
 from app import models  # noqa: F401  (registers tables on Base.metadata)
 from app.mirror import models as mirror_models  # noqa: F401  (the Pipedrive mirror tables)
+from app.google import models as google_models  # noqa: F401  (the Google daily tables)
 
 target_metadata = Base.metadata
 

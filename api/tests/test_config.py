@@ -1,3 +1,5 @@
+from datetime import date
+
 from app.config import Settings
 
 
@@ -155,3 +157,112 @@ def test_an_incomplete_newsletter_setting_warns_at_boot(caplog):
     Settings(_env_file=None, pipedrive_newsletter_field="newshash", pipedrive_newsletter_option_map={"opted_in": 1120, "opted_out": 1121})
     Settings(_env_file=None)
     assert "NEWSLETTER" not in caplog.text
+
+
+# ---- Google reporting (Ads, GA4 Data API, Search Console) -----------------------------------
+
+
+def test_google_values_are_read_without_the_prefix_like_database_url(monkeypatch):
+    """scripts/google_auth.py prints GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET /
+    GOOGLE_REFRESH_TOKEN, and the ids are set the same way; both spellings work."""
+    monkeypatch.setenv("GOOGLE_CLIENT_ID", "cid")
+    monkeypatch.setenv("GOOGLE_CLIENT_SECRET", "csec")
+    monkeypatch.setenv("GOOGLE_REFRESH_TOKEN", "1//refresh-secret-xyz")
+    monkeypatch.setenv("GOOGLE_ADS_CUSTOMER_ID", "516-153-2396")
+    monkeypatch.setenv("GA4_PROPERTY_ID", "403870147")
+    monkeypatch.setenv("SEARCH_CONSOLE_SITE_URL", "https://www.biofarm.co.uk/")
+    s = Settings(_env_file=None)
+    assert s.google_client_id == "cid"
+    assert s.google_client_secret.get_secret_value() == "csec" and "csec" not in repr(s)
+    assert s.google_refresh_token.get_secret_value() == "1//refresh-secret-xyz" and "refresh-secret-xyz" not in repr(s)
+    assert s.google_ads_customer_id == "5161532396"  # the API wants digits only; the UI shows dashes
+    assert s.ga4_property_id == "403870147"
+    assert s.search_console_site_url == "https://www.biofarm.co.uk/"
+    assert s.google_enabled
+    monkeypatch.delenv("GOOGLE_ADS_CUSTOMER_ID")
+    monkeypatch.setenv("BIOFARM_GOOGLE_ADS_CUSTOMER_ID", "1112223333")
+    assert Settings(_env_file=None).google_ads_customer_id == "1112223333"
+
+
+def test_google_is_off_without_the_three_credentials_or_any_source():
+    assert not Settings(_env_file=None).google_enabled
+    creds = dict(google_client_id="c", google_client_secret="s", google_refresh_token="r")
+    assert not Settings(_env_file=None, **creds).google_enabled  # nothing to pull
+    assert Settings(_env_file=None, **creds, ga4_property_id="1").google_enabled
+    assert not Settings(_env_file=None, google_client_id="c", ga4_property_id="1").google_enabled
+
+
+def test_google_ids_that_are_not_numbers_are_dropped_not_fatal(caplog):
+    s = Settings(_env_file=None, google_ads_customer_id="customers/abc", ga4_property_id="G-3MS9TLLZRN")
+    assert s.google_ads_customer_id is None and s.ga4_property_id is None
+    assert "GA4_PROPERTY_ID" in caplog.text and "G-3MS9TLLZRN" not in caplog.text  # the measurement id is the classic mistake; described, not echoed
+
+
+def test_key_event_map_defaults_to_the_biofarm_property_and_parses_leniently(monkeypatch, caplog):
+    s = Settings(_env_file=None)
+    assert s.ga4_key_event_map == {"Contact Form": "enquiry", "Newsletter Sign Up Form": "newsletter_signup", "E-mail Click": "email_click"}
+    assert s.google_brand_query_pattern == r"(?i)bio ?farm"
+    assert s.google_import_minutes == 0 and s.google_import_window_days == 35 and s.google_backfill_days == 480
+    monkeypatch.setenv("BIOFARM_GA4_KEY_EVENT_MAP", '{"Contact Form": "enquiry", "Bad": "unknown_kind", "purchase": "enquiry"}')
+    s = Settings(_env_file=None)
+    assert s.ga4_key_event_map == {"Contact Form": "enquiry", "purchase": "enquiry"}
+    assert "unknown_kind" in caplog.text
+    monkeypatch.setenv("BIOFARM_GA4_KEY_EVENT_MAP", "{not json")
+    assert Settings(_env_file=None).ga4_key_event_map == {}
+
+
+def test_an_invalid_brand_regex_fails_the_boot_plainly():
+    import pytest
+
+    with pytest.raises(ValueError, match="GOOGLE_BRAND_QUERY_PATTERN"):
+        Settings(_env_file=None, google_brand_query_pattern="(unclosed")
+
+
+def test_heard_about_option_map_parses_from_json_env_and_drops_unknown_answers(monkeypatch, caplog):
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD", "heardhash")
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP", '{"search": "1261", "linkedin": 1265, "facebook": 1, "ai": "no"}')
+    with caplog.at_level("ERROR"):
+        s = Settings(_env_file=None)
+    assert s.pipedrive_heard_about_field == "heardhash"
+    assert s.pipedrive_heard_about_option_map == {"search": 1261, "linkedin": 1265}
+    assert "'facebook'" in caplog.text and "'ai'" in caplog.text
+    caplog.clear()
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP", '{"search": 1261')
+    assert Settings(_env_file=None).pipedrive_heard_about_option_map == {}
+    assert "BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP" in caplog.text and "JSON" in caplog.text
+
+
+def test_an_incomplete_heard_about_setting_warns_at_boot(caplog):
+    with caplog.at_level("WARNING"):
+        Settings(_env_file=None, pipedrive_heard_about_field="heardhash", pipedrive_heard_about_option_map={"search": 1261})
+    assert "BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP" in caplog.text and "linkedin" in caplog.text and "other" in caplog.text
+    caplog.clear()
+    Settings(_env_file=None, pipedrive_heard_about_option_map={"search": 1261})
+    assert "BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD" in caplog.text
+    caplog.clear()
+    Settings(_env_file=None)
+    assert "HEARD_ABOUT" not in caplog.text
+
+
+def test_the_nsip_pipeline_counts_as_developer_work():
+    assert Settings(_env_file=None).pipedrive_pipeline_audiences[10] == "developer"
+
+
+def test_the_qualified_tick_rule_has_its_field_and_start_date():
+    s = Settings(_env_file=None)
+    assert s.pipedrive_qualified_field_name == "Qualified Lead?" and s.pipedrive_qualified_yes_label == "YES"
+    assert s.pipedrive_qualified_rule_from == date(2026, 11, 17)
+    assert Settings(_env_file=None, pipedrive_qualified_rule_from="").pipedrive_qualified_rule_from is None  # the tick rule switched off
+
+
+def test_a_malformed_tick_rule_start_date_is_logged_and_the_default_kept_not_a_failed_boot(monkeypatch, caplog):
+    # a bad paste on Render must never take every form on the site offline
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_QUALIFIED_RULE_FROM", "17/11/2026")
+    with caplog.at_level("ERROR"):
+        s = Settings(_env_file=None)
+    assert s.pipedrive_qualified_rule_from == date(2026, 11, 17)
+    assert "BIOFARM_PIPEDRIVE_QUALIFIED_RULE_FROM" in caplog.text and "2026-11-17" in caplog.text
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_QUALIFIED_RULE_FROM", "2026-11-18")
+    assert Settings(_env_file=None).pipedrive_qualified_rule_from == date(2026, 11, 18)
+    monkeypatch.setenv("BIOFARM_PIPEDRIVE_QUALIFIED_RULE_FROM", " 2026-11-18T00:00:00 ")  # a date-time at midnight is the same day
+    assert Settings(_env_file=None).pipedrive_qualified_rule_from == date(2026, 11, 18)

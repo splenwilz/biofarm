@@ -6,35 +6,13 @@ changes and per-campaign opens and clicks) comes from the person flow. No foreig
 a stage a deal still points at, and the mirror must not refuse that row.
 """
 
-from datetime import UTC, datetime
+from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text
+from sqlalchemy import Boolean, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.types import TypeDecorator
 
-from app.db import Base
+from app.db import Base, UtcDateTime  # noqa: F401  (re-exported: the mirror's tables and app.google.models use it)
 from app.models import JsonCol
-
-
-class UtcDateTime(TypeDecorator[datetime]):
-    """A timezone-aware UTC datetime on every backend. Postgres stores
-    timestamptz; SQLite stores naive text, so values come back naive there
-    and are re-labelled UTC on the way out."""
-
-    impl = DateTime(timezone=True)
-    cache_ok = True
-
-    def process_bind_param(self, value: datetime | None, dialect) -> datetime | None:
-        if value is None:
-            return None
-        if value.tzinfo is None:
-            raise ValueError("mirror datetimes must be timezone-aware")
-        return value.astimezone(UTC)
-
-    def process_result_value(self, value: datetime | None, dialect) -> datetime | None:
-        if value is None:
-            return None
-        return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
 
 
 class Pipeline(Base):
@@ -204,8 +182,9 @@ class MirrorLead(Base):
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
     archive_time: Mapped[datetime | None] = mapped_column(UtcDateTime)
     was_seen: Mapped[bool] = mapped_column(Boolean, default=False)
-    # Pipedrive never lists a converted or removed lead again; a full import
-    # marks the rows it no longer sees. Incremental runs cannot tell.
+    # Pipedrive never lists a converted or removed lead again; every import
+    # reads both inboxes whole and marks the rows it no longer sees. The row
+    # stays: a converted lead's deal reports at this date with these labels.
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     add_time: Mapped[datetime | None] = mapped_column(UtcDateTime, index=True)
     update_time: Mapped[datetime | None] = mapped_column(UtcDateTime)

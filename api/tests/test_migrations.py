@@ -52,3 +52,44 @@ def test_migrated_schema_has_the_pipedrive_mirror_tables(tmp_path, monkeypatch):
     command.downgrade(Config(str(ALEMBIC_INI)), "1bbbed35dc39")  # back to the leads-only schema, whatever sits above the mirror revisions
     remaining = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     assert not (expected & remaining)
+
+
+def test_migrated_schema_has_the_google_daily_tables(tmp_path, monkeypatch):
+    from app import models  # noqa: F401
+    from app.db import Base
+    from app.google import models as google_models  # noqa: F401
+
+    db_path = tmp_path / "mig.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{db_path}")
+    command.upgrade(Config(str(ALEMBIC_INI)), "head")
+
+    db = sqlite3.connect(db_path)
+    migrated = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    expected = {"google_ads_daily", "ga4_channel_daily", "ga4_source_daily", "ga4_key_event_daily", "gsc_daily", "google_import_runs"}
+    assert expected <= migrated
+    for table in expected:
+        columns = {row[1] for row in db.execute(f"PRAGMA table_info({table})")}
+        assert columns == set(Base.metadata.tables[table].columns.keys()), table
+    db.execute("INSERT INTO google_ads_daily (date, campaign_id, campaign_name, cost_micros, clicks, impressions, conversions, conversions_value, fetched_at)"
+               " VALUES ('2026-10-01', 1, 'Brand', 1000000, 3, 30, 0.5, 0, '2026-11-11 10:00:00')")
+    db.commit()
+
+    command.downgrade(Config(str(ALEMBIC_INI)), "b8e5f3d1c2a7")
+    remaining = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    assert not (expected & remaining)
+
+
+def test_developer_answer_columns_come_and_go_with_their_migration(tmp_path, monkeypatch):
+    db_path = tmp_path / "mig.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{db_path}")
+    cfg = Config(str(ALEMBIC_INI))
+    command.upgrade(cfg, "head")
+
+    def cols() -> set[str]:
+        return {row[1] for row in sqlite3.connect(db_path).execute("PRAGMA table_info(leads)")}
+
+    assert {"units_needed", "site_location", "units_when"} <= cols()
+    command.downgrade(cfg, "c4d7e9f1a2b3")
+    assert not ({"units_needed", "site_location", "units_when"} & cols())
+    command.upgrade(cfg, "head")
+    assert {"units_needed", "site_location", "units_when"} <= cols()

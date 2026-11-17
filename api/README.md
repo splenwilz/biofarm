@@ -15,8 +15,8 @@ which blocked GA4 conversion tracking and lost UTM/gclid lead-source data.
    Response: `202 {"status":"accepted","id":...}`.
 4. A background task then:
    - finds-or-creates the Person in Pipedrive (API v2), setting `marketing_status=subscribed` on newsletter opt-in;
-   - creates a Lead (API v1 - leads have no v2) with attribution custom fields and, from a form that asked, the "Newsletter Sign Up" field (Opted In / Opted Out, as the old embeds wrote it; see `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD`);
-   - pins a Note with the message, the ticked fields, the contact form's "Where did you hear about us?" answer (`heard_about`, plus their own words in `heard_about_other` when they chose Other; both kept on the row) and the attribution breakdown;
+   - creates a Lead (API v1 - leads have no v2) with attribution custom fields, from a form that asked, the "Newsletter Sign Up" field (Opted In / Opted Out, as the old embeds wrote it; see `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD`), and the contact form's "Where did you hear about us?" answer in the "How they heard" field Sales added on 17 Nov 2026 (see `BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD`; their own words behind Other stay in the note);
+   - pins a Note with the message, the ticked fields, the contact form's "Where did you hear about us?" answer (`heard_about`, plus their own words in `heard_about_other` when they chose Other; both kept on the row), the three developer questions (`units_needed`, `site_location`, `units_when`: accepted for any role and kept on the row; the forms carry the fields commented out until Vix and Chris agree to ask them) and the attribution breakdown;
    - optionally fires a GA4 Measurement Protocol event (`generate_lead_server`).
 5. Sync outcome is recorded on the row: `synced | failed | skipped_spam | disabled`.
    Failed rows keep the error and can be re-synced later.
@@ -67,7 +67,9 @@ managed Postgres later is just changing `DATABASE_URL`. Disk caveats: deploys
 have a brief restart blip (services with disks skip zero-downtime deploys), and
 disk durability = Render's **daily disk snapshots** (at least 7 days retained)
 - snapshots restore the *whole disk* to the snapshot time, so up to a day of
-leads can be lost and single files can't be cherry-picked. Take a logical
+leads can be lost and single files can't be cherry-picked; the same goes for
+the event costs and notes typed on the dashboard (`marketing_events`), which
+live in this file too. Take a logical
 backup of `/var/data/leads.db` occasionally too (see Querying leads), or
 upgrade to Postgres when the data matters enough.
 
@@ -79,7 +81,7 @@ PIPEDRIVE_COMPANY_DOMAIN=biofarm PIPEDRIVE_API_TOKEN=xxx \
 ```
 
 Creates the UTM/attribution custom fields (leads inherit deal fields) and
-prints the `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` value to set on the service. It also prints the `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD` / `_OPTION_MAP` values read from the existing "Newsletter Sign Up" field.
+prints the `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` value to set on the service. It also prints the `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD` / `_OPTION_MAP` and `BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD` / `_OPTION_MAP` values read from the existing "Newsletter Sign Up" and "How they heard" fields.
 Without it, attribution still lands in the pinned note and our DB - the map
 just makes it filterable in Pipedrive.
 
@@ -102,14 +104,18 @@ history, every deal field change, each person's consent changes
 uv run python scripts/import_pipedrive.py            # changes since the last good run
 uv run python scripts/import_pipedrive.py --full     # everything, changelogs included
 uv run python scripts/import_pipedrive.py --dry-run  # read and count, write nothing
+uv run python scripts/seed_events.py                 # marketing events Pipedrive's history shows (app/reporting/event_seed.py), once; --dry-run / --update-match
+uv run --with google-auth-oauthlib python scripts/google_auth.py   # one-off: sign in to Google, print the three OAuth values (see Google feed)
+uv run python scripts/import_google.py               # Google Ads, GA4, Search Console: the trailing window, or a backfill into empty tables; --days N / --dry-run
 ```
 
 Every write is an upsert on the Pipedrive id and the history tables have
 natural keys, so running it again creates no duplicates. An incremental run
 reads deals and persons updated since the previous good run's start minus
 ten minutes, plus deals deleted in the last 30 days, then re-reads the
-changelog only of deals whose `update_time` moved. Activities and open leads
-use the same window; archived leads are always read whole (no filter there).
+changelog only of deals whose `update_time` moved. Activities use the same
+window; both lead inboxes (open and archived) are read whole on every run, so
+a lead Pipedrive has converted or removed is flagged within the run interval.
 Paging is by cursor at 500 a page (v2) or start/limit (v1 leads and flow);
 a 429 waits for `x-ratelimit-reset`, a 5xx or network error backs off and
 retries up to five times, any other 4xx fails the run. The token travels in
@@ -132,14 +138,26 @@ submissions land between imports), gzipped, and the feed queries skip the raw
 API JSON on every row; a page view after an import takes the one rebuild, the
 rest are served from memory. It returns the marketing dashboard's records in its own
 `DashboardData` shape (camelCase JSON): deals, enquiries and the newsletter
-section today; spend, traffic, search and events stay empty until their
-feeds exist. The dashboard's server reads it with
+section from the Pipedrive mirror; spend, traffic, search and conversions
+from the Google daily tables (step 4); events from `marketing_events`. The dashboard's server reads it with
 the shared token in `x-dashboard-token`; the browser never sees the token or
 this endpoint. `app/reporting/` applies the KPI rule: a deal belongs to the
 audience of the pipeline it was created in (found from its stage history, so
-a deal parked in DORMANT or moved to Legal keeps its origin); a Developer
-Pipeline deal is qualified at creation, a Landowner Pipeline deal when it
-first leaves CALL / QUALIFY for another stage of that pipeline.
+a deal parked in DORMANT or moved to Legal keeps its origin). Until 17 Nov
+2026 a Developer Pipeline deal is qualified at creation, a Landowner Pipeline
+deal when it first leaves CALL / QUALIFY for another stage of that pipeline.
+From that day Sales tick a "Qualified Lead?" field (YES / NO) on every lead
+and deal, and the tick decides: a record received on or after the start date
+(`BIOFARM_PIPEDRIVE_QUALIFIED_RULE_FROM`) is qualified when the field says
+YES, in any marketing pipeline (the NSIP Pipeline, added the same day, is
+developer work), and not otherwise. It counts from the moment the deal
+changelog saw the tick, else from when the record came in; a deal converted
+from a lead is judged and dated from the lead. A lead ticked YES before
+conversion is a qualified record under its lead id until its deal takes over
+(a ticked lead whose audience nobody knows yet waits for that). Each record
+carries the option as `qualificationStatus` for the dashboard's 14-day alert.
+The field is found in the mirror by name and the option by label; if the
+mirror has neither, the log says so and the pipeline rule applies.
 
 Enquiries (agreed 8 Nov 2026) come from Pipedrive, so the series reaches back
 to January 2024 rather than to the day our own form went live: every lead in
@@ -151,9 +169,12 @@ campaign is a tracking test, or whose person has a test address or domain;
 website sign-ups by people at a staff domain; and newsletter sign-ups, which
 the feed reports by month under `newsletter.signups` instead. A deal
 converted from a lead (`source_lead_id`, which v2 deals return on request)
-is counted once: as the lead, at the lead's date, while the mirror still has
-the lead; Pipedrive deletes converted leads, so a full import marks leads it
-no longer sees as deleted. Each enquiry carries Pipedrive's source channel
+is counted once. Pipedrive deletes the lead at conversion and never lists it
+again; every import reads both lead inboxes whole and flags the copy it
+keeps, and from then on the deal is the enquiry, at the lead's date and with
+the lead's attribution and labels (so a label-only event still counts the
+deal), the deal filling in what the lead lacked. A lead converted before the
+mirror existed has no copy and reports at the deal's date. Each enquiry carries Pipedrive's source channel
 (a word in the title can fix it, e.g. the FBI event batch; website-origin
 records default to Website); the dashboard's KPI config decides which
 channels are inbound and which are outbound / network, the same split as for
@@ -183,6 +204,58 @@ The client-side `generate_lead` event (fired by the form block) is the key
 event; the server event is named `generate_lead_server` so the two never
 double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 
+### Google feed (step 4): Ads spend, GA4 traffic, Search Console
+
+`app/google/` pulls three read-only reports once a day into daily tables
+(`google_ads_daily` per campaign, `ga4_channel_daily`, `ga4_source_daily`,
+`ga4_key_event_daily`, `gsc_daily` as total / brand / non-brand, plus
+`google_import_runs`), and `app/reporting/google.py` rolls them up by month
+for the dashboard's spend, traffic, search and conversions sections. Every
+run re-reads the last `BIOFARM_GOOGLE_IMPORT_WINDOW_DAYS` days ending
+yesterday (figures are revised for a while; Search Console lands 2 to 3
+days late) and replaces them; a source whose table is empty is backfilled
+`BIOFARM_GOOGLE_BACKFILL_DAYS` days instead. Sources are independent: one
+failing is logged into the run row as `partial` and the others still land.
+`googleSyncedAt` in the payload is the last run where every source landed,
+so the dashboard's "Google data" alert fires when one source keeps failing.
+Each source counts its days in its own time zone (Ads: the account's; GA4:
+the property's reporting zone; Search Console: Pacific time), so a month's
+figure can differ by a few hours' worth of traffic from the other sources
+and from Pipedrive, which is UTC. The dashboard shows what each Google UI shows.
+
+Setup, once:
+
+1. In a Google Cloud project ("Biofarm reporting"), enable the Google Ads
+   API, the Google Analytics Data API and the Search Console API, and create
+   an OAuth client of type **Desktop app**. Download its JSON to
+   `api/secrets/` (gitignored) and set `GOOGLE_CLIENT_SECRETS_FILE` in
+   `api/.env`. Then, on the Google Ads API Overview page of the project,
+   **apply for the Explorer access level**: enabling the API grants Test
+   access, which reaches test accounts only, and the real account stays out
+   of reach until Explorer is approved (usually automatic). Explorer allows
+   2,880 operations a day, far more than one pull a day needs. Without it the
+   Ads pull fails every run, logged as `partial` with the other two sources
+   still landing, and the dashboard's Google alert stays on.
+2. Set the OAuth consent screen's publishing status to **In production**.
+   While it is "Testing", Google issues refresh tokens that expire after
+   7 days, so the pull would stop a week after every sign-in. Publishing
+   needs no verification for the team's own use; sign-in shows an
+   "unverified app" screen once.
+3. `uv run --with google-auth-oauthlib python scripts/google_auth.py`, signing
+   in with the Gmail that has read-only access to the Ads account, the GA4
+   property and the Search Console property. It prints `GOOGLE_CLIENT_ID`,
+   `GOOGLE_CLIENT_SECRET` and `GOOGLE_REFRESH_TOKEN`; put them in `api/.env`
+   and in the Render environment, nowhere else.
+4. Set the source ids (below), run `uv run alembic upgrade head` if the tables
+   are new, then `uv run python scripts/import_google.py` once for the
+   backfill, and set `BIOFARM_GOOGLE_IMPORT_MINUTES=1440` on Render for the
+   daily pull inside the web process.
+
+The Ads call uses REST `searchStream` on API version `v26` (sunset November
+2027; `tests/test_google_clients.py` fails two months before as the reminder
+to bump `ADS_API_VERSION`). No developer token: they were sunset on
+9 September 2026 and access comes from the Cloud project.
+
 ## Environment variables
 
 | Variable | Required | Purpose |
@@ -200,12 +273,22 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `BIOFARM_PIPEDRIVE_CLIENT_TYPE_MAP` | no | JSON: form value -> option id, e.g. `{"developer": 531}` |
 | `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD` | no | "Newsletter Sign Up" lead field hash (an option field; leads inherit deal fields). Set on every lead from a form that asks about the newsletter - contact and landowner (Opted In or Opted Out from the tick-box), newsletter (Opted In) - as the old Pipedrive embeds did; the CPD and Fold forms never ask, so their leads leave it empty |
 | `BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP` | no | JSON: `{"opted_in": <option id>, "opted_out": <option id>}`, the field's option ids from `GET /v1/dealFields` |
+| `BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD` | no | "How they heard" lead field hash (a multiple-option deal field; one answer is written, as the text of its option id, which is how v1 leads take and return such fields). Set on every lead whose form answered "Where did you hear about us?" |
+| `BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP` | no | JSON: form answer -> option id for `search`, `linkedin`, `referral`, `event`, `newsletter`, `press`, `marketplace`, `ai`, `other`; `scripts/setup_pipedrive_fields.py` prints it. An answer the map lacks stays in the note only |
 | `BIOFARM_GA4_MEASUREMENT_ID` | no | `G-3MS9TLLZRN` |
 | `BIOFARM_GA4_API_SECRET` | no | secret |
-| `BIOFARM_DASHBOARD_TOKEN` | for the dashboard | shared secret the marketing dashboard's server sends as `x-dashboard-token` to `GET /v1/dashboard`; unset = the endpoint answers 503 to everyone |
+| `BIOFARM_DASHBOARD_TOKEN` | for the dashboard | shared secret the marketing dashboard's server sends as `x-dashboard-token` to `GET /v1/dashboard` and to the event writes `POST /v1/dashboard/events`, `PUT`/`DELETE /v1/dashboard/events/{id}` (table `marketing_events`: name, date, type, cost, attendees, notes and the Pipedrive match rules; enquiries and qualified per event are counted from the mirror, see `app/reporting/events.py`); unset = the endpoints answer 503 to everyone |
 | `BIOFARM_MIRROR_IMPORT_MINUTES` | for the dashboard | minutes between Pipedrive mirror imports run inside the web process (`15` on Render); `0` (default) = off. The import runs in-process because a Render cron job cannot reach the service's persistent disk, where the SQLite database lives. One run at a time: the run row in `pd_import_runs` is the lock. A run cancelled by a deploy's SIGTERM closes its row as failed on the way out, the web process closes any row still "running" when it starts, and the standalone script treats a row left "running" for 2 hours as dead |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN` | for the Google feed | the OAuth client and refresh token `scripts/google_auth.py` prints (read with these plain names, or with the `BIOFARM_` prefix). The three together switch the pull on, with at least one source id below |
+| `GOOGLE_ADS_CUSTOMER_ID` | for Ads spend | the Ads account id, digits (dashes accepted: `516-153-2396`); anything else is logged and that source is skipped |
+| `GA4_PROPERTY_ID` | for traffic, conversions, AI referrals | the GA4 property number (not the `G-` measurement id) |
+| `SEARCH_CONSOLE_SITE_URL` | for search | the property exactly as Search Console names it: `https://www.biofarm.co.uk/` or `sc-domain:biofarm.co.uk` |
+| `BIOFARM_GOOGLE_IMPORT_MINUTES` | for the daily pull | minutes between Google imports inside the web process (`1440` on Render); `0` (default) = off. Set without the credentials above, the boot logs one warning and pulls nothing |
+| `BIOFARM_GOOGLE_IMPORT_WINDOW_DAYS` / `BIOFARM_GOOGLE_BACKFILL_DAYS` | no | days re-read every run (default 35) and read into an empty table (default 480) |
+| `BIOFARM_GOOGLE_BRAND_QUERY_PATTERN` | no | RE2 regex for Search Console queries naming the brand, default `(?i)bio ?farm` |
+| `BIOFARM_GA4_KEY_EVENT_MAP` | no | JSON object: GA4 key event name -> `enquiry`, `newsletter_signup` or `email_click`; default maps `Contact Form`, `Newsletter Sign Up Form` and `E-mail Click`. Names not listed are stored but not reported |
 | `BIOFARM_PIPEDRIVE_WEBSITE_CHANNEL` | for the dashboard | "Website" option id of the Source channel deal field (1037). Without it website leads, and the deals they are converted into, reach Pipedrive with no Source channel (Pipedrive also drops `channel_id` then); the API warns at boot and the dashboard falls back to origin API / Web Forms = Website |
-| `BIOFARM_PIPEDRIVE_PIPELINE_AUDIENCES` | no | JSON: pipeline id -> `developer` or `landowner`, default `{"3":"developer","7":"developer","2":"landowner","6":"landowner"}` (the two DORMANT pipelines keep their audience) |
+| `BIOFARM_PIPEDRIVE_PIPELINE_AUDIENCES` | no | JSON: pipeline id -> `developer` or `landowner`, default `{"3":"developer","7":"developer","10":"developer","2":"landowner","6":"landowner"}` (the two DORMANT pipelines keep their audience; 10 is the NSIP Pipeline) |
 | `BIOFARM_ENQUIRY_EXCLUDED_DEAL_ORIGINS` | no | JSON list of Pipedrive deal origins that are not enquiries, default `["Import"]` |
 | `BIOFARM_ENQUIRY_WEBSITE_ORIGINS` | no | JSON list of origins that mean "came through the website" (default Website channel; form read from the title, except that a Pipedrive web form named `Landowner Contact Form` - the landowner page's embed until November 2026 - counts as the `landowner` form so the by-form table stays in one row across the switch), default `["WebForms","API"]` |
 | `BIOFARM_ENQUIRY_TEST_CAMPAIGNS` | no | JSON list of UTM campaigns that were tracking tests, default `["tracking-test","go-live-check","field-map","final-check"]` |
@@ -214,7 +297,9 @@ double-count. Mark `generate_lead` as a key event in GA4 Admin → Events.
 | `BIOFARM_ENQUIRY_TEST_TITLE_PATTERN` | no | case-insensitive regex for test titles, default `\btest\b(?!\s+valley)` |
 | `BIOFARM_ENQUIRY_NEWSLETTER_TITLE_PATTERN` | no | case-insensitive regex; website records whose title matches are newsletter sign-ups, default `^\s*newsletter` |
 | `BIOFARM_ENQUIRY_CHANNEL_BY_TITLE` | no | JSON object: a whole word in the title -> Source channel label it forces, default `{"FBI":"Trade Show / Event"}` |
-| `BIOFARM_PIPEDRIVE_DEVELOPER_PIPELINE_ID`, `..._LANDOWNER_PIPELINE_ID`, `..._LANDOWNER_QUALIFY_STAGE_ID` | no | the KPI rule's ids, default 3, 2 and 6 |
+| `BIOFARM_PIPEDRIVE_DEVELOPER_PIPELINE_ID`, `..._LANDOWNER_PIPELINE_ID`, `..._LANDOWNER_QUALIFY_STAGE_ID` | no | the pipeline rule's ids, default 3, 2 and 6 |
+| `BIOFARM_PIPEDRIVE_QUALIFIED_RULE_FROM` | no | the day the tick rule starts, default `2026-11-17`; empty switches it off (the pipeline rule applies to everything) |
+| `BIOFARM_PIPEDRIVE_QUALIFIED_FIELD_NAME`, `..._QUALIFIED_YES_LABEL` | no | the field and option the tick rule reads, by name and label as the mirror holds them; default `Qualified Lead?` and `YES` |
 | `BIOFARM_AUTO_CREATE_TABLES` | prod: `false` | Alembic owns the schema in prod |
 | `BIOFARM_RATE_LIMIT` | no | default `5/minute` per IP |
 | `BIOFARM_MIN_FILL_SECONDS` | no | spam fill-time threshold, default 3 |

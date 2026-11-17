@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.config import Settings
 from app.db import Base, make_engine
+from app.google.importer import google_import_once, google_start_clean
 from app.mirror.schedule import import_once, run_periodically, start_clean
 from app.routes.dashboard import router as dashboard_router
 from app.routes.leads import router as leads_router
@@ -54,22 +55,42 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # configured (see Settings.mirror_import_minutes). First run after a
         # minute so a deploy settles before the API budget is spent.
         app.state.import_task = None
+        if settings.mirror_import_minutes > 0 and not settings.pipedrive_enabled:
+            logging.getLogger("app.mirror").warning(
+                "BIOFARM_MIRROR_IMPORT_MINUTES is set but the Pipedrive mirror import is off: it needs "
+                "BIOFARM_PIPEDRIVE_COMPANY_DOMAIN and BIOFARM_PIPEDRIVE_API_TOKEN"
+            )
         if settings.mirror_import_minutes > 0 and settings.pipedrive_enabled:
             await start_clean(app.state.sessionmaker)
             app.state.import_task = asyncio.create_task(
                 run_periodically(import_once(app.state.sessionmaker, settings), every=settings.mirror_import_minutes * 60),
                 name="pipedrive-mirror-import",
             )
+        # The Google pull (Ads, GA4, Search Console) runs the same way when its
+        # interval is set; once a day is the intended cadence.
+        app.state.google_import_task = None
+        if settings.google_import_minutes > 0 and not settings.google_enabled:
+            logging.getLogger("app.google").warning(
+                "BIOFARM_GOOGLE_IMPORT_MINUTES is set but the Google pull is off: it needs GOOGLE_CLIENT_ID, "
+                "GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN and at least one of GOOGLE_ADS_CUSTOMER_ID, "
+                "GA4_PROPERTY_ID, SEARCH_CONSOLE_SITE_URL"
+            )
+        if settings.google_import_minutes > 0 and settings.google_enabled:
+            await google_start_clean(app.state.sessionmaker)
+            app.state.google_import_task = asyncio.create_task(
+                run_periodically(google_import_once(app.state.sessionmaker, settings), every=settings.google_import_minutes * 60),
+                name="google-import",
+            )
         try:
             yield
         finally:
-            task = app.state.import_task
-            if task is not None:
-                task.cancel()
-                try:
-                    await task
-                except asyncio.CancelledError:
-                    logging.getLogger("app.mirror").debug("import schedule stopped")
+            for task, log in ((app.state.import_task, "app.mirror"), (app.state.google_import_task, "app.google")):
+                if task is not None:
+                    task.cancel()
+                    try:
+                        await task
+                    except asyncio.CancelledError:
+                        logging.getLogger(log).debug("import schedule stopped")
             await engine.dispose()
 
     app = FastAPI(
