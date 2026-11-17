@@ -59,6 +59,12 @@ services:
       #   BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP (JSON: {"opted_in": id, "opted_out": id}, see api/README.md)
       #   BIOFARM_GA4_MEASUREMENT_ID           (G-3MS9TLLZRN)
       #   BIOFARM_GA4_API_SECRET               (GA4 Admin > Data streams > MP API secrets)
+      # Google feed for the dashboard (Ads spend, GA4 traffic, Search Console; see api/README.md "Google feed"):
+      #   GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REFRESH_TOKEN (from scripts/google_auth.py; consent
+      #                                         screen must be "In production" or the token expires in 7 days)
+      #   GOOGLE_ADS_CUSTOMER_ID, GA4_PROPERTY_ID, SEARCH_CONSOLE_SITE_URL (each source pulled only when set)
+      #                                         (the Cloud project needs Explorer access on the Ads API, see the README)
+      #   BIOFARM_GOOGLE_IMPORT_MINUTES=1440   (the daily pull runs inside this process, like the mirror import)
 
   # The marketing dashboard (dashboard/ subdirectory): a Next.js server that
   # reads the API's /v1/dashboard feed on every page load, server-side only.

@@ -4,3 +4,6 @@ __pycache__/
 .env
 .pytest_cache/
 *.db
+# Google OAuth client JSON (scripts/google_auth.py reads it via GOOGLE_CLIENT_SECRETS_FILE)
+secrets/
+client_secret*.json
