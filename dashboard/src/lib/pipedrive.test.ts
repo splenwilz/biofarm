@@ -14,4 +14,7 @@ describe("pipedriveDealUrl", () => {
   it("keeps only the number from a prefixed id such as the demo's", () => {
     expect(pipedriveDealUrl("deal-57", "biofarm")).toBe("https://biofarm.pipedrive.com/deal/57");
   });
+  it("sends a lead id (a uuid: a lead Sales ticked before converting it) to the leads inbox, not to a nonsense deal number", () => {
+    expect(pipedriveDealUrl("f5b1be40-df45-11f1-a57a-2d6d1f97051a", "biofarm")).toBe("https://biofarm.pipedrive.com/leads/inbox/f5b1be40-df45-11f1-a57a-2d6d1f97051a");
+  });
 });

@@ -57,7 +57,7 @@ export function ViewAll({
   );
 }
 
-/** Source rows as meters: track = enquiries, fill = the ones that qualified. */
+/** Source rows as meters: track = enquiries, fill = the ones that qualified, with the conversion once the row has enough enquiries. */
 export function sourceMeters(rows: SourceRow[], minEnquiries: number) {
   return rows.map((r) => ({
     key: r.group,
@@ -65,19 +65,31 @@ export function sourceMeters(rows: SourceRow[], minEnquiries: number) {
     value: Math.max(r.enquiries, r.qualified),
     valueText: `${integer(r.enquiries)} ${r.enquiries === 1 ? "enquiry" : "enquiries"}`,
     fill: r.qualified,
-    fillText: `${integer(r.qualified)} qualified${r.conversion === null ? (r.qualified ? " · deals created by Sales" : "") : r.conversionBase >= minEnquiries ? ` · ${pct(r.conversion)}` : ""}`,
+    fillText: `${integer(r.qualified)} qualified${r.enquiries >= minEnquiries && r.qualified <= r.enquiries ? ` · ${pct(r.qualified / r.enquiries)}` : ""}`,
   }));
 }
 
 /**
- * The conversion column: the share of lead enquiries that qualified, once the row has
- * `minEnquiries` of them; a dash below that; "Sales-created" where the qualified deals
- * are the team's own (nothing to measure over) or outnumber the leads that preceded them.
+ * Conversion: qualified ÷ enquiries (the user's definition, 12 Nov 2026), once
+ * the row has `minEnquiries` of them; a dash below that, and a dash where the
+ * qualified outnumber the enquiries (deals from earlier months qualifying in
+ * this window), since a share over 100% says nothing useful.
  */
-export function conversionText(r: { conversionBase: number; qualified: number; conversion: number | null }, minEnquiries: number): string {
-  if (r.conversion === null || r.conversion > 1) return r.qualified ? "Sales-created" : "–";
-  if (r.conversionBase < minEnquiries) return "–";
-  return pct(r.conversion);
+export function conversionText(r: { enquiries: number; qualified: number }, minEnquiries: number): string {
+  const share = conversionShare(r, minEnquiries);
+  return share === null ? "–" : pct(share);
+}
+
+/** The same conversion as a fraction, or null where the page shows a dash, so an export never prints what the screen withholds. */
+export function conversionShare(r: { enquiries: number; qualified: number }, minEnquiries: number): number | null {
+  if (r.enquiries < minEnquiries || r.qualified > r.enquiries) return null;
+  return r.qualified / r.enquiries;
+}
+
+/** Conversion as a percentage to one decimal for CSV, null where the page shows a dash. */
+export function conversionPct(r: { enquiries: number; qualified: number }, minEnquiries: number): number | null {
+  const share = conversionShare(r, minEnquiries);
+  return share === null ? null : Math.round(share * 1000) / 10;
 }
 
 /** The change-row note under a cost per qualified while no spend has been entered. */
@@ -154,6 +166,7 @@ export function OverviewPage() {
             label="Qualified opportunities"
             value={integer(h.qualified)}
             delta={{ value: h.qualifiedDelta, note: prev }}
+            footnote={`Target ${integer(config.targetQualifiedPerMonth)} · ${config.trailingMonths}-month average ${h.trailingAvg.toFixed(1)}`}
             info={[
               `Inbound deals qualified in ${monthName(report.reportMonth)}${audienceNote}, counted in the month they qualified. Network deals are left out.`,
               [
@@ -173,7 +186,8 @@ export function OverviewPage() {
             testId="kpi-cpqo"
             label="Cost per qualified"
             value={gbp(h.cpqoMonth)}
-            compare={h.spendMonth === 0 ? WAITING_FOR_SPEND : undefined}
+            compare={h.spendMonth === 0 ? WAITING_FOR_SPEND : h.cpqoMonth === null ? `${gbp(h.spendMonth)} spent, no qualified opportunity to divide it by` : undefined}
+            footnote={h.cpqoMonth === null ? undefined : `${gbp(h.spendMonth)} of media spend brought ${integer(h.qualified)} qualified ${h.qualified === 1 ? "opportunity" : "opportunities"}`}
             delta={
               h.cpqoMonth !== null && h.cpqoPrev !== null
                 ? {
@@ -205,12 +219,10 @@ export function OverviewPage() {
             delta={{ value: h.enquiries - h.enquiriesPrev, note: prev }}
             footnote={[filters.audience === "all" ? null : `${integer(h.enquiriesAudienceUnknown)} audience unknown`, `${integer(h.enquiriesNetwork)} outbound / network`, `${integer(h.enquiriesUnattributed)} no channel set`, "not counted"].filter(Boolean).join(" · ")}
             info={[
-              `Inbound enquiries in ${monthName(report.reportMonth)}${audienceNote}: Pipedrive leads and deals the team created directly whose source channel is inbound (website, info inbox, LinkedIn, events, marketplace). Outbound / network records and those with no channel set are shown underneath for context.`,
+              `Inbound enquiries in ${monthName(report.reportMonth)}${audienceNote}: leads and directly created deals from website, info inbox, LinkedIn, events or marketplace.`,
               [
-                `Last ${config.trailingMonths} months: ${integer(h.enquiriesTrailing)}`,
-                h.enquiriesLastYear === null
-                  ? null
-                  : `${lastYear}: ${integer(h.enquiriesLastYear)}`,
+                `${config.trailingMonths} months to ${monthName(report.reportMonth)}: ${integer(h.enquiriesTrailing)}`,
+                h.enquiriesLastYear === null ? null : `${lastYear}: ${integer(h.enquiriesLastYear)}`,
               ]
                 .filter(Boolean)
                 .join(" · ") + ".",
@@ -265,7 +277,7 @@ export function OverviewPage() {
             id="sources"
             title="Top sources"
             subtitle={`${period.window}${audienceNote} · the darker part qualified`}
-            info={`Source groups ranked by enquiries over the breakdown window, which the Sources page can change. Bar length is enquiries; the darker part is those that went on to qualify. Qualified % is the share of lead enquiries that qualified; deals the team created directly count as enquiries but not in the share, since they qualify the same day. It needs at least ${integer(config.qualifiedShareMinEnquiries)} lead enquiries. Where the qualified deals are all Sales-created, or outnumber the leads, the share reads Sales-created.`}
+            info={`Source groups ranked by enquiries over the breakdown window, which the Sources page can change. Bar length is enquiries; the darker part is those that went on to qualify. Conversion is qualified ÷ enquiries, shown once a row has at least ${integer(config.qualifiedShareMinEnquiries)} enquiries. Deals the team created directly count as enquiries and as qualified.`}
             action={<ViewAll href={linkTo("/sources")}>All sources</ViewAll>}
             padded={false}
             fullHeight
@@ -276,7 +288,7 @@ export function OverviewPage() {
               barHeader=""
               barWidth="26%"
               dense
-              columns={["Enquiries", "Qualified", "Qualified %"]}
+              columns={["Enquiries", "Qualified", "Conversion"]}
               rows={report.sources.map((r) => ({
                 key: r.group,
                 label: r.group,

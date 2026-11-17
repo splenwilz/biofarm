@@ -93,22 +93,4 @@ describe("demo data", () => {
     expect(data.search.months.find((m) => m.month === DEMO_LAST_MONTH)!.aiMentionShare).not.toBeNull();
   });
 
-  it("gives developer deals a result for each draft check, and some fail one, so the switches do something", () => {
-    const developer = data.deals.filter((d) => d.pipeline === "developer");
-    expect(developer.length).toBeGreaterThan(0);
-    for (const d of developer) {
-      expect(Object.keys(d.checks ?? {}).sort()).toEqual(["buyer", "habitat", "project", "serve", "timing"]);
-    }
-    expect(developer.some((d) => Object.values(d.checks!).includes(false))).toBe(true);
-    expect(developer.filter((d) => Object.values(d.checks!).every(Boolean)).length).toBeGreaterThan(developer.length / 3);
-    for (const d of data.deals.filter((d) => d.pipeline === "landowner")) expect(d.checks).toBeUndefined();
-  });
-
-  it("switching every check on lowers the qualified count for the latest month", () => {
-    const allOn = { ...kpiConfig, qualificationChecks: { buyer: true, project: true, serve: true, habitat: true, timing: true } };
-    const before = qualifiedByMonth(data.deals, [DEMO_LAST_MONTH], kpiConfig)[0].inbound;
-    const after = qualifiedByMonth(data.deals, [DEMO_LAST_MONTH], allOn)[0].inbound;
-    expect(after).toBeLessThan(before);
-    expect(after).toBeGreaterThan(0);
-  });
 });

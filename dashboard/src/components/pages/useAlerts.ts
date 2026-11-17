@@ -24,6 +24,6 @@ export function useAlerts() {
   const now = useNow(data.syncedAt);
   // quality counts cover marketing's enquiries: the team's outbound records are not expected to carry a person or a reply
   const quality = useMemo(() => dataQuality({ ...data, enquiries: inboundEnquiries(data.enquiries, config) }, spend, report.months), [data, config, spend, report.months]);
-  const alerts = useMemo(() => buildAlerts({ report, quality, config, now }), [report, quality, config, now]);
+  const alerts = useMemo(() => buildAlerts({ report, quality, config, now, googleSyncedAt: data.googleSyncedAt }), [report, quality, config, now, data.googleSyncedAt]);
   return { alerts, quality, now };
 }

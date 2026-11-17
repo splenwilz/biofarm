@@ -1,21 +1,23 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { kpiConfig } from "@/config/kpi";
-import { buildDemoData, DEMO_LAST_MONTH } from "@/data/demo";
-import { monthRange } from "@/lib/kpi";
+import { buildDemoData, DEMO_LAST_MONTH, DEMO_TODAY } from "@/data/demo";
+import { monthOf, monthRange } from "@/lib/kpi";
+import { buildReport } from "@/lib/report";
 import { DashboardProvider } from "@/components/DashboardProvider";
 import { CohortsPage } from "@/components/pages/CohortsPage";
 import { AlertsPage } from "@/components/pages/AlertsPage";
 import { CampaignsPage } from "@/components/pages/CampaignsPage";
 import { DataQualityPage } from "@/components/pages/DataQualityPage";
+import { defaultWindowTo } from "@/components/EventDialog";
 import { EventsPage } from "@/components/pages/EventsPage";
 import { KpiRulePage } from "@/components/pages/KpiRulePage";
 import { ReportPage } from "@/components/pages/ReportPage";
 import { TrafficPage } from "@/components/pages/TrafficPage";
 import { NewsletterPage } from "@/components/pages/NewsletterPage";
 import { SearchPage } from "@/components/pages/SearchPage";
-import { conversionText, OverviewPage } from "@/components/pages/OverviewPage";
+import { conversionPct, conversionText, OverviewPage } from "@/components/pages/OverviewPage";
 import { SourcesPage } from "@/components/pages/SourcesPage";
 import { SpendPage } from "@/components/pages/SpendPage";
 import { navState, resetNavigation } from "@/test/navigation";
@@ -66,15 +68,19 @@ describe("cost per qualified while there is no spend data", () => {
   });
 });
 
-describe("qualified share minimum", () => {
-  it("a share needs at least the configured enquiries; Sales-created stays when deals outnumber enquiries", () => {
-    expect(conversionText({ conversionBase: 1, qualified: 1, conversion: 1 }, 5)).toBe("–");
-    expect(conversionText({ conversionBase: 4, qualified: 2, conversion: 0.5 }, 5)).toBe("–");
-    expect(conversionText({ conversionBase: 5, qualified: 2, conversion: 0.4 }, 5)).toBe("40%");
-    expect(conversionText({ conversionBase: 0, qualified: 2, conversion: null }, 5)).toBe("Sales-created");
-    expect(conversionText({ conversionBase: 2, qualified: 3, conversion: 1.5 }, 5)).toBe("Sales-created");
-    expect(conversionText({ conversionBase: 0, qualified: 0, conversion: null }, 5)).toBe("–");
+describe("conversion column", () => {
+  it("is qualified ÷ enquiries from the configured minimum of enquiries; a dash below it, and where qualified outnumber enquiries", () => {
+    expect(conversionText({ enquiries: 10, qualified: 3 }, 5)).toBe("30%");
+    expect(conversionText({ enquiries: 5, qualified: 0 }, 5)).toBe("0%");
+    expect(conversionText({ enquiries: 4, qualified: 2 }, 5)).toBe("–");
+    expect(conversionText({ enquiries: 0, qualified: 1 }, 5)).toBe("–");
+    expect(conversionText({ enquiries: 6, qualified: 7 }, 5)).toBe("–");
     expect(kpiConfig.qualifiedShareMinEnquiries).toBe(5);
+  });
+  it("gives the CSV the same number the screen shows, and null where the screen shows a dash", () => {
+    expect(conversionPct({ enquiries: 12, qualified: 4 }, 5)).toBe(33.3);
+    expect(conversionPct({ enquiries: 4, qualified: 2 }, 5)).toBeNull();
+    expect(conversionPct({ enquiries: 6, qualified: 7 }, 5)).toBeNull();
   });
 });
 
@@ -91,10 +97,20 @@ describe("OverviewPage", () => {
   it("renders the title, three tiles that each show the month's number and the change from the previous month, and the trend", () => {
     wrap(<OverviewPage />);
     expect(screen.getByRole("heading", { level: 1, name: /overview/i })).toBeInTheDocument();
-    expect(screen.getByTestId("kpi-qualified")).toHaveTextContent(/^Qualified opportunities\d+[−+±]\d+ vs September$/);
-    expect(screen.getByTestId("kpi-cpqo")).toHaveTextContent(/^Cost per qualified£[\d,]+[−+±]£[\d,]+ vs September$/);
+    expect(screen.getByTestId("kpi-qualified")).toHaveTextContent(/^Qualified opportunities\d+[−+±]\d+ vs SeptemberTarget \d+ · 3-month average \d+\.\d$/);
+    expect(screen.getByTestId("kpi-cpqo")).toHaveTextContent(/^Cost per qualified£[\d,]+[−+±]£[\d,]+ vs September£[\d,]+ of media spend brought \d+ qualified opportunit(y|ies)$/);
     expect(screen.getByTestId("kpi-enquiries")).toHaveTextContent(/^Enquiries\d+[−+±]\d+ vs September\d+ outbound \/ network · \d+ no channel set · not counted$/);
     expect(screen.queryByTestId("kpi-speed")).not.toBeInTheDocument();
+  });
+
+  it("the enquiries tooltip names each figure: the month alone, the three-month total, and the same month a year earlier", async () => {
+    wrap(<OverviewPage />);
+    const r = buildReport(data, data.spend, kpiConfig, { audience: "all", month: DEMO_LAST_MONTH, window: 3 }, DEMO_TODAY);
+    fireEvent.mouseOver(screen.getByRole("button", { name: /^about enquiries$/i }));
+    const tip = await screen.findByRole("tooltip");
+    expect(tip).toHaveTextContent(`3 months to October: ${r.headline.enquiriesTrailing} · Oct 2025: ${r.headline.enquiriesLastYear}.`);
+    expect(r.headline.enquiriesTrailing).toBeGreaterThan(r.headline.enquiries);
+    expect(screen.getByTestId("kpi-enquiries")).toHaveTextContent(new RegExp(`^Enquiries${r.headline.enquiries}`));
     expect(screen.queryByRole("heading", { level: 2, name: "Speed to lead" })).not.toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /qualified opportunities by month/i })).toBeInTheDocument();
@@ -146,10 +162,17 @@ describe("OverviewPage", () => {
     expect(within(toggle).getByRole("button", { name: /24 months/i })).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("lists the source groups with counts first and the qualified share after", () => {
+  it("lists the source groups with enquiries, qualified and the conversion (qualified ÷ enquiries), dashed under 5 enquiries", () => {
     wrap(<OverviewPage />);
     const table = screen.getByRole("table", { name: /top sources/i });
-    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Source", "", "Enquiries", "Qualified", "Qualified %"]);
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Source", "", "Enquiries", "Qualified", "Conversion"]);
+    for (const row of within(table).getAllByRole("row").slice(1)) {
+      const cells = within(row).getAllByRole("cell").map((c) => c.textContent);
+      const enquiries = Number(cells[1]!.replace(/,/g, ""));
+      if (enquiries < 5) expect(cells[3]).toBe("–");
+      else expect(cells[3]).toMatch(/^\d+%$/);
+    }
+    expect(screen.queryByText(/not yet judged/i)).not.toBeInTheDocument();
     expect(within(table).getByText("Paid search")).toBeInTheDocument();
     expect(within(table).queryByText("Google Ads")).not.toBeInTheDocument();
     expect(within(table).queryByRole("button")).not.toBeInTheDocument();
@@ -180,7 +203,8 @@ describe("SourcesPage", () => {
     expect(screen.getByRole("heading", { level: 1, name: /sources/i })).toBeInTheDocument();
     const table = screen.getByRole("table", { name: /enquiries by source/i });
     expect(within(table).getAllByRole("row").length).toBeGreaterThan(3);
-    expect(within(table).getByRole("columnheader", { name: "Conversion" })).toBeInTheDocument();
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Source", "", "Enquiries", "Qualified", "Conversion", "Cost per qualified"]);
+    expect(screen.queryByText(/not yet judged/i)).not.toBeInTheDocument();
     expect(within(table).getByRole("columnheader", { name: "Cost per qualified" })).toBeInTheDocument();
     expect(within(table).getByText("Direct/unknown")).toBeInTheDocument();
     expect(within(table).queryByText("Google Ads")).not.toBeInTheDocument();
@@ -202,10 +226,10 @@ describe("SourcesPage", () => {
 
   it("shows four tiles with one number and one comparison with the previous window each, the rest behind the icon", async () => {
     wrap(<SourcesPage />);
-    expect(screen.getByTestId("kpi-source-enquiries")).toHaveTextContent(/^Enquiries\d+[−+±]\d+ vs May to Jul 2026$/);
-    expect(screen.getByTestId("kpi-paid-share")).toHaveTextContent(/^Paid share\d+%[−+±]\d+ pts vs May to Jul 2026$/);
-    expect(screen.getByTestId("kpi-paid-cpqo")).toHaveTextContent(/^Paid cost per qualified£[\d,]+[−+±]£[\d,]+ vs May to Jul 2026$/);
-    expect(screen.getByTestId("kpi-best-converting")).toHaveTextContent(/^Best converting[A-Za-z /]+\d+% of \d+ qualified$/);
+    expect(screen.getByTestId("kpi-source-enquiries")).toHaveTextContent(/^Enquiries\d+[−+±]\d+ vs May to Jul 2026\d+ qualified · (\d+%|–) of enquiries$/);
+    expect(screen.getByTestId("kpi-paid-share")).toHaveTextContent(/^Paid share\d+%[−+±]\d+ pts vs May to Jul 2026\d+ of \d+ enquiries from paid search and LinkedIn ads$/);
+    expect(screen.getByTestId("kpi-paid-cpqo")).toHaveTextContent(/^Paid cost per qualified£[\d,]+[−+±]£[\d,]+ vs May to Jul 2026£[\d,]+ of ad spend brought \d+ qualified from paid sources$/);
+    expect(screen.getByTestId("kpi-best-converting")).toHaveTextContent(/^Best converting[A-Za-z /()]+\d+ of \d+ enquiries qualified \(\d+%\)$/);
     expect(screen.queryByText(/minimum 5 enquiries/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/ad spend per qualified enquiry/i)).not.toBeInTheDocument();
     fireEvent.mouseOver(screen.getByRole("button", { name: /^about best converting$/i }));
@@ -237,7 +261,7 @@ describe("SourcesPage", () => {
     resetNavigation("/sources", "window=1");
     wrap(<SourcesPage />);
     expect(within(screen.getByRole("group", { name: /period length/i })).getByRole("button", { name: /1 month/i })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("kpi-source-enquiries")).toHaveTextContent(/vs September$/);
+    expect(screen.getByTestId("kpi-source-enquiries")).toHaveTextContent(/vs September\d+ qualified/);
     expect(screen.getAllByText(/Oct 2026/).length).toBeGreaterThan(1);
   });
 });
@@ -324,21 +348,20 @@ describe("KpiRulePage", () => {
       expect(within(inbound).getByText(name)).toBeInTheDocument();
     }
     expect(within(inbound).queryByText("Website")).not.toBeInTheDocument();
-    expect(screen.getByText("Landowner enquiries will have their own checklist.")).toBeInTheDocument();
-    expect(screen.getByText("Once the checks are agreed, a stage move alone won't count as qualified.")).toBeInTheDocument();
-    expect(screen.getByText("Draft, not yet agreed")).toBeInTheDocument();
+    expect(screen.queryByText("Landowner enquiries will have their own checklist.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Draft, not yet agreed")).not.toBeInTheDocument();
+    expect(screen.queryByRole("switch")).not.toBeInTheDocument();
   });
 
-  it("lists the five draft checks as switches, all off", () => {
+  it("states the rule agreed with Sales and Land on Monday 9 November 2026, in their words", () => {
     wrap(<KpiRulePage />);
-    const group = screen.getByRole("group", { name: /checks/i });
-    const switches = within(group).getAllByRole("switch");
-    expect(switches.map((s) => s.getAttribute("aria-checked") ?? (s as HTMLInputElement).checked.toString())).toEqual(["false", "false", "false", "false", "false"]);
-    expect(within(group).getByRole("switch", { name: /it's a buyer: a developer or their consultant/i })).toBeInTheDocument();
-    expect(within(group).getByRole("switch", { name: /it's a real project: a site, with planning in progress or granted/i })).toBeInTheDocument();
-    expect(within(group).getByRole("switch", { name: /we can serve it: a bank in the same or a neighbouring council area/i })).toBeInTheDocument();
-    expect(within(group).getByRole("switch", { name: /right habitat type/i })).toBeInTheDocument();
-    expect(within(group).getByRole("switch", { name: /realistic timing: units needed within 12 to 18 months/i })).toBeInTheDocument();
+    expect(screen.getByText("Agreed with Sales and Land on Monday 9 November 2026")).toBeInTheDocument();
+    expect(screen.getByText(/from 17 nov 2026 sales tick .*qualified lead\?.* on every lead and deal, and the tick decides/i)).toBeInTheDocument();
+    expect(screen.getByText(/a lead ticked yes before it becomes a deal counts from the day it came in/i)).toBeInTheDocument();
+    expect(screen.getByText(/before that day: a developer deal counted from the day it was created, a landowner deal once it moved past .*call \/ qualify/i)).toBeInTheDocument();
+    expect(screen.getByText(/still counts if sales later turn it down/i)).toBeInTheDocument();
+    expect(screen.getByText(/job seekers, suppliers and other non-buyers never count/i)).toBeInTheDocument();
+    expect(screen.queryByText(/is not counted either way/i)).not.toBeInTheDocument();
   });
 
   it("shows the targets, the ramp and this month's target, with no admin role", () => {
@@ -493,6 +516,7 @@ describe("CampaignsPage", () => {
       else expect(cells[3]).toMatch(/^\d+%$/);
     }
     expect(rows.some((row) => Number(within(row).getAllByRole("cell")[1].textContent) < 5)).toBe(true);
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Page", "Enquiries", "Enquiries", "Qualified", "Conversion"]);
     expect(screen.getByText("Conversion is shown for pages with at least 5 enquiries.")).toBeInTheDocument();
   });
 
@@ -509,7 +533,7 @@ describe("TrafficPage and EventsPage", () => {
   it("traffic shows sessions, conversion and channels", () => {
     resetNavigation("/traffic");
     wrap(<TrafficPage />);
-    expect(screen.getByText("GA4 sessions, all channels")).toBeInTheDocument();
+    expect(screen.getByText(/GA4, all channels/)).toBeInTheDocument();
     expect(screen.getByText("Visit to enquiry rate")).toBeInTheDocument();
     expect(screen.queryByText(/session to enquiry/i)).not.toBeInTheDocument();
     const channels = screen.getByRole("table", { name: /sessions by channel/i });
@@ -538,12 +562,12 @@ describe("TrafficPage and EventsPage", () => {
   it("traffic cards show one number, one change and one short line each, with the rest behind the icon", async () => {
     resetNavigation("/traffic");
     wrap(<TrafficPage />);
-    expect(screen.getByTestId("kpi-sessions")).toHaveTextContent(/^Sessions[\d,]+[−+±][\d,]+ vs Sep 2026GA4 sessions, all channels$/);
-    expect(screen.getByTestId("kpi-visit-rate")).toHaveTextContent(/^Visit to enquiry rate\d+\.\d%[−+±]\d+\.\d pts vs Sep 2026Sessions that became an enquiry$/);
-    expect(screen.getByTestId("kpi-biggest-channel")).toHaveTextContent(/^Biggest channel[A-Za-z ]+\d+% of sessions$/);
-    expect(screen.getByTestId("kpi-paid-share")).toHaveTextContent(/^Paid share\d+%Paid search and paid social$/);
-    expect(screen.queryByText(/Oct 2025/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/enquiries from [\d,]+ sessions/i)).not.toBeInTheDocument();
+    expect(screen.getByTestId("kpi-sessions")).toHaveTextContent(/^Sessions[\d,]+[−+±][\d,]+ vs Sep 2026Oct 2025: [\d,]+ · GA4, all channels$/);
+    expect(screen.getByTestId("kpi-visit-rate")).toHaveTextContent(/^Visit to enquiry rate\d+\.\d%[−+±]\d+\.\d pts vs Sep 2026\d+ enquiries from [\d,]+ sessions$/);
+    expect(screen.getByTestId("kpi-biggest-channel")).toHaveTextContent(/^Biggest channel[A-Za-z ]+\d+% of sessions[\d,]+ of [\d,]+ sessions$/);
+    expect(screen.getByTestId("kpi-paid-share")).toHaveTextContent(/^Paid share\d+%[\d,]+ of [\d,]+ sessions from paid search, display and paid social$/);
+    expect(screen.getByText(/Oct 2025: [\d,]+/)).toBeInTheDocument(); // the same month last year sits on the card now, not only in the tooltip
+    expect(screen.getByText(/enquiries from [\d,]+ sessions/i)).toBeInTheDocument(); // the rate's parts are on the card; the formula stays behind the icon
     expect(screen.queryByText(/÷/)).not.toBeInTheDocument();
     fireEvent.mouseOver(screen.getByRole("button", { name: /^about sessions$/i }));
     expect(await screen.findByRole("tooltip")).toHaveTextContent(/Oct 2025: [\d,]+/);
@@ -600,7 +624,7 @@ describe("TrafficPage and EventsPage", () => {
     expect(tip).toHaveTextContent(/£[\d,]+ · \d+ qualified/);
   });
 
-  it("events get their cost through the row's edit dialog, which feeds the card and the table", () => {
+  it("events get their cost through the row's edit dialog, which feeds the card and the table", async () => {
     resetNavigation("/events");
     wrap(<EventsPage />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -613,53 +637,119 @@ describe("TrafficPage and EventsPage", () => {
     expect(within(dialog).getByText(/enter a cost above zero, or leave it blank/i)).toBeInTheDocument();
     fireEvent.change(within(dialog).getByLabelText(/cost \(£\)/i), { target: { value: "250" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /^save$/i }));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(screen.getByTestId("kpi-event-cpqo")).toHaveTextContent(/5 of 6 events have a cost$/);
-    const row = within(screen.getByRole("table", { name: /^events$/i })).getByRole("row", { name: /webinar: nsip/i });
+    const row = within(await screen.findByRole("table", { name: /^events$/i })).getByRole("row", { name: /webinar: nsip/i });
     expect(within(row).getAllByRole("cell").map((c) => c.textContent)).toContain("£250");
   });
 
-  it("events are added from a button beside the export, in a dialog, and a session-added event can be removed from its edit dialog", () => {
+  it("events are added from a button beside the export, in a dialog with no leads field (Pipedrive counts them), and any event can be removed from its edit dialog", async () => {
     resetNavigation("/events");
     wrap(<EventsPage />);
     const add = screen.getByRole("button", { name: /^add event$/i });
     expect(add.closest("[data-print='hide']")).not.toBeNull();
     fireEvent.click(add);
     const dialog = screen.getByRole("dialog", { name: /^add an event$/i });
+    expect(within(dialog).queryByLabelText(/^leads$/i)).not.toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole("button", { name: /^save$/i }));
     expect(within(dialog).getByText(/give the event a name/i)).toBeInTheDocument();
     fireEvent.change(within(dialog).getByLabelText(/^name$/i), { target: { value: "Landowner evening, Wells" } });
     fireEvent.change(within(dialog).getByLabelText(/^date$/i), { target: { value: "2026-10-14" } });
     fireEvent.change(within(dialog).getByLabelText(/^type$/i), { target: { value: "cpd" } });
     fireEvent.change(within(dialog).getByLabelText(/^attendees$/i), { target: { value: "22" } });
-    fireEvent.change(within(dialog).getByLabelText(/^leads$/i), { target: { value: "6" } });
+    fireEvent.change(within(dialog).getByLabelText(/words in the title/i), { target: { value: "Wells, evening" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /^save$/i }));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    const table = screen.getByRole("table", { name: /^events$/i });
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    const table = await screen.findByRole("table", { name: /^events$/i });
     const row = within(table).getByRole("row", { name: /landowner evening, wells/i });
     expect(row).toHaveTextContent(/14 Oct 2026 · CPD session · Maturing/);
-    expect(within(row).getAllByRole("cell").map((c) => c.textContent)).toEqual(expect.arrayContaining(["22", "6", "0", "–", "–"]));
+    expect(within(row).getAllByRole("cell").map((c) => c.textContent)).toEqual(expect.arrayContaining(["22", "0", "0", "–", "–"]));
     expect(screen.getByTestId("kpi-event-cpqo")).toHaveTextContent(/4 of 7 events have a cost$/);
     fireEvent.click(within(row).getByRole("button", { name: /^edit landowner evening, wells$/i }));
     const edit = screen.getByRole("dialog", { name: /^edit event$/i });
+    expect(within(edit).getByLabelText(/words in the title/i)).toHaveValue("Wells, evening");
     fireEvent.click(within(edit).getByRole("button", { name: /^remove event$/i }));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(within(edit).getByText(/remove this event and its cost\?/i)).toBeInTheDocument();
+    fireEvent.click(within(edit).getByRole("button", { name: /^keep$/i }));
+    expect(within(edit).queryByText(/remove this event and its cost\?/i)).not.toBeInTheDocument();
+    fireEvent.click(within(edit).getByRole("button", { name: /^remove event$/i }));
+    fireEvent.click(within(edit).getByRole("button", { name: /^yes, remove$/i }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(within(table).queryByText(/landowner evening, wells/i)).not.toBeInTheDocument();
-    fireEvent.click(within(table).getByRole("button", { name: /^edit futurebuild 2026, excel london$/i }));
-    expect(within(screen.getByRole("dialog")).queryByRole("button", { name: /^remove event$/i })).not.toBeInTheDocument();
+    fireEvent.click(await within(table).findByRole("button", { name: /^edit futurebuild 2026, excel london$/i }));
+    expect(within(screen.getByRole("dialog")).getByRole("button", { name: /^remove event$/i })).toBeInTheDocument();
   });
 
-  it("events refuse a date in the future", () => {
+  it("events accept a date after today, so an upcoming event can be set up before it happens", async () => {
     resetNavigation("/events");
     wrap(<EventsPage />);
+    const upcoming = `${data.syncedAt.slice(0, 7)}-28`; // later this month: after "today"
+    expect(upcoming > data.syncedAt.slice(0, 10)).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: /^add event$/i }));
     const dialog = screen.getByRole("dialog");
-    fireEvent.change(within(dialog).getByLabelText(/^name$/i), { target: { value: "Futurebuild 2027" } });
-    fireEvent.change(within(dialog).getByLabelText(/^date$/i), { target: { value: "2027-03-03" } });
+    fireEvent.change(within(dialog).getByLabelText(/^name$/i), { target: { value: "Lesnewth open day" } });
+    fireEvent.change(within(dialog).getByLabelText(/^date$/i), { target: { value: upcoming } });
+    fireEvent.change(within(dialog).getByLabelText(/^type$/i), { target: { value: "open_day" } });
+    fireEvent.change(within(dialog).getByLabelText(/logged until/i), { target: { value: "2026-01-01" } });
     fireEvent.click(within(dialog).getByRole("button", { name: /^save$/i }));
-    expect(within(dialog).getByText(/after the event has happened/i)).toBeInTheDocument();
-    fireEvent.click(within(dialog).getByRole("button", { name: /^cancel$/i }));
-    expect(within(screen.getByRole("table", { name: /^events$/i })).queryByText(/futurebuild 2027/i)).not.toBeInTheDocument();
+    expect(within(dialog).getByText(/the window ends before it starts/i)).toBeInTheDocument();
+    fireEvent.change(within(dialog).getByLabelText(/logged until/i), { target: { value: "" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: /^save$/i }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByText(/after the event has happened/i)).not.toBeInTheDocument();
+    // the page lists the twelve months to the default month (the one before the sync date), so this month's event is not in view yet
+    const table = await screen.findByRole("table", { name: /^events$/i });
+    expect(within(table).queryByRole("row", { name: /lesnewth open day/i })).not.toBeInTheDocument();
+  });
+
+  it("on the feed, event changes are written through /api/events, shown at once and the page data refreshed; a refused write keeps the dialog open with the reason", async () => {
+    resetNavigation("/events");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    try {
+      render(
+        <DashboardProvider data={{ ...data, source: "pipedrive" }} config={kpiConfig}>
+          <EventsPage />
+        </DashboardProvider>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: /^add event$/i }));
+      const dialog = screen.getByRole("dialog", { name: /^add an event$/i });
+      const when = `${monthRange(monthOf(data.syncedAt), 2)[0]}-27`; // inside the page's window
+      fireEvent.change(within(dialog).getByLabelText(/^name$/i), { target: { value: "Groundswell 2027" } });
+      fireEvent.change(within(dialog).getByLabelText(/^date$/i), { target: { value: when } });
+      fireEvent.change(within(dialog).getByLabelText(/cost \(£\)/i), { target: { value: "1800" } });
+      fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ detail: "Database schema is behind the code" }), { status: 503 }));
+      fireEvent.click(within(dialog).getByRole("button", { name: /^save$/i }));
+      expect(await within(dialog).findByRole("alert")).toHaveTextContent(/not saved: database schema is behind the code/i);
+      fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ id: "srv-9" }), { status: 201, headers: { "content-type": "application/json" } }));
+      fireEvent.click(within(dialog).getByRole("button", { name: /^save$/i }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      const [url, init] = fetchMock.mock.calls[1]!;
+      expect(url).toBe("/api/events");
+      expect(init.method).toBe("POST");
+      expect(JSON.parse(init.body)).toMatchObject({ name: "Groundswell 2027", date: when, type: "trade_show", costGbp: 1800, attendees: null, match: { titleWords: [], channel: false, windowFrom: when, windowTo: defaultWindowTo(when) } });
+      expect(navState.refresh).toHaveBeenCalledTimes(1);
+      const table = await screen.findByRole("table", { name: /^events$/i });
+      const row = within(table).getByRole("row", { name: /groundswell 2027/i });
+      expect(within(row).getAllByRole("cell").map((c) => c.textContent)).toContain("£1,800");
+      fireEvent.click(within(row).getByRole("button", { name: /^edit groundswell 2027$/i }));
+      const edit = screen.getByRole("dialog");
+      // a refused removal keeps the dialog open and says why; the row stays
+      fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ detail: "The lead API could not be reached; nothing was changed" }), { status: 502 }));
+      fireEvent.click(within(edit).getByRole("button", { name: /^remove event$/i }));
+      fireEvent.click(within(edit).getByRole("button", { name: /^yes, remove$/i }));
+      expect(await within(edit).findByRole("alert")).toHaveTextContent(/could not be reached/i);
+      expect(within(table).getByText(/groundswell 2027/i)).toBeInTheDocument();
+      fetchMock.mockResolvedValueOnce(new Response(null, { status: 200 }));
+      fireEvent.click(within(edit).getByRole("button", { name: /^remove event$/i }));
+      fireEvent.click(within(edit).getByRole("button", { name: /^yes, remove$/i }));
+      await waitFor(() => expect(within(table).queryByText(/groundswell 2027/i)).not.toBeInTheDocument());
+      expect(fetchMock.mock.calls[3]![0]).toBe("/api/events/srv-9");
+      expect(fetchMock.mock.calls[3]![1].method).toBe("DELETE");
+      expect(navState.refresh).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("events ask for costs when none have been entered", () => {
@@ -686,7 +776,8 @@ describe("AlertsPage, DataQualityPage, ReportPage", () => {
     expect(items.length).toBeGreaterThan(0);
     for (const item of items) expect(within(item).getByRole("link", { name: /go there/i })).toBeInTheDocument();
     expect(screen.getAllByText(/no new data from pipedrive for 2 days/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/off until the field exists in pipedrive/i)).toBeInTheDocument();
+    expect(screen.getByText(/deals with no qualification status after 14 days/i)).toBeInTheDocument();  // listed as a live rule now Pipedrive has the field
+    expect(screen.queryByText(/off until the field exists in pipedrive/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/no reply logged/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/nightly/i)).not.toBeInTheDocument();
   });
@@ -747,7 +838,7 @@ describe("KpiRulePage targets", () => {
     const field = screen.getByLabelText(/qualified a month by jan 2027/i);
     fireEvent.change(field, { target: { value: "15" } });
     fireEvent.blur(field);
-    expect(screen.getByTestId("kpi-qualified")).not.toHaveTextContent(/target/i);
+    expect(screen.getByTestId("kpi-qualified")).toHaveTextContent(/Target 15/);
     fireEvent.mouseOver(screen.getByRole("button", { name: /^about qualified opportunities$/i }));
     expect(await screen.findByRole("tooltip")).toHaveTextContent(/Target 15/);
     const log = screen.getByRole("table", { name: /target changes/i });
@@ -773,16 +864,5 @@ describe("KpiRulePage targets", () => {
   it("the data status card notes that leads converted before the mirror existed carry their conversion date", () => {
     both();
     expect(screen.getByText(/Enquiries that were converted to deals before 8 Nov 2026 carry the date they became a deal/i)).toBeInTheDocument();
-  });
-
-  it("switching a draft check on recalculates the overview", () => {
-    both();
-    const count = () => Number(within(screen.getByTestId("kpi-qualified")).getByText(/^\d+$/).textContent);
-    const before = count();
-    for (const name of [/it's a buyer/i, /real project/i, /we can serve it/i, /right habitat/i, /realistic timing/i]) {
-      fireEvent.click(screen.getByRole("switch", { name }));
-    }
-    expect(count()).toBeLessThan(before);
-    expect(count()).toBeGreaterThan(0);
   });
 });

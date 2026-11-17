@@ -15,6 +15,9 @@ describe("channel names", () => {
       "AI assistant": "AI search",
       Direct: "Direct/unknown",
       Referral: "Referral",
+      Display: "Display ads",
+      "Paid other": "Other paid",
+      Other: "Other",
     };
     for (const [channel, name] of Object.entries(expected)) expect(channelName(channel as TrafficChannel)).toBe(name);
     expect(Object.keys(TRAFFIC_CHANNEL_NAMES).sort()).toEqual(Object.keys(expected).sort());

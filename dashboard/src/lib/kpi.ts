@@ -3,7 +3,7 @@
  * apply comes from the KpiConfig passed in, never from constants here.
  */
 
-import { QUALIFICATION_CHECKS, type KpiConfig } from "@/config/kpi";
+import { type KpiConfig } from "@/config/kpi";
 import { CHANNEL_NAMES } from "@/lib/channelNames";
 import type { Audience, Channel, Deal, Enquiry, Pipeline, SourceGroup, SpendEntry, SpendPlatform } from "@/lib/types";
 
@@ -54,20 +54,17 @@ export function inboundEnquiries(enquiries: Enquiry[], cfg: KpiConfig): Enquiry[
 }
 
 /**
- * The draft checks that are switched on, applied to a deal's recorded results.
- * A deal with no results, or none for a given check, is left as the stage move
- * decided; only a recorded fail on a check that is on removes it.
+ * The rule agreed with Sales and Land on 9 Nov 2026: a record in a counted
+ * pipeline with a qualified date. The feed sets that date (until 17 Nov 2026
+ * creation for developer deals and the move past CALL / QUALIFY for landowner
+ * deals; from then the "Qualified Lead?" tick, on deals and on leads not yet
+ * converted). Its later status never matters: a deal Sales turned down still
+ * counts.
  */
-export function passesChecks(deal: Deal, cfg: KpiConfig): boolean {
-  if (!deal.checks) return true;
-  return QUALIFICATION_CHECKS.every((c) => !cfg.qualificationChecks[c.id] || deal.checks![c.id] !== false);
-}
-
 function isQualified(deal: Deal, cfg: KpiConfig, pipeline?: Pipeline): deal is Deal & { qualifiedAt: string } {
   if (!deal.qualifiedAt) return false;
   if (!cfg.pipelines.includes(deal.pipeline)) return false;
-  if (pipeline !== undefined && deal.pipeline !== pipeline) return false;
-  return passesChecks(deal, cfg);
+  return pipeline === undefined || deal.pipeline === pipeline;
 }
 
 function monthIndex(month: string): number {
@@ -283,13 +280,19 @@ export function platformOf(label: string | null): SpendPlatform | null {
 export interface PlatformRow {
   platform: string;
   enquiries: number;
-  /** The enquiries the share is measured over: leads, not deals the team created directly (those qualify the same day by definition). */
-  conversionBase: number;
+  /** Lead enquiries: not deals the team created directly (those qualify the same day by definition). */
+  leads: number;
   qualified: number;
   /** Qualified opportunities that are not themselves directly created deals. */
   qualifiedFromLeads: number;
-  /** qualifiedFromLeads / conversionBase, or null when there is nothing to measure over. */
-  conversion: number | null;
+  /**
+   * Leads in the window with no qualified deal yet. Kept in the data, shown on
+   * no page: until the qualified field exists in Pipedrive nobody has judged
+   * them (some are job seekers or landowners, some are buyers Sales never
+   * converted), and a gap on screen only invites excuses. Never below zero:
+   * leads from before the window can qualify inside it.
+   */
+  notYetJudged: number;
   /** Spend in the window for paid platforms; null for unpaid ones, whose cost column stays blank. */
   spendGbp: number | null;
   /** spendGbp / qualified; null when either is missing. */
@@ -331,7 +334,7 @@ export function enquiriesBySource(enquiries: Enquiry[], deals: Deal[], spend: Sp
     const platforms = groups.get(group)!;
     let r = platforms.get(platform);
     if (!r) {
-      r = { platform, enquiries: 0, conversionBase: 0, qualified: 0, qualifiedFromLeads: 0, conversion: null, spendGbp: PAID_GROUPS.has(group) ? 0 : null, cpqo: null };
+      r = { platform, enquiries: 0, leads: 0, qualified: 0, qualifiedFromLeads: 0, notYetJudged: 0, spendGbp: PAID_GROUPS.has(group) ? 0 : null, cpqo: null };
       platforms.set(platform, r);
     }
     return r;
@@ -341,7 +344,7 @@ export function enquiriesBySource(enquiries: Enquiry[], deals: Deal[], spend: Sp
     if (!inRange.has(monthOf(e.createdAt)) || !audienceMatches(audience, e)) continue;
     const r = cell(sourceOf(e.sourceLabel, e.channel));
     r.enquiries += 1;
-    if (!isDirectDeal(e)) r.conversionBase += 1;
+    if (!isDirectDeal(e)) r.leads += 1;
   }
   const pipeline = audience === "developer" || audience === "landowner" ? audience : undefined;
   if (audience === undefined || pipeline) {
@@ -359,7 +362,7 @@ export function enquiriesBySource(enquiries: Enquiry[], deals: Deal[], spend: Sp
   }
   const finish = <T extends Omit<PlatformRow, "platform">>(r: T): T => {
     r.spendGbp = r.spendGbp === null ? null : Math.round(r.spendGbp * 100) / 100;
-    r.conversion = r.conversionBase > 0 ? r.qualifiedFromLeads / r.conversionBase : null;
+    r.notYetJudged = Math.max(r.leads - r.qualifiedFromLeads, 0);
     r.cpqo = r.spendGbp ? cpqo(r.spendGbp, r.qualified) : null;
     return r;
   };
@@ -369,10 +372,10 @@ export function enquiriesBySource(enquiries: Enquiry[], deals: Deal[], spend: Sp
     return finish({
       group,
       enquiries: sum((p) => p.enquiries),
-      conversionBase: sum((p) => p.conversionBase),
+      leads: sum((p) => p.leads),
       qualified: sum((p) => p.qualified),
       qualifiedFromLeads: sum((p) => p.qualifiedFromLeads),
-      conversion: null,
+      notYetJudged: 0,
       spendGbp: PAID_GROUPS.has(group) ? sum((p) => p.spendGbp ?? 0) : null,
       cpqo: null,
       platforms,

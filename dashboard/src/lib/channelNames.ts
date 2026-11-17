@@ -20,6 +20,10 @@ export const CHANNEL_NAMES = {
   /** Only records with no channel at all; anything with a known channel has its own group. */
   direct: "Direct/unknown",
   aiSearch: "AI search",
+  /** Traffic-only channels: GA4 sees these visits, enquiry forms never carry them as a source. */
+  display: "Display ads",
+  paidOther: "Other paid",
+  other: "Other",
 } as const;
 
 export type ChannelName = (typeof CHANNEL_NAMES)[keyof typeof CHANNEL_NAMES];
@@ -34,6 +38,9 @@ export const TRAFFIC_CHANNEL_NAMES: Record<TrafficChannel, ChannelName> = {
   "AI assistant": CHANNEL_NAMES.aiSearch,
   Direct: CHANNEL_NAMES.direct,
   Referral: CHANNEL_NAMES.referral,
+  Display: CHANNEL_NAMES.display,
+  "Paid other": CHANNEL_NAMES.paidOther,
+  Other: CHANNEL_NAMES.other,
 };
 
 export function channelName(channel: TrafficChannel): ChannelName {

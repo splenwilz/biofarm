@@ -4,7 +4,7 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { ColumnChart } from "@/components/charts/ColumnChart";
 import { MeterList } from "@/components/charts/MeterList";
@@ -21,12 +21,34 @@ import { SpendPanel } from "@/components/SpendPanel";
 import { useReport } from "@/components/pages/useReport";
 import { WindowToggle } from "@/components/WindowToggle";
 import { gbp, integer, monthLabel, PLATFORM_LABEL, pct } from "@/lib/format";
+import { feedCovers, splitByFeedCoverage } from "@/lib/spendMerge";
+import type { SpendEntry, SpendPlatform } from "@/lib/types";
 
 export function SpendPage() {
-  const { spend, addSpend, removeSpend, importSpend } = useDashboard();
+  const { data, spend, addSpend, removeSpend, importSpend } = useDashboard();
   const { report, config, period } = useReport();
   const [adding, setAdding] = useState(false);
   const [imported, setImported] = useState<ImportResult | null>(null);
+  const skippedByFeed = useRef<string[]>([]);
+
+  const coveredMessage = (platform: SpendPlatform, month: string) => `${PLATFORM_LABEL[platform]} for ${monthLabel(month)} comes from the feed, so the line was skipped.`;
+  const addUnlessFed = (entry: Omit<SpendEntry, "id">) => {
+    if (feedCovers(data.spend, entry)) {
+      setImported({ added: 0, errors: [coveredMessage(entry.platform, entry.month)] });
+      return;
+    }
+    addSpend(entry);
+  };
+  const importUnlessFed = (entries: Omit<SpendEntry, "id">[]) => {
+    const { kept, skipped } = splitByFeedCoverage<Omit<SpendEntry, "id">>(data.spend, entries);
+    skippedByFeed.current = skipped.map((e) => coveredMessage(e.platform, e.month));
+    if (kept.length) importSpend(kept);
+  };
+  const reportImport = (result: ImportResult) => {
+    const skipped = skippedByFeed.current;
+    skippedByFeed.current = [];
+    setImported({ added: result.added - skipped.length, errors: [...result.errors, ...skipped] });
+  };
   const h = report.headline;
   const month = monthLabel(report.reportMonth);
   const prev = `vs ${monthLabel(report.prevMonth)}`;
@@ -42,13 +64,13 @@ export function SpendPage() {
     <Stack spacing={3}>
       <PageHeader
         title="Media spend"
-        subtitle="Campaign and media spend only, never team cost. Entered by hand or imported from the agency's CSV until the ad platforms are connected."
+        subtitle="Campaign and media spend only, never team cost. Google Ads comes from the account each day; Microsoft and LinkedIn are entered by hand or imported from the agency's CSV."
         actions={
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap" }}>
             <Button variant="outlined" color="inherit" onClick={() => setAdding(true)} startIcon={<Icon name="plus" size={16} />} data-print="hide" sx={{ height: 40, borderColor: "divider", fontWeight: 500, whiteSpace: "nowrap" }}>
               Add spend
             </Button>
-            <SpendImport months={report.months} onImport={importSpend} onResult={setImported} />
+            <SpendImport months={report.months} onImport={importUnlessFed} onResult={reportImport} />
             <ExportButton filename={`biofarm-media-spend-${report.months[0]}-to-${report.reportMonth}`} rows={exportRows} />
           </Stack>
         }
@@ -72,7 +94,7 @@ export function SpendPage() {
             compare={h.spendMonth === 0 ? WAITING_FOR_SPEND : undefined}
             delta={h.cpqoMonth !== null && h.cpqoPrev !== null ? { value: Math.round(h.cpqoMonth - h.cpqoPrev), note: prev, betterWhen: "down", format: (v) => gbp(v) } : undefined}
             trend={cpqoTrend}
-            footnote={`${month} · spend ÷ qualified inbound opportunities, all audiences`}
+            footnote={h.cpqoMonth === null ? `${month} · no qualified inbound opportunity yet to set the spend against` : `${gbp(h.spendMonth)} of spend brought ${integer(h.qualified)} qualified inbound ${h.qualified === 1 ? "opportunity" : "opportunities"} in ${month}`}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -144,7 +166,7 @@ export function SpendPage() {
           months={report.months}
           onClose={() => setAdding(false)}
           onAdd={(entry) => {
-            addSpend(entry);
+            addUnlessFed(entry);
             setAdding(false);
           }}
         />

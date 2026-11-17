@@ -356,12 +356,6 @@ export function buildDemoData(seed = 2026): DashboardData {
 
   deals.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 
-  // the draft checks' results, from their own stream so the numbers above stay as they were
-  const checkRandom = rng(seed + 1);
-  for (const d of deals) {
-    if (d.pipeline !== "developer") continue;
-    d.checks = { buyer: checkRandom() < 0.95, project: checkRandom() < 0.9, serve: checkRandom() < 0.85, habitat: checkRandom() < 0.92, timing: checkRandom() < 0.8 };
-  }
   enquiries.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const search = buildSearch(random, months);
   return {

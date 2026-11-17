@@ -1,5 +1,5 @@
-import type { KpiConfig } from "@/config/kpi";
-import { gbp, integer, monthLabel, pct, windowLabel } from "@/lib/format";
+import { kpiConfig, type KpiConfig } from "@/config/kpi";
+import { dateLabel, gbp, integer, monthLabel, pct, windowLabel } from "@/lib/format";
 import { cpqo, isDirectDeal, monthOf, monthRange, qualifiedInbound, SOURCE_GROUPS, sourceOf, type MonthlyQualified } from "@/lib/kpi";
 import type { Report } from "@/lib/report";
 import { channelName, type ChannelName } from "@/lib/channelNames";
@@ -95,10 +95,11 @@ export function campaignSummary(rows: CampaignRow[], totalEnquiries: number, min
 export interface PageRow {
   page: string;
   enquiries: number;
-  /** Enquiries the conversion is measured over: leads, not deals created directly. */
-  conversionBase: number;
+  /** Lead enquiries: not deals created directly. */
+  leads: number;
   qualified: number;
-  conversion: number | null;
+  /** Leads on this page with no qualified deal yet: not judged, not unqualified. */
+  notYetJudged: number;
 }
 
 /** The row for enquiries with no landing page: the team's own Pipedrive records, and web-form leads whose page was not captured. */
@@ -114,18 +115,18 @@ export function landingPages(enquiries: Enquiry[], deals: Deal[], months: string
     const page = e.landingPage ?? NOT_WEBSITE;
     let r = rows.get(page);
     if (!r) {
-      r = { page, enquiries: 0, conversionBase: 0, qualified: 0, conversion: null };
+      r = { page, enquiries: 0, leads: 0, qualified: 0, notYetJudged: 0 };
       rows.set(page, r);
     }
     r.enquiries += 1;
     const qualified = e.personId !== null && qualifiedPeople.has(e.personId);
     if (qualified) r.qualified += 1;
     if (!isDirectDeal(e)) {
-      r.conversionBase += 1;
+      r.leads += 1;
       if (qualified) fromLeads.set(page, (fromLeads.get(page) ?? 0) + 1);
     }
   }
-  for (const r of rows.values()) r.conversion = r.conversionBase ? (fromLeads.get(r.page) ?? 0) / r.conversionBase : null;
+  for (const r of rows.values()) r.notYetJudged = Math.max(r.leads - (fromLeads.get(r.page) ?? 0), 0);
   return [...rows.values()].sort((a, b) => b.enquiries - a.enquiries || b.qualified - a.qualified || a.page.localeCompare(b.page));
 }
 
@@ -195,7 +196,8 @@ export interface ChannelRow {
   byMonth: number[];
 }
 
-const PAID_CHANNELS: ReadonlySet<TrafficChannel> = new Set(["Paid search", "Paid social"]);
+/** Every channel Biofarm pays for by the click or the impression; the Paid share card is these over all sessions. */
+export const PAID_CHANNELS: ReadonlySet<TrafficChannel> = new Set(["Paid search", "Paid social", "Display", "Paid other"]);
 
 export interface TrafficReport {
   sessionsByMonth: number[];
@@ -252,6 +254,7 @@ export const EVENT_TYPE_LABEL: Record<MarketingEvent["type"], string> = {
   trade_show: "Trade show",
   cpd: "CPD session",
   webinar: "Webinar",
+  open_day: "Open day",
 };
 
 export interface EventRow extends MarketingEvent {
@@ -305,7 +308,7 @@ export function eventsReport(events: MarketingEvent[], months: string[], maturit
     events: inWindow,
     totals: {
       events: inWindow.length,
-      attendees: inWindow.reduce((s, e) => s + e.attendees, 0),
+      attendees: inWindow.reduce((s, e) => s + (e.attendees ?? 0), 0),
       leads: inWindow.reduce((s, e) => s + e.leads, 0),
       qualified: inWindow.reduce((s, e) => s + e.qualified, 0),
       costedEvents: costed.length,
@@ -417,8 +420,12 @@ export interface AlertRule {
 /** Every rule the Alerts page checks, in the order it lists them. `buildAlerts` evaluates the enabled ones. */
 export const ALERT_RULES: readonly AlertRule[] = [
   { id: "pipedrive-stale", group: "data", title: "No new data from Pipedrive for 2 days", enabled: true },
+  { id: "google-stale", group: "data", title: "No new data from Google Ads, GA4 or Search Console for 2 days", enabled: true },
   { id: "deals-no-channel", group: "data", title: "More than 3% of deals without a source channel", enabled: true },
-  { id: "deals-no-qualification", group: "data", title: "Deals with no qualification status after 14 days", enabled: false, note: "Off until the field exists in Pipedrive" },
+  {
+    id: "deals-no-qualification", group: "data", title: "Deals with no qualification status after 14 days", enabled: kpiConfig.qualificationStatusInPipedrive,
+    note: kpiConfig.qualificationStatusInPipedrive ? undefined : "Off until the field exists in Pipedrive",
+  },
   { id: "spend-missing", group: "data", title: "No spend entered for the month", enabled: true },
   { id: "below-target", group: "performance", title: "Qualified opportunities more than 25% below target", enabled: true },
   { id: "cpqo-up", group: "performance", title: "Cost per qualified opportunity more than 30% above the trailing 3-month average", enabled: true },
@@ -431,12 +438,14 @@ export interface AlertInput {
   config: KpiConfig;
   /** Wall-clock instant, for staleness. */
   now: string;
+  /** When the Google pull last wrote anything: null = never, absent = no feed (demo). */
+  googleSyncedAt?: string | null;
 }
 
 const DAY = 86_400_000;
 
 /** Rules a monthly ritual needs to hear about, in order of severity within each group. Thresholds are deliberate and visible here. */
-export function buildAlerts({ report, quality, config, now }: AlertInput): Alert[] {
+export function buildAlerts({ report, quality, config, now, googleSyncedAt }: AlertInput): Alert[] {
   const alerts: Alert[] = [];
   const h = report.headline;
   const month = monthLabel(report.reportMonth);
@@ -453,6 +462,28 @@ export function buildAlerts({ report, quality, config, now }: AlertInput): Alert
       href: "/kpi-rule",
     });
   }
+  if (googleSyncedAt === null) {
+    alerts.push({
+      id: "google-stale",
+      group: "data",
+      severity: "critical",
+      title: "Google data has never fully arrived",
+      detail: "At least one of Google Ads, GA4 and Search Console has not completed a pull yet, so its section is empty or frozen. The API's import log names which; check its Google settings.",
+      href: "/traffic",
+    });
+  } else if (googleSyncedAt !== undefined) {
+    const googleAgeDays = (Date.parse(now) - Date.parse(googleSyncedAt)) / DAY;
+    if (googleAgeDays > 2) {
+      alerts.push({
+        id: "google-stale",
+        group: "data",
+        severity: "critical",
+        title: "No new data from Google Ads, GA4 or Search Console for 2 days",
+        detail: `The last pull completed ${Math.floor(googleAgeDays)} days ago. It runs daily; a quiet feed usually means Google refused the sign-in (a revoked token) or the API access level changed. Spend, traffic and search stay frozen until it recovers.`,
+        href: "/spend",
+      });
+    }
+  }
   if (quality.dealsNoChannel.share > 0.03) {
     alerts.push({
       id: "deals-no-channel",
@@ -464,15 +495,17 @@ export function buildAlerts({ report, quality, config, now }: AlertInput): Alert
     });
   }
   if (config.qualificationStatusInPipedrive) {
+    // Only deals created since the field existed: nobody could have ticked an older one.
+    const since = Date.parse(config.qualificationStatusFrom);
     const cutoff = Date.parse(now) - config.qualificationStatusDays * DAY;
-    const unqualified = quality.deals.filter((d) => Date.parse(d.createdAt) <= cutoff && !d.qualificationStatus);
+    const unqualified = quality.deals.filter((d) => Date.parse(d.createdAt) >= since && Date.parse(d.createdAt) <= cutoff && !d.qualificationStatus);
     if (unqualified.length > 0) {
       alerts.push({
         id: "deals-no-qualification",
         group: "data",
         severity: "info",
         title: `Deals with no qualification status after ${config.qualificationStatusDays} days`,
-        detail: `${unqualified.length} ${unqualified.length === 1 ? "deal" : "deals"} older than ${config.qualificationStatusDays} days still have no qualification status in Pipedrive.`,
+        detail: `${unqualified.length} ${unqualified.length === 1 ? "deal" : "deals"} created since ${dateLabel(config.qualificationStatusFrom)} and older than ${config.qualificationStatusDays} days still ${unqualified.length === 1 ? "has" : "have"} no "Qualified Lead?" answer in Pipedrive.`,
         href: "/data-quality",
       });
     }

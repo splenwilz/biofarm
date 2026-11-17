@@ -1,11 +1,8 @@
 "use client";
 
 import Chip from "@mui/material/Chip";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
-import Switch from "@mui/material/Switch";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -20,7 +17,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { SHELL_USER } from "@/components/shell/nav";
 import { useFilters } from "@/components/shell/useFilters";
-import { QUALIFICATION_CHECKS, type KpiConfig } from "@/config/kpi";
+import type { KpiConfig } from "@/config/kpi";
 import { dateLabel, monthLabel } from "@/lib/format";
 import { inboundSourceGroups, qualifiedTargetForMonth } from "@/lib/kpi";
 
@@ -159,7 +156,7 @@ function ChangeLog({ log, config }: { log: TargetChange[]; config: KpiConfig }) 
 }
 
 export function KpiRulePage() {
-  const { config, data, setTargets, targetLog, setCheck } = useDashboard();
+  const { config, data, setTargets, targetLog } = useDashboard();
   const { filters } = useFilters();
   // Until sign-in exists the person in the sidebar footer is who made the change.
   const who = SHELL_USER.name;
@@ -204,27 +201,14 @@ export function KpiRulePage() {
           <Section id="rule" title="What counts as a qualified inbound opportunity">
             <Row term="Pipelines">{config.pipelines.map((p) => PIPELINE_LABEL[p]).join(" and ")}</Row>
             <Row term="Qualifies when">
-              A Developer Pipeline deal is created (its first stage is &ldquo;OPPORTUNITY (Qualified)&rdquo;). A Landowner Pipeline deal moves past
-              &ldquo;CALL / QUALIFY&rdquo;.
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
-                Once the checks are agreed, a stage move alone won&apos;t count as qualified.
-              </Typography>
-            </Row>
-            <Row term="Checks, developer enquiries">
               <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
-                <Chip label="Draft, not yet agreed" size="small" color="warning" variant="outlined" />
-                <FormGroup role="group" aria-label="Checks, developer enquiries">
-                  {QUALIFICATION_CHECKS.map((check) => (
-                    <FormControlLabel
-                      key={check.id}
-                      control={<Switch size="small" checked={config.qualificationChecks[check.id]} onChange={(e) => setCheck(check.id, e.target.checked)} slotProps={{ input: { role: "switch" } }} />}
-                      label={check.label}
-                      slotProps={{ typography: { variant: "body2" } }}
-                    />
-                  ))}
-                </FormGroup>
-                <Typography variant="body2" color="text.secondary">
-                  Landowner enquiries will have their own checklist.
+                <Chip label="Agreed with Sales and Land on Monday 9 November 2026" size="small" color="success" variant="outlined" />
+                <Typography variant="body2" component="ul" sx={{ m: 0, pl: 2.5, "& li": { mb: 0.5 } }}>
+                  <li>From {dateLabel(config.qualificationStatusFrom)} Sales tick &ldquo;Qualified Lead?&rdquo; (YES or NO) on every lead and deal, and the tick decides: YES counts, in the Developer, Landowner or NSIP pipeline, from the moment of the tick.</li>
+                  <li>A lead ticked YES before it becomes a deal counts from the day it came in; its deal takes over once converted.</li>
+                  <li>Before that day: a developer deal counted from the day it was created, a landowner deal once it moved past &ldquo;CALL / QUALIFY&rdquo;. Those older deals keep that rule.</li>
+                  <li>A qualified deal still counts if Sales later turn it down, for price, no local bank or any other reason.</li>
+                  <li>Job seekers, suppliers and other non-buyers never count.</li>
                 </Typography>
               </Stack>
             </Row>
@@ -269,7 +253,9 @@ export function KpiRulePage() {
               )}
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
                 Enquiries that were converted to deals before 8 Nov 2026 carry the date they became a deal, because Pipedrive deletes a lead on
-                conversion and the mirror did not exist to keep the original date. From that day the mirror keeps it.
+                conversion and the mirror did not exist to keep the original date. From that day the mirror keeps it. The same goes for an
+                event matched by its lead label: a deal converted before that day carries no label, so it counts for the event only through
+                Deal Source, a word in the title or the Trade Show / Event channel. From that day the deal keeps the lead&apos;s label.
               </Typography>
             </Section>
           </Stack>

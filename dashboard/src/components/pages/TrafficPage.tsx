@@ -45,7 +45,7 @@ export function TrafficPage() {
             value={integer(t.sessions)}
             delta={{ value: t.sessions - t.sessionsPrev, note: prev }}
             trend={t.sessionsByMonth}
-            footnote="GA4 sessions, all channels"
+            footnote={t.sessionsLastYear === null ? "GA4 sessions, all channels" : `${lastYear}: ${integer(t.sessionsLastYear)} · GA4, all channels`}
             info={[`Website sessions in ${month}, every channel.`, [t.sessionsLastYear === null ? null : `${lastYear}: ${integer(t.sessionsLastYear)}`, provenance].filter(Boolean).join(" · ") + "."]}
           />
         </Grid>
@@ -55,7 +55,7 @@ export function TrafficPage() {
             label="Visit to enquiry rate"
             value={pct(t.conversion, 1)}
             delta={convPts === null ? undefined : { value: convPts, note: `pts ${prev}`, format: (v) => v.toFixed(1) }}
-            footnote="Sessions that became an enquiry"
+            footnote={`${integer(report.headline.enquiries)} enquiries from ${integer(t.sessions)} sessions`}
             info={[`Enquiries divided by sessions in ${month}.`, `${integer(report.headline.enquiries)} enquiries from ${integer(t.sessions)} sessions.`]}
           />
         </Grid>
@@ -66,11 +66,18 @@ export function TrafficPage() {
             label="Biggest channel"
             value={t.channels[0]?.name ?? "–"}
             compare={t.channels[0] ? `${pct(t.channels[0].share)} of sessions` : undefined}
+            footnote={t.channels[0] ? `${integer(t.channels[0].sessions)} of ${integer(t.sessions)} sessions` : undefined}
             info={[`The channel with the most sessions in ${month}.`, `GA4 default channel grouping, with AI assistants split out${t.channels[0] ? ` · ${integer(t.channels[0].sessions)} sessions` : ""}.`]}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <KpiCard testId="kpi-paid-share" label="Paid share" value={pct(t.paidShare)} footnote="Paid search and paid social" info={`Paid channels as a share of all sessions in ${month}.`} />
+          <KpiCard
+            testId="kpi-paid-share"
+            label="Paid share"
+            value={pct(t.paidShare)}
+            footnote={t.paidShare === null ? "Paid search, display and paid social" : `${integer(Math.round(t.paidShare * t.sessions))} of ${integer(t.sessions)} sessions from paid search, display and paid social`}
+            info={`Paid channels (paid search, display, Performance Max and paid social) as a share of all sessions in ${month}.`}
+          />
         </Grid>
       </Grid>
 

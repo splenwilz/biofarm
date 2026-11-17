@@ -45,14 +45,14 @@ block, grouped navigation with a tinted active pill, person footer), a sticky
 | `/traffic` | Sessions by month and by channel, session-to-enquiry conversion |
 | `/newsletter` | Subscribers, last-issue open and click rates, one meter per issue, subscribers by month |
 | `/search` | Brand searches against target, AI referral sessions, AI mention share, referrals by assistant |
-| `/events` | Trade shows, CPD sessions and webinars: attendees, leads, qualified |
+| `/events` | Trade shows, CPD sessions, webinars and open days: attendees and cost entered by hand, leads and qualified counted from Pipedrive by each event's match rules. On the feed, adds, edits and removals are saved through `/api/events` (Next route handlers that forward to the lead API with the server's token); on demo data they last the session. |
 | `/spend` | Spend and CPQO tiles; by-platform spend with the opportunities each platform paid for and its own cost per opportunity; spend by month; add, remove and CSV-import lines |
 | `/alerts` | Rules that fired: stale data, missing spend, below target, cost jump, unattributed deals, unanswered enquiries; the sidebar and bell carry the count |
 | `/data-quality` | Gaps that distort the numbers, speed to lead, and the list of deals to fix in Pipedrive |
 | `/report` | The month on one page: print to PDF, copy the summary text, export, and the delivery schedule settings |
-| `/kpi-rule` | The rule spelled out from `src/config/kpi.ts`: targets anyone can change (logged: who, old, new, when), the qualified ramp and this month's target, the five draft qualification checks as switches, data sources, data status |
+| `/kpi-rule` | The rule spelled out from `src/config/kpi.ts`: targets anyone can change (logged: who, old, new, when), the qualified ramp and this month's target, the rule agreed with Sales and Land on 9 Nov 2026, data sources, data status |
 
-Every page has **Export CSV** of what it shows, and a print stylesheet drops the sidebar and top bar. Under the route group, `loading.tsx` draws a skeleton while data loads and `error.tsx` keeps the shell and offers a retry; the app-level `not-found.tsx` points home.
+Every page has **Export CSV** of what it shows, and a print stylesheet drops the sidebar and top bar. Under the route group, `loading.tsx` draws a skeleton while data loads and `error.tsx` keeps the shell and offers a retry; the app-level `not-found.tsx` points home. When the lead API does not deliver the feed (no import yet, a migration not yet applied, wrong token, no answer), the layout renders `src/components/FeedUnavailable.tsx` with the API's own explanation instead of throwing, because in production Next replaces the message of an error thrown in a Server Component with a generic one.
 
 **Filters live in the URL** (`?audience=developer&month=2026-09`), the way
 BoothIQ carries `?booth=`. The audience switcher and month select in the top
@@ -63,7 +63,7 @@ bar rewrite the current URL; every sidebar link preserves the filters. Defaults
 
 | Path | What |
 |---|---|
-| `src/config/kpi.ts` | The KPI definition: target and its ramp, the draft qualification checks (`QUALIFICATION_CHECKS`, all off until agreed), pipelines, inbound vs network channels, cohort horizons. Change the rule here, nowhere else. |
+| `src/config/kpi.ts` | The KPI definition: target and its ramp, pipelines, inbound vs network channels, cohort horizons. The rule itself (the feed sets each record's qualified date: until 17 Nov 2026 a developer deal from creation and a landowner deal once past CALL / QUALIFY, from then the "Qualified Lead?" tick on deals and on leads not yet converted; a turned-down deal still counts) is in `src/lib/kpi.ts`; conversion on the pages is qualified ÷ enquiries from `qualifiedShareMinEnquiries` (5) enquiries. Change the rule here, nowhere else. |
 | `src/lib/types.ts` | Domain records (`Deal`, `Enquiry`, `SpendEntry`) the backend will produce. |
 | `src/lib/kpi.ts` | Pure calculations: qualified by month, spend and CPQO, `qualifiedTargetForMonth` (the ramp), `passesChecks` (the draft checks that are on, applied inside the one qualified-deal test every page uses), `inboundSourceGroups` (inbound channels by the shared names), source groups (`sourceOf` maps a source/medium label or Pipedrive channel to one of eight groups and a platform inside it; `enquiriesBySource` joins spend for cost per qualified on paid groups), cohorts. |
 | `src/lib/report.ts` | `buildReport()`: everything the pages show, derived once from records + config + filters. |
@@ -78,7 +78,8 @@ bar rewrite the current URL; every sidebar link preserves the filters. Defaults
 | `src/lib/csv.ts` | CSV writer for exports and the spend CSV reader (month, platform, campaign, amount). |
 | `src/components/DashboardProvider.tsx` | Client context: the loaded records, KPI config, and what was entered this session: spend, chart notes, events and their edits (`events`, `addEvent`, `updateEvent`, `removeEvent`), target changes with their log (`setTargets(patch, who)`, `targetLog`) and the draft check switches (`setCheck`). |
 | `src/components/SpendDialog.tsx`, `SpendImport.tsx`, `SpendPanel.tsx` | Media spend entry: the "Add spend" dialog and "Import CSV" button in the page header, and the month's lines with a remove control. |
-| `src/components/EventDialog.tsx` | One dialog for adding an event and editing it later: name, date, type, attendees, leads and cost (stand, travel, fees). Opened from the Events header button and from each row's edit control. |
+| `src/components/EventDialog.tsx` | One dialog for adding an event and editing it later: name, date (future allowed), type, attendees, cost (stand, travel, fees), notes, and how its enquiries are found in Pipedrive (words in the title, the Trade Show / Event channel, a date window). Opened from the Events header button and from each row's edit control. |
+| `src/app/api/events/` | `POST /api/events`, `PUT` and `DELETE /api/events/[id]`: forward event writes to the lead API (`src/data/eventsApi.ts`, server-only, token never in the browser); 501 on demo data. No sign-in yet, so anyone with the dashboard URL can use them. |
 | `src/components/shell/` | `AppShell` (sidebar, top bar, drawer), `nav.ts` (the menu), `useFilters` (URL filters), inline Heroicons. |
 | `src/components/charts/` | `BarTable` (bar in its own column, printed numbers, optional sparkline column and expandable child rows), `MeterList`, `CohortHeatmap`, `ColumnChart`, `JoinedLeftChart` (joined above zero, left below, net written above each month), `ChartNotes` (the shared note markers), `OutcomeBars` and `palette.ts` (one hue does the work; grey for context; a light-to-dark ramp for magnitude). |
 | `src/components/pages/` | One client component per route, all reading `useReport()`, which also returns `period` (the month and the breakdown window as words) so every card and section can name the window it covers. `WindowToggle` sits on the Sources and Campaigns headers. |

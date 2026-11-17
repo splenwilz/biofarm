@@ -18,6 +18,7 @@ import {
   SOURCE_GROUPS,
   sourceOf,
   spendByMonth,
+  type SourceRow,
   trailingSum,
 } from "@/lib/kpi";
 import type { Deal, Enquiry, SpendEntry } from "@/lib/types";
@@ -223,38 +224,41 @@ describe("enquiriesBySource", () => {
     expect(rows[0]).toEqual({
       group: "Paid search",
       enquiries: 2,
-      conversionBase: 2,
+      leads: 2,
       qualified: 1,
       qualifiedFromLeads: 1,
-      conversion: 0.5,
+
+      notYetJudged: 1,
       spendGbp: 150,
       cpqo: 150,
       platforms: [
-        { platform: "Microsoft Ads", enquiries: 1, conversionBase: 1, qualified: 1, qualifiedFromLeads: 1, conversion: 1, spendGbp: 50, cpqo: 50 },
-        { platform: "Google Ads", enquiries: 1, conversionBase: 1, qualified: 0, qualifiedFromLeads: 0, conversion: 0, spendGbp: 100, cpqo: null },
+        { platform: "Microsoft Ads", enquiries: 1, leads: 1, qualified: 1, qualifiedFromLeads: 1, notYetJudged: 0, spendGbp: 50, cpqo: 50 },
+        { platform: "Google Ads", enquiries: 1, leads: 1, qualified: 0, qualifiedFromLeads: 0, notYetJudged: 1, spendGbp: 100, cpqo: null },
       ],
     });
     expect(rows[2]).toEqual({
       group: "Website (source not tracked)",
       enquiries: 1,
-      conversionBase: 1,
+      leads: 1,
       qualified: 0,
       qualifiedFromLeads: 0,
-      conversion: 0,
+
+      notYetJudged: 1,
       spendGbp: null,
       cpqo: null,
-      platforms: [{ platform: "Website", enquiries: 1, conversionBase: 1, qualified: 0, qualifiedFromLeads: 0, conversion: 0, spendGbp: null, cpqo: null }],
+      platforms: [{ platform: "Website", enquiries: 1, leads: 1, qualified: 0, qualifiedFromLeads: 0, notYetJudged: 1, spendGbp: null, cpqo: null }],
     });
     expect(rows[3]).toEqual({
       group: "Info email inbox",
       enquiries: 0,
-      conversionBase: 0,
+      leads: 0,
       qualified: 1,
       qualifiedFromLeads: 1,
-      conversion: null,
+
+      notYetJudged: 0,
       spendGbp: null,
       cpqo: null,
-      platforms: [{ platform: "Info email inbox", enquiries: 0, conversionBase: 0, qualified: 1, qualifiedFromLeads: 1, conversion: null, spendGbp: null, cpqo: null }],
+      platforms: [{ platform: "Info email inbox", enquiries: 0, leads: 0, qualified: 1, qualifiedFromLeads: 1, notYetJudged: 0, spendGbp: null, cpqo: null }],
     });
   });
 
@@ -269,7 +273,7 @@ describe("enquiriesBySource", () => {
     const row = enquiriesBySource(list, qualified, [], months, cfg)[0];
     expect(row.group).toBe("Website (source not tracked)");
     expect([row.enquiries, row.qualified]).toEqual([3, 2]);
-    expect([row.conversionBase, row.qualifiedFromLeads, row.conversion]).toEqual([2, 1, 0.5]);
+    expect([row.leads, row.qualifiedFromLeads, row.notYetJudged]).toEqual([2, 1, 1]);
   });
 
   it("a deal converted from a lead Pipedrive has deleted came in as a lead, so it stays in the share", () => {
@@ -278,12 +282,19 @@ describe("enquiriesBySource", () => {
       enquiry({ id: "88", createdAt: "2026-10-03", kind: "deal", converted: true, form: null, sourceLabel: null, personId: 3 }),
     ];
     const row = enquiriesBySource(list, [deal({ id: "88", createdAt: "2026-10-03", personId: 3 })], [], months, cfg)[0];
-    expect([row.enquiries, row.conversionBase, row.qualified, row.qualifiedFromLeads, row.conversion]).toEqual([2, 2, 1, 1, 0.5]);
+    expect([row.enquiries, row.leads, row.qualified, row.qualifiedFromLeads, row.notYetJudged]).toEqual([2, 2, 1, 1, 1]);
+  });
+
+  it("not yet judged is the window's leads with no qualified deal yet, never below zero when earlier leads qualified in the window", () => {
+    const list: Enquiry[] = [enquiry({ id: "l1", createdAt: "2026-10-01", sourceLabel: null, personId: 1 })];
+    const qualified: Deal[] = [deal({ id: "q1", createdAt: "2026-10-05", personId: 1 }), deal({ id: "q2", createdAt: "2026-10-06", personId: 9 })];
+    const row = enquiriesBySource(list, qualified, [], months, cfg)[0];
+    expect([row.leads, row.qualifiedFromLeads, row.notYetJudged]).toEqual([1, 2, 0]);
   });
 
   it("keeps paid groups' spend as a number (so the cost column can say '–') and unpaid groups' as null (blank)", () => {
     const rows = enquiriesBySource(enquiries, deals, spend, months, cfg);
-    expect(rows.find((r) => r.group === "LinkedIn ads")).toEqual({ group: "LinkedIn ads", enquiries: 0, conversionBase: 0, qualified: 0, qualifiedFromLeads: 0, conversion: null, spendGbp: 0, cpqo: null, platforms: [] });
+    expect(rows.find((r) => r.group === "LinkedIn ads")).toEqual({ group: "LinkedIn ads", enquiries: 0, leads: 0, qualified: 0, qualifiedFromLeads: 0, notYetJudged: 0, spendGbp: 0, cpqo: null, platforms: [] });
     expect(rows.find((r) => r.group === "Organic search")!.spendGbp).toBeNull();
   });
 
@@ -306,10 +317,46 @@ describe("enquiriesBySource", () => {
 
   it("can be limited to one audience / pipeline; spend stays audience-neutral", () => {
     const rows = enquiriesBySource(enquiries, deals, spend, months, cfg, "landowner");
-    expect(rows[0]).toEqual({ group: "Newsletter", enquiries: 1, conversionBase: 1, qualified: 0, qualifiedFromLeads: 0, conversion: 0, spendGbp: null, cpqo: null, platforms: [{ platform: "Newsletter", enquiries: 1, conversionBase: 1, qualified: 0, qualifiedFromLeads: 0, conversion: 0, spendGbp: null, cpqo: null }] });
+    expect(rows[0]).toEqual({ group: "Newsletter", enquiries: 1, leads: 1, qualified: 0, qualifiedFromLeads: 0, notYetJudged: 1, spendGbp: null, cpqo: null, platforms: [{ platform: "Newsletter", enquiries: 1, leads: 1, qualified: 0, qualifiedFromLeads: 0, notYetJudged: 1, spendGbp: null, cpqo: null }] });
     const paid = rows.find((r) => r.group === "Paid search")!;
     expect(paid.spendGbp).toBe(150);
     expect(paid.cpqo).toBeNull();
+  });
+});
+
+describe("October 2026, as the live feed had it on 12 Nov 2026", () => {
+  // 33 inbound enquiries: 24 leads nobody converted, 5 developer leads converted to deals, 1 landowner lead
+  // converted to a deal still in CALL / QUALIFY, 3 developer deals Sales created directly. Plus two landowner
+  // deals from September (one from a lead, one created directly) that moved past CALL / QUALIFY in October.
+  const oct = ["2026-10"];
+  const list: Enquiry[] = [
+    ...Array.from({ length: 24 }, (_, i) => enquiry({ id: `open-${i}`, createdAt: `2026-10-${String(i + 1).padStart(2, "0")}`, sourceLabel: null, personId: 100 + i })),
+    ...Array.from({ length: 5 }, (_, i) => enquiry({ id: `dev-${i}`, createdAt: `2026-10-${String(i + 5).padStart(2, "0")}`, kind: "deal", converted: true, form: null, sourceLabel: null, personId: 200 + i })),
+    enquiry({ id: "lo-conv", createdAt: "2026-10-12", kind: "deal", converted: true, form: null, sourceLabel: null, personId: 300 }),
+    ...Array.from({ length: 3 }, (_, i) => enquiry({ id: `direct-${i}`, createdAt: `2026-10-${String(i + 8).padStart(2, "0")}`, kind: "deal", form: null, sourceLabel: null, personId: 400 + i })),
+  ];
+  const sep: Enquiry[] = [
+    enquiry({ id: "lo-sep-lead", createdAt: "2026-09-29", kind: "deal", converted: true, form: null, sourceLabel: null, personId: 500 }),
+    enquiry({ id: "lo-sep-direct", createdAt: "2026-09-21", kind: "deal", form: null, sourceLabel: null, channel: "Trade Show / Event", personId: 501 }),
+  ];
+  const deals: Deal[] = [
+    ...Array.from({ length: 5 }, (_, i) => deal({ id: `dev-${i}`, createdAt: `2026-10-${String(i + 5).padStart(2, "0")}`, personId: 200 + i })),
+    deal({ id: "lo-conv", createdAt: "2026-10-12", pipeline: "landowner", qualifiedAt: null, personId: 300 }),
+    ...Array.from({ length: 3 }, (_, i) => deal({ id: `direct-${i}`, createdAt: `2026-10-${String(i + 8).padStart(2, "0")}`, personId: 400 + i })),
+    deal({ id: "lo-sep-lead", createdAt: "2026-09-29", pipeline: "landowner", qualifiedAt: "2026-10-08", personId: 500 }),
+    deal({ id: "lo-sep-direct", createdAt: "2026-09-21", pipeline: "landowner", qualifiedAt: "2026-10-20", channel: "Trade Show / Event", personId: 501 }),
+  ];
+
+  it("counts 33 enquiries, 10 qualified (8 developer, 2 landowner), 6 of them from leads, and 24 leads not yet judged", () => {
+    expect(inboundEnquiries([...list, ...sep], cfg).filter((e) => monthOf(e.createdAt) === "2026-10")).toHaveLength(33);
+    expect(qualifiedByMonth(deals, oct, cfg)[0].inbound).toBe(10);
+    expect(qualifiedByMonth(deals, oct, cfg, "developer")[0].inbound).toBe(8);
+    expect(qualifiedByMonth(deals, oct, cfg, "landowner")[0].inbound).toBe(2);
+    const rows = enquiriesBySource([...list, ...sep], deals, [], oct, cfg);
+    const sum = (pick: (r: SourceRow) => number) => rows.reduce((s, r) => s + pick(r), 0);
+    expect([sum((r) => r.enquiries), sum((r) => r.leads), sum((r) => r.qualified), sum((r) => r.qualifiedFromLeads), sum((r) => r.notYetJudged)]).toEqual([33, 30, 10, 6, 24]);
+    // the landowner lead whose deal is still in CALL / QUALIFY is one of the 24: not yet judged, not unqualified
+    expect(rows.find((r) => r.group === "Website (source not tracked)")!.notYetJudged).toBe(24);
   });
 });
 
@@ -403,28 +450,18 @@ describe("platformOf", () => {
   });
 });
 
-describe("qualification checks", () => {
-  const failing = deal({ id: "a", createdAt: "2026-10-05T10:00:00Z", checks: { buyer: false, project: true, serve: true, habitat: true, timing: true } });
-  const passing = deal({ id: "b", createdAt: "2026-10-06T10:00:00Z", checks: { buyer: true, project: true, serve: true, habitat: true, timing: true } });
-  const bare = deal({ id: "c", createdAt: "2026-10-07T10:00:00Z" });
-  const withChecks = (on: Partial<KpiConfig["qualificationChecks"]>): KpiConfig => ({ ...cfg, qualificationChecks: { ...cfg.qualificationChecks, ...on } });
-
-  it("every check is off by default, so a stage move alone counts", () => {
-    expect(Object.values(cfg.qualificationChecks).every((v) => v === false)).toBe(true);
-    expect(qualifiedInbound([failing, passing, bare], cfg)).toHaveLength(3);
+describe("the qualified rule (agreed with Sales and Land, 9 Nov 2026)", () => {
+  it("a developer deal counts from creation whatever happens to it later, so a deal Sales turned down still counts", () => {
+    const lost = deal({ id: "a", createdAt: "2026-10-05T10:00:00Z", status: "lost" });
+    const open = deal({ id: "b", createdAt: "2026-10-06T10:00:00Z" });
+    expect(qualifiedInbound([lost, open], cfg).map((d) => d.id)).toEqual(["a", "b"]);
+    expect(qualifiedByMonth([lost, open], ["2026-10"], cfg)[0].inbound).toBe(2);
   });
 
-  it("a check that is switched on removes the deals that failed it, everywhere", () => {
-    const on = withChecks({ buyer: true });
-    expect(qualifiedInbound([failing, passing, bare], on).map((d) => d.id)).toEqual(["b", "c"]);
-    expect(qualifiedByMonth([failing, passing, bare], ["2026-10"], on)[0].inbound).toBe(2);
-  });
-
-  it("a deal with no check results, or no result for that check, is left as the stage move decided", () => {
-    const partial = deal({ id: "d", createdAt: "2026-10-08T10:00:00Z", checks: { project: false } });
-    const on = withChecks({ buyer: true, serve: true, habitat: true, timing: true });
-    expect(qualifiedInbound([bare, partial], on)).toHaveLength(2);
-    expect(qualifiedInbound([partial], withChecks({ project: true }))).toHaveLength(0);
+  it("a deal with no qualified date, or outside the counted pipelines, is not qualified", () => {
+    const unqualified = deal({ id: "c", createdAt: "2026-10-07T10:00:00Z", qualifiedAt: null });
+    expect(qualifiedInbound([unqualified], cfg)).toHaveLength(0);
+    expect(qualifiedInbound([deal({ id: "d", createdAt: "2026-10-07T10:00:00Z" })], { ...cfg, pipelines: ["landowner"] })).toHaveLength(0);
   });
 });
 

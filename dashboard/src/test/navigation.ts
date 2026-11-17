@@ -10,6 +10,7 @@ export const navState = {
   search: "",
   replace: vi.fn(),
   push: vi.fn(),
+  refresh: vi.fn(),
 };
 
 export function resetNavigation(pathname = "/", search = "") {
@@ -17,10 +18,11 @@ export function resetNavigation(pathname = "/", search = "") {
   navState.search = search;
   navState.replace.mockReset();
   navState.push.mockReset();
+  navState.refresh.mockReset();
 }
 
 export const navigationMock = {
   usePathname: () => navState.pathname,
   useSearchParams: () => new URLSearchParams(navState.search),
-  useRouter: () => ({ replace: navState.replace, push: navState.push, prefetch: () => {} }),
+  useRouter: () => ({ replace: navState.replace, push: navState.push, refresh: navState.refresh, prefetch: () => {} }),
 };

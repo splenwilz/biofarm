@@ -9,7 +9,7 @@ import { BarTable } from "@/components/charts/BarTable";
 import { useDashboard } from "@/components/DashboardProvider";
 import { ExportButton } from "@/components/ExportButton";
 import { KpiCard } from "@/components/KpiCard";
-import { WAITING_FOR_SPEND } from "@/components/pages/OverviewPage";
+import { conversionText, WAITING_FOR_SPEND } from "@/components/pages/OverviewPage";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { useReport } from "@/components/pages/useReport";
@@ -183,12 +183,12 @@ export function CampaignsPage() {
             cells: [
               integer(p.enquiries),
               integer(p.qualified),
-              p.conversionBase >= config.pageConversionMinEnquiries ? pct(p.conversion) : "–",
+              conversionText(p, config.qualifiedShareMinEnquiries),
             ],
           }))}
         />
         <Typography variant="caption" color="text.secondary" sx={{ display: "block", px: 2, py: 1.5 }}>
-          {`Conversion is shown for pages with at least ${integer(config.pageConversionMinEnquiries)} enquiries.`}
+          {`Conversion is shown for pages with at least ${integer(config.qualifiedShareMinEnquiries)} enquiries.`}
         </Typography>
       </Section>
     </Stack>

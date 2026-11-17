@@ -187,7 +187,8 @@ export function buildReport(
       ),
       enquiries: enquiryCount([months[last]]),
       enquiriesPrev: enquiryCount([months[last - 1]]),
-      enquiriesTrailing: enquiryCount(trailingMonths),
+      // the headline's trailing figures are always config.trailingMonths, never the Sources/Campaigns window from the URL
+      enquiriesTrailing: enquiryCount(months.slice(-config.trailingMonths)),
       enquiriesNetwork: contextCount("network", [months[last]]),
       enquiriesUnattributed: contextCount("unattributed", [months[last]]),
       enquiriesAudienceUnknown: filters.audience === "all" ? 0 : inboundOnly.filter((e) => e.audience === "other" && monthOf(e.createdAt) === months[last]).length,

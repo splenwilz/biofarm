@@ -87,7 +87,7 @@ describe("landingPages and enquiriesByForm", () => {
     expect(rows.reduce((s, r) => s + r.count, 0)).toBe(report.headline.enquiries);
   });
 
-  it("landing pages: a deal created directly counts on its row but not in the row's conversion", () => {
+  it("landing pages: a deal created directly counts on its row but is never not yet judged", () => {
     const list: Enquiry[] = [
       { id: "l1", createdAt: `${DEMO_LAST_MONTH}-02T09:00:00Z`, kind: "lead", form: "contact", audience: "developer", channel: "Website", sourceLabel: "direct", campaign: null, landingPage: "/x", firstContactAt: null, personId: 1, archived: false, converted: false },
       { id: "l2", createdAt: `${DEMO_LAST_MONTH}-03T09:00:00Z`, kind: "lead", form: "contact", audience: "developer", channel: "Website", sourceLabel: "direct", campaign: null, landingPage: "/x", firstContactAt: null, personId: 2, archived: false, converted: false },
@@ -99,9 +99,9 @@ describe("landingPages and enquiriesByForm", () => {
     ];
     const rows = landingPages(list, qualified, [DEMO_LAST_MONTH], kpiConfig);
     const x = rows.find((r) => r.page === "/x")!;
-    expect([x.enquiries, x.conversionBase, x.qualified, x.conversion]).toEqual([2, 2, 1, 0.5]);
+    expect([x.enquiries, x.leads, x.qualified, x.notYetJudged]).toEqual([2, 2, 1, 1]);
     const none = rows.find((r) => r.page === "No landing page recorded")!;
-    expect([none.enquiries, none.conversionBase, none.qualified, none.conversion]).toEqual([1, 0, 1, null]);
+    expect([none.enquiries, none.leads, none.qualified, none.notYetJudged]).toEqual([1, 0, 1, 0]);
   });
 
   it("landing pages: records with no page recorded sit on one labelled row", () => {
@@ -135,6 +135,17 @@ describe("outcomesBySource", () => {
 
 describe("trafficReport", () => {
   const t = trafficReport(data.traffic, months, report.enquiriesByMonth);
+
+  it("counts display and Google's cross-network traffic as paid", () => {
+    const month = months[months.length - 1];
+    const traffic = [
+      { month, channel: "Direct" as const, sessions: 50 },
+      { month, channel: "Display" as const, sessions: 30 },
+      { month, channel: "Paid other" as const, sessions: 15 },
+      { month, channel: "Other" as const, sessions: 5 },
+    ];
+    expect(trafficReport(traffic, months, report.enquiriesByMonth).paidShare).toBeCloseTo(45 / 100, 9);
+  });
 
   it("totals sessions per month and splits the report month by channel, largest first", () => {
     expect(t.sessionsByMonth).toHaveLength(12);
@@ -256,6 +267,20 @@ describe("dataQuality and alerts", () => {
     expect(alert.detail).not.toMatch(/nightly/i);
   });
 
+  it("flags the Google feed when it has never run or has gone quiet, and stays silent on demo data", () => {
+    const demo = buildAlerts({ report, quality: q, config: kpiConfig, now: DEMO_TODAY });
+    expect(demo.some((a) => a.id === "google-stale")).toBe(false);
+    const never = buildAlerts({ report, quality: q, config: kpiConfig, now: DEMO_TODAY, googleSyncedAt: null });
+    expect(never.find((a) => a.id === "google-stale")).toMatchObject({ severity: "critical", group: "data", title: "Google data has never fully arrived" });
+    const fresh = buildAlerts({ report, quality: q, config: kpiConfig, now: "2026-11-02T18:00:00Z", googleSyncedAt: "2026-11-01T06:10:00Z" });
+    expect(fresh.some((a) => a.id === "google-stale")).toBe(false);
+    const quiet = buildAlerts({ report, quality: q, config: kpiConfig, now: "2026-11-04T09:00:00Z", googleSyncedAt: "2026-11-01T06:10:00Z" });
+    const alert = quiet.find((a) => a.id === "google-stale")!;
+    expect(alert.title).toMatch(/for 2 days/);
+    expect(alert.detail).toMatch(/3 days ago/);
+    expect(ALERT_RULES.some((r) => r.id === "google-stale" && r.group === "data" && r.enabled)).toBe(true);
+  });
+
   it("compares cost per qualified with the trailing three-month average, not the month before", () => {
     const h = report.headline;
     const jumped = buildAlerts({ report: { ...report, headline: { ...h, cpqoMonth: 1000, cpqoTrailing: 700, cpqoPrev: 2000 } }, quality: q, config: kpiConfig, now: DEMO_TODAY });
@@ -281,15 +306,20 @@ describe("dataQuality and alerts", () => {
     expect(productive.some((a) => a.id.startsWith("paid-no-qualified"))).toBe(false);
   });
 
-  it("lists the qualification-status rule but keeps it switched off until Pipedrive has the field", () => {
+  it("checks the qualification status only on deals created since Sales got the field, 17 Nov 2026", () => {
     const rule = ALERT_RULES.find((r) => r.id === "deals-no-qualification")!;
-    expect(rule).toMatchObject({ group: "data", enabled: false });
-    expect(rule.note).toMatch(/until the field exists in Pipedrive/i);
-    const old = { ...data.deals[0], id: "deal-old", createdAt: "2026-09-01T09:00:00Z", qualificationStatus: null };
-    const off = buildAlerts({ report, quality: dataQuality({ ...data, deals: [...data.deals, old] }, data.spend, months), config: kpiConfig, now: DEMO_TODAY });
+    expect(rule).toMatchObject({ group: "data", enabled: true });
+    expect(rule.note).toBeUndefined();  // the "off until" note went with the switch
+    const old = { ...data.deals[0], id: "deal-old", createdAt: "2026-09-01T09:00:00Z", qualificationStatus: null };  // before the field existed: nothing to tick
+    const fresh = { ...data.deals[0], id: "deal-fresh", createdAt: "2026-11-18T09:00:00Z", qualificationStatus: null };
+    const ticked = { ...data.deals[0], id: "deal-ticked", createdAt: "2026-11-18T09:00:00Z", qualificationStatus: "NO" };
+    const quality = dataQuality({ ...data, deals: [...data.deals, old, fresh, ticked] }, data.spend, monthRange("2026-12", 12));  // a window that reaches the new deals
+    const alerts = buildAlerts({ report, quality, config: kpiConfig, now: "2026-12-10T06:00:00Z" });
+    expect(alerts.find((a) => a.id === "deals-no-qualification")).toMatchObject({ group: "data", detail: '1 deal created since 17 Nov 2026 and older than 14 days still has no "Qualified Lead?" answer in Pipedrive.' });
+    const early = buildAlerts({ report, quality, config: kpiConfig, now: "2026-11-20T06:00:00Z" });  // the fresh deal is two days old
+    expect(early.some((a) => a.id === "deals-no-qualification")).toBe(false);
+    const off = buildAlerts({ report, quality, config: { ...kpiConfig, qualificationStatusInPipedrive: false }, now: "2026-12-10T06:00:00Z" });
     expect(off.some((a) => a.id === "deals-no-qualification")).toBe(false);
-    const on = buildAlerts({ report, quality: dataQuality({ ...data, deals: [...data.deals, old] }, data.spend, months), config: { ...kpiConfig, qualificationStatusInPipedrive: true }, now: DEMO_TODAY });
-    expect(on.find((a) => a.id === "deals-no-qualification")).toMatchObject({ group: "data" });
     expect(ALERT_RULES.some((r) => /no reply logged/i.test(r.title))).toBe(false);
   });
 

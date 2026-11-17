@@ -163,3 +163,17 @@ describe("buildReport year-on-year and platform figures", () => {
     else expect(google.cpqo).toBeNull();
   });
 });
+
+describe("headline trailing figures", () => {
+  it("sum the configured three months whatever window the Sources page toggle left in the URL", () => {
+    const data = buildDemoData();
+    const three = buildReport(data, data.spend, kpiConfig, { audience: "all", month: DEMO_LAST_MONTH, window: 3 }, DEMO_TODAY);
+    const one = buildReport(data, data.spend, kpiConfig, { audience: "all", month: DEMO_LAST_MONTH, window: 1 }, DEMO_TODAY);
+    const twelve = buildReport(data, data.spend, kpiConfig, { audience: "all", month: DEMO_LAST_MONTH, window: 12 }, DEMO_TODAY);
+    expect(one.headline.enquiriesTrailing).toBe(three.headline.enquiriesTrailing);
+    expect(twelve.headline.enquiriesTrailing).toBe(three.headline.enquiriesTrailing);
+    expect(three.headline.enquiriesTrailing).toBeGreaterThan(three.headline.enquiries); // three months hold more than the last one alone
+    expect(one.headline.trailingAvg).toBe(three.headline.trailingAvg);
+    expect(one.headline.cpqoTrailing).toBe(three.headline.cpqoTrailing);
+  });
+});

@@ -6,9 +6,20 @@
  * `missing` names what is absent or blank, `seen` lists every variable whose
  * name contains DASHBOARD (whitespace shown as ␠) so a misspelt key stands out.
  */
+import { connection } from "next/server";
+
 const FEED_SETTINGS = ["DASHBOARD_API_URL", "DASHBOARD_API_TOKEN"] as const;
 
-export function GET(): Response {
+
+/**
+ * Answered per request, never prerendered. A GET route that reads no request
+ * data is otherwise built as static HTML under Cache Components (the segment
+ * config `dynamic` is not allowed there), and this one would then report the
+ * build machine's environment ("feed", nothing missing) whatever the server
+ * actually has. `connection()` is the documented way to wait for a real request.
+ */
+export async function GET(): Promise<Response> {
+  await connection();
   const missing = FEED_SETTINGS.filter((name) => !process.env[name]?.trim());
   const seen = Object.keys(process.env)
     .filter((name) => name.toUpperCase().includes("DASHBOARD"))
