@@ -1,4 +1,4 @@
-<!-- CONTACT FORM v2.0 - /contact, green "Get in touch" section (replaces the main Pipedrive embed).
+<!-- CONTACT FORM v2.1 - /contact, green "Get in touch" section (replaces the main Pipedrive embed).
      Design: web/variations/contact-v2-centred.html, chosen by Vix 11 Nov 2026: centred statement, a hairline,
      then the form in two columns on cream fields with small-caps labels; the newsletter choice and the
      Submit pill share the closing row. The prototype's "Let's talk." heading is left out because the page's
@@ -6,7 +6,9 @@
      The eyebrow, statement and form all live in this one block, so the section needs no other blocks:
      paste it into the Code Block where the "Get in touch" embed currently sits and delete any heading
      text block left over from the old layout.
-     Fields, names, keys and copy are v1.3's (five "I am a" roles, nine heard-about answers, "Other" box).
+     Fields, names, keys and copy are v1.3's (five "I am a" roles, nine heard-about answers, "Other" box),
+     plus v2.1's three developer questions (units needed, site location, when), shown when Developer,
+     Planning consultant or Ecologist is ticked: COMMENTED OUT for now (see the block below), pending Vix and Chris.
      /about uses about-form-INLINE.html instead (same script, side-by-side layout).
      Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
 <style>
@@ -26,6 +28,7 @@
   .bf-two .bf-field{display:flex;flex-direction:column;justify-content:flex-end;}
   .bf-two .bf-full{grid-column:1 / -1;}
   .bf-two .bf-field[hidden]{display:none;}
+  .bf-dev[hidden]{display:none;}
   @media(max-width:700px){.bf-two{grid-template-columns:1fr;}}
   .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea,.bf-form select{display:block;width:100%;min-height:58px;font-family:inherit;font-size:18px;line-height:1.3;font-weight:300;color:#212121;background:#F7F8F3;border:1px solid rgba(17,17,17,.28);border-radius:3px;padding:16px 18px;transition:background .2s,border-color .2s;}
   .bf-form input::placeholder,.bf-form textarea::placeholder{color:rgba(17,17,17,.5);}
@@ -111,6 +114,32 @@
         <label><input type="checkbox" name="fields" value="other">Other</label>
       </div>
     </fieldset>
+    <!-- DEVELOPER QUESTIONS, NOT YET IN USE (12 Nov 2026): kept out of the form until Vix and Chris agree
+         to ask them; the worry is that three more fields cost enquiries. The API already accepts and
+         stores them (units_needed, site_location, units_when). To switch on: remove this comment's
+         opening and closing markers; the script below already handles both states.
+    <div class="bf-two bf-dev" id="bfDevFields" hidden>
+      <div class="bf-field">
+        <label for="bfUnitsNeeded">Biodiversity units needed (if known)</label>
+        <input type="text" id="bfUnitsNeeded" name="units_needed" maxlength="100" autocomplete="off" placeholder="e.g. 1.2 area units, 0.6 hedgerow">
+      </div>
+      <div class="bf-field">
+        <label for="bfSiteLocation">Site location (postcode or council)</label>
+        <input type="text" id="bfSiteLocation" name="site_location" maxlength="200" autocomplete="off" placeholder="Postcode, town or local authority">
+      </div>
+      <div class="bf-field bf-full">
+        <label for="bfUnitsWhen">When do you need units?</label>
+        <select id="bfUnitsWhen" name="units_when">
+          <option value="">Please choose</option>
+          <option value="within_3_months">Within 3 months</option>
+          <option value="3_to_12_months">3 to 12 months</option>
+          <option value="12_to_18_months">12 to 18 months</option>
+          <option value="later">Later</option>
+          <option value="not_sure">Not sure yet</option>
+        </select>
+      </div>
+    </div>
+    -->
     <div class="bf-field">
       <label for="bfMessage">Your Message (optional)</label>
       <textarea id="bfMessage" name="message" maxlength="5000" rows="4" placeholder="Where the site is, what stage it’s at, what you need from us…"></textarea>
@@ -156,6 +185,29 @@
     heardOtherField.hidden = !other;
     if (!other) form.heard_about_other.value = '';
   });
+
+  // The three developer questions show when Developer, Planning consultant or Ecologist is
+  // ticked (consultants and ecologists often act for a developer); with none of those ticked
+  // the block hides and empties, so a change of mind never sends stale answers.
+  var devFields = document.getElementById('bfDevFields'); // null while the block above is commented out
+  var DEV_ROLES = ['developer', 'planning_consultant', 'ecologist'];
+  function syncDevFields() {
+    if (!devFields) return;
+    var show = Array.prototype.some.call(form.querySelectorAll('input[name=fields]:checked'), function (el) {
+      return DEV_ROLES.indexOf(el.value) !== -1;
+    });
+    devFields.hidden = !show;
+    if (!show) {
+      form.units_needed.value = '';
+      form.site_location.value = '';
+      form.units_when.value = '';
+    }
+  }
+  if (devFields) {
+    Array.prototype.forEach.call(form.querySelectorAll('input[name=fields]'), function (el) {
+      el.addEventListener('change', syncDevFields);
+    });
+  }
 
   form.addEventListener('focusin', function () {
     if (!startedAt) startedAt = Date.now();
@@ -217,6 +269,9 @@
       message: form.message.value.trim() || null,
       heard_about: form.heard_about.value || null,
       heard_about_other: form.heard_about.value === 'other' ? (form.heard_about_other.value.trim().slice(0, 200) || null) : null,
+      units_needed: devFields ? (form.units_needed.value.trim().slice(0, 100) || null) : null,
+      site_location: devFields ? (form.site_location.value.trim().slice(0, 200) || null) : null,
+      units_when: devFields ? (form.units_when.value || null) : null,
       newsletter_opt_in: newsletter.value === 'yes',
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,

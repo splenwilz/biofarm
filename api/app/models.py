@@ -1,11 +1,11 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, Integer, String, Text, func
+from sqlalchemy import JSON, Boolean, DateTime, Float, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db import Base
+from app.db import Base, UtcDateTime
 
 # JSONB on Postgres (indexable with GIN if attribution reporting grows);
 # plain JSON on SQLite in tests.
@@ -32,6 +32,10 @@ class Lead(Base):
     heard_about: Mapped[str | None] = mapped_column(String(30))
     # their own words when heard_about is "other", else NULL
     heard_about_other: Mapped[str | None] = mapped_column(String(200))
+    # the contact form's developer questions, as typed / a schemas.UnitsWhen key, or NULL
+    units_needed: Mapped[str | None] = mapped_column(String(100))
+    site_location: Mapped[str | None] = mapped_column(String(200))
+    units_when: Mapped[str | None] = mapped_column(String(20))
 
     page: Mapped[str | None] = mapped_column(String(512))
     attribution: Mapped[dict | None] = mapped_column(JsonCol)
@@ -53,3 +57,29 @@ class Lead(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+
+class MarketingEvent(Base):
+    """A marketing event (trade show, CPD session, webinar) as the dashboard
+    shows it. Name, date, type, cost and attendees are entered by hand; the
+    enquiries and qualified opportunities are counted from the Pipedrive
+    mirror by `match`, the signals Sales used to tag that event's records:
+    {"labels": [lead label ids], "deal_sources": [Deal Source option labels],
+    "title_words": [whole words in the title], "channel": true to take every
+    record on the Trade Show / Event channel, "window_from"/"window_to":
+    ISO dates bounding when the records were logged}. See app/reporting/events.py."""
+
+    __tablename__ = "marketing_events"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    name: Mapped[str] = mapped_column(String(200))
+    date: Mapped[datetime] = mapped_column(UtcDateTime)
+    type: Mapped[str] = mapped_column(String(20))  # schemas.EventType: trade_show | cpd | webinar | open_day
+    cost_gbp: Mapped[float | None] = mapped_column(Float)
+    attendees: Mapped[int | None] = mapped_column(Integer)
+    notes: Mapped[str | None] = mapped_column(Text)
+    match: Mapped[dict] = mapped_column(JsonCol, default=dict)
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime, server_default=func.now())
+    # The dashboard payload's cache key reads the newest updated_at, so every write must move it:
+    # the route and the seed set it by hand, and onupdate covers any write path that forgets.
+    updated_at: Mapped[datetime] = mapped_column(UtcDateTime, server_default=func.now(), onupdate=func.now())

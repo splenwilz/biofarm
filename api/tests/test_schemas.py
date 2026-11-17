@@ -123,3 +123,23 @@ def test_the_heard_about_answers_are_the_agreed_nine():
     assert HEARD_ABOUT_LABELS["search"] == "Search engine"
     assert HEARD_ABOUT_LABELS["marketplace"] == "BNG marketplace or listing site"
     assert HEARD_ABOUT_LABELS["ai"] == "AI assistant (like ChatGPT)"
+
+
+def test_the_units_when_answers_each_have_a_label():
+    from typing import get_args
+
+    from app.schemas import UNITS_WHEN_LABELS, UnitsWhen
+    assert list(UNITS_WHEN_LABELS) == list(get_args(UnitsWhen)) == ["within_3_months", "3_to_12_months", "12_to_18_months", "later", "not_sure"]
+    assert all(UNITS_WHEN_LABELS[k] for k in UNITS_WHEN_LABELS)
+
+
+def test_contact_submission_tidies_the_developer_answers():
+    from app.schemas import ContactSubmission
+
+    base = {"name": "J", "email": "j@e.com"}
+    s = ContactSubmission(**base, units_needed="  about 5 ", site_location=" RH17 5PB ", units_when="later")
+    assert (s.units_needed, s.site_location, s.units_when) == ("about 5", "RH17 5PB", "later")
+    s = ContactSubmission(**base, units_needed="   ", site_location="")
+    assert s.units_needed is None and s.site_location is None and s.units_when is None
+    with pytest.raises(ValidationError):
+        ContactSubmission(**base, units_when="whenever")

@@ -1,11 +1,12 @@
-<!-- ABOUT PAGE "LET'S TALK" SECTION v2 - /about, the whole green section in one block (replaces the two
+<!-- ABOUT PAGE "LET'S TALK" SECTION v2.1 - /about, the whole green section in one block (replaces the two
      native text blocks on the left AND the Pipedrive embed on the right).
      Design: web/variations/about-v1-statement-left.html, chosen by Vix 11 Nov 2026: statement on the left
      ("Let's talk", the question, one line of lead), the form on the right in one narrow column on cream
      fields with small-caps labels, name and email paired. Stacks to one column under 900px.
      Paste into a Code Block that spans the full width of the green section, then delete the old
      "Let's talk" / "Want to know what BNG could mean for you?" text blocks and the embed.
-     Same questions, field names, API and tracking as contact-form-INLINE.html v2.0 (the About embed used the
+     Same questions, field names, API and tracking as contact-form-INLINE.html v2.1, including the three
+     developer questions, commented out for now like there (the About embed used the
      same Pipedrive form id as the contact page, so the GTM conversion triggers fire unchanged).
      Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
 <style>
@@ -26,6 +27,7 @@
   .bf-form .req{color:#212121;}
   .bf-field{margin:0 0 22px;}
   .bf-field[hidden]{display:none;}
+  .bf-dev[hidden]{display:none;}
   .bf-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px;margin:0 0 22px;}
   .bf-two .bf-field{margin:0;display:flex;flex-direction:column;justify-content:flex-end;}
   @media(max-width:600px){.bf-two{grid-template-columns:1fr;}}
@@ -94,6 +96,32 @@
         <label><input type="checkbox" name="fields" value="other">Other</label>
       </div>
     </fieldset>
+    <!-- DEVELOPER QUESTIONS, NOT YET IN USE (12 Nov 2026): kept out of the form until Vix and Chris agree
+         to ask them; the worry is that three more fields cost enquiries. The API already accepts and
+         stores them (units_needed, site_location, units_when). To switch on: remove this comment's
+         opening and closing markers; the script below already handles both states.
+    <div class="bf-dev" id="bfDevFields" hidden>
+      <div class="bf-field">
+        <label for="bfUnitsNeeded">Biodiversity units needed (if known)</label>
+        <input type="text" id="bfUnitsNeeded" name="units_needed" maxlength="100" autocomplete="off" placeholder="e.g. 1.2 area units, 0.6 hedgerow">
+      </div>
+      <div class="bf-field">
+        <label for="bfSiteLocation">Site location (postcode or council)</label>
+        <input type="text" id="bfSiteLocation" name="site_location" maxlength="200" autocomplete="off" placeholder="Postcode, town or local authority">
+      </div>
+      <div class="bf-field">
+        <label for="bfUnitsWhen">When do you need units?</label>
+        <select id="bfUnitsWhen" name="units_when">
+          <option value="">Please choose</option>
+          <option value="within_3_months">Within 3 months</option>
+          <option value="3_to_12_months">3 to 12 months</option>
+          <option value="12_to_18_months">12 to 18 months</option>
+          <option value="later">Later</option>
+          <option value="not_sure">Not sure yet</option>
+        </select>
+      </div>
+    </div>
+    -->
     <div class="bf-field">
       <label for="bfHeardAbout">Where did you hear about us? (optional)</label>
       <select id="bfHeardAbout" name="heard_about">
@@ -159,6 +187,29 @@
     if (!other) form.heard_about_other.value = '';
   });
 
+  // The three developer questions show when Developer, Planning consultant or Ecologist is
+  // ticked (consultants and ecologists often act for a developer); with none of those ticked
+  // the block hides and empties, so a change of mind never sends stale answers.
+  var devFields = document.getElementById('bfDevFields'); // null while the block above is commented out
+  var DEV_ROLES = ['developer', 'planning_consultant', 'ecologist'];
+  function syncDevFields() {
+    if (!devFields) return;
+    var show = Array.prototype.some.call(form.querySelectorAll('input[name=fields]:checked'), function (el) {
+      return DEV_ROLES.indexOf(el.value) !== -1;
+    });
+    devFields.hidden = !show;
+    if (!show) {
+      form.units_needed.value = '';
+      form.site_location.value = '';
+      form.units_when.value = '';
+    }
+  }
+  if (devFields) {
+    Array.prototype.forEach.call(form.querySelectorAll('input[name=fields]'), function (el) {
+      el.addEventListener('change', syncDevFields);
+    });
+  }
+
   form.addEventListener('focusin', function () {
     if (!startedAt) startedAt = Date.now();
   }, { once: true });
@@ -219,6 +270,9 @@
       message: form.message.value.trim() || null,
       heard_about: form.heard_about.value || null,
       heard_about_other: form.heard_about.value === 'other' ? (form.heard_about_other.value.trim().slice(0, 200) || null) : null,
+      units_needed: devFields ? (form.units_needed.value.trim().slice(0, 100) || null) : null,
+      site_location: devFields ? (form.site_location.value.trim().slice(0, 200) || null) : null,
+      units_when: devFields ? (form.units_when.value || null) : null,
       newsletter_opt_in: newsletter.value === 'yes',
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,

@@ -97,6 +97,9 @@ async def submit_contact(
         newsletter_opt_in=submission.newsletter_opt_in,
         heard_about=submission.heard_about,
         heard_about_other=submission.heard_about_other,
+        units_needed=submission.units_needed,
+        site_location=submission.site_location,
+        units_when=submission.units_when,
         page=submission.page,
         attribution=submission.attribution.model_dump(exclude_none=True)
         if submission.attribution

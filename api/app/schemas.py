@@ -77,6 +77,19 @@ HEARD_ABOUT_LABELS: dict[str, str] = {
 }
 
 
+# "When do you need units?", the third of the developer questions the contact
+# form shows when Developer, Planning consultant or Ecologist is ticked. Keys
+# are what the form submits; the labels are repeated in the Pipedrive note.
+UnitsWhen = Literal["within_3_months", "3_to_12_months", "12_to_18_months", "later", "not_sure"]
+UNITS_WHEN_LABELS: dict[str, str] = {
+    "within_3_months": "Within 3 months",
+    "3_to_12_months": "3 to 12 months",
+    "12_to_18_months": "12 to 18 months",
+    "later": "Later",
+    "not_sure": "Not sure yet",
+}
+
+
 class ContactSubmission(LeadSubmissionBase):
     phone: str | None = Field(default=None, max_length=50)
     fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
@@ -85,8 +98,15 @@ class ContactSubmission(LeadSubmissionBase):
     heard_about: HeardAbout | None = None
     # Their own words when heard_about is "other" (the form shows a text box then).
     heard_about_other: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] | None = None
+    # The three developer questions (9 Nov 2026 meeting: a developer lead is
+    # qualified once we know the unit deficit, the site location and the
+    # timeline). All optional, accepted whatever role is ticked: a consultant
+    # answering for a client is just as useful.
+    units_needed: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
+    site_location: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] | None = None
+    units_when: UnitsWhen | None = None
 
-    @field_validator("heard_about_other", mode="after")
+    @field_validator("heard_about_other", "units_needed", "site_location", mode="after")
     @classmethod
     def _empty_words_are_none(cls, value: str | None) -> str | None:
         return value or None
