@@ -48,7 +48,7 @@ export function EventsPage() {
           <KpiCard label="Events" value={integer(e.totals.events)} detail={`${integer(e.totals.attendees)} attendees in total`} footnote={`Last 12 months · ${provenance}`} />
         </Grid>
         <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <KpiCard label="Leads from events" value={integer(e.totals.leads)} detail={e.totals.attendees ? `${pct(e.totals.leads / e.totals.attendees)} of attendees` : undefined} footnote="Captured at or after the event, logged in Pipedrive with the Trade Show / Event channel" />
+          <KpiCard label="Leads from events" value={integer(e.totals.leads)} detail={e.totals.attendees ? `${pct(e.totals.leads / e.totals.attendees)} of attendees` : undefined} footnote="Enquiries Pipedrive holds for each event: by its lead label, Deal Source, a word in the title or the Trade Show / Event channel" />
         </Grid>
         <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <KpiCard label="Qualified from events" value={integer(e.totals.qualified)} detail={e.totals.leads ? `${pct(e.totals.qualified / e.totals.leads)} of event leads so far` : undefined} footnote="Recent events are still maturing" />
@@ -85,7 +85,7 @@ export function EventsPage() {
             sublabel: `${dateLabel(x.date)} · ${EVENT_TYPE_LABEL[x.type]}${x.mature ? "" : " · Maturing"}`,
             total: x.leads,
             fill: x.qualified,
-            cells: [integer(x.attendees), integer(x.leads), integer(x.qualified), typeof x.costGbp === "number" ? gbp(x.costGbp) : "–", x.cpqo === null ? "–" : gbp(x.cpqo)],
+            cells: [x.attendees === null ? "–" : integer(x.attendees), integer(x.leads), integer(x.qualified), typeof x.costGbp === "number" ? gbp(x.costGbp) : "–", x.cpqo === null ? "–" : gbp(x.cpqo)],
             muted: !x.mature,
             action: (
               <IconButton size="small" aria-label={`Edit ${x.name}`} onClick={() => setDialog(x)} sx={{ color: "text.secondary" }}>
@@ -105,17 +105,16 @@ export function EventsPage() {
           key={dialog === "add" ? "add" : dialog.id}
           open
           event={dialog === "add" ? undefined : dialog}
-          today={today}
           onClose={() => setDialog(null)}
-          onSave={(values) => {
-            if (dialog === "add") addEvent({ ...values, qualified: 0 });
-            else updateEvent(dialog.id, values);
+          onSave={async (values) => {
+            if (dialog === "add") await addEvent(values);
+            else await updateEvent(dialog.id, values);
             setDialog(null);
           }}
           onRemove={
-            dialog !== "add" && dialog.id.startsWith("event-local-")
-              ? () => {
-                  removeEvent(dialog.id);
+            dialog !== "add"
+              ? async () => {
+                  await removeEvent(dialog.id);
                   setDialog(null);
                 }
               : undefined

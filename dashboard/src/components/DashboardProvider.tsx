@@ -1,10 +1,42 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 
-import type { KpiConfig, QualificationCheckId } from "@/config/kpi";
+import type { KpiConfig } from "@/config/kpi";
 import { monthOf, monthRange } from "@/lib/kpi";
-import type { Annotation, DashboardData, MarketingEvent, SpendEntry } from "@/lib/types";
+import { mergeSpend } from "@/lib/spendMerge";
+import type { Annotation, DashboardData, EventInput, MarketingEvent, SpendEntry } from "@/lib/types";
+
+/** The event as the lead API takes it: a plain date, snake-free camelCase keys, the match block always present. */
+function toApi(event: EventInput) {
+  return {
+    name: event.name,
+    date: event.date.slice(0, 10),
+    type: event.type,
+    attendees: event.attendees,
+    costGbp: event.costGbp ?? null,
+    notes: event.notes ?? null,
+    match: event.match ?? { labels: [], dealSources: [], titleWords: [], channel: false, windowFrom: event.date.slice(0, 10), windowTo: event.date.slice(0, 10) },
+  };
+}
+
+async function writeEvent(method: "POST" | "PUT" | "DELETE", url: string, body?: unknown): Promise<{ id: string }> {
+  const res = await fetch(url, { method, headers: body === undefined ? {} : { "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) });
+  if (!res.ok) {
+    let detail = `${res.status}`;
+    try {
+      const json = (await res.json()) as { detail?: unknown };
+      if (typeof json.detail === "string") detail = json.detail;
+      else if (Array.isArray(json.detail)) detail = json.detail.map((d: { msg?: string }) => d.msg ?? "").join("; ");
+    } catch {
+      /* no JSON body */
+    }
+    throw new Error(`The event was not saved: ${detail}`);
+  }
+  const text = await res.text();
+  return text ? (JSON.parse(text) as { id: string }) : { id: "" };
+}
 
 export interface DashboardContextValue {
   data: DashboardData;
@@ -14,13 +46,16 @@ export interface DashboardContextValue {
   addSpend: (entry: Omit<SpendEntry, "id">) => void;
   removeSpend: (id: string) => void;
   importSpend: (entries: Omit<SpendEntry, "id">[]) => void;
-  /** Loaded events plus those added this session, with this session's edits applied. */
+  /**
+   * Events. On the feed every change is written to the lead API through
+   * /api/events and the page data is refreshed; the change also shows at once.
+   * On demo data changes live for the session only. A rejected write throws
+   * with the API's message, so the dialog can show it.
+   */
   events: MarketingEvent[];
-  addEvent: (event: Omit<MarketingEvent, "id">) => void;
-  /** Change an event's details or its hand-entered cost (null clears the cost). */
-  updateEvent: (id: string, patch: Partial<Omit<MarketingEvent, "id">>) => void;
-  /** Only events added this session can be removed. */
-  removeEvent: (id: string) => void;
+  addEvent: (event: EventInput) => Promise<void>;
+  updateEvent: (id: string, values: EventInput) => Promise<void>;
+  removeEvent: (id: string) => Promise<void>;
   /** Loaded notes plus those added this session. */
   annotations: Annotation[];
   addAnnotation: (note: Omit<Annotation, "id">) => void;
@@ -32,8 +67,6 @@ export interface DashboardContextValue {
   setTargets: (targets: Partial<Pick<KpiConfig, TargetField>>, who: string) => void;
   /** Every target change this session, newest first, until the backend stores them. */
   targetLog: TargetChange[];
-  /** Switch one of the draft qualification checks on or off; every page recalculates. */
-  setCheck: (id: QualificationCheckId, on: boolean) => void;
   /** Monthly report delivery settings, read by the backend scheduler once it exists. */
   schedule: ReportSchedule;
   setSchedule: (schedule: ReportSchedule) => void;
@@ -81,11 +114,7 @@ const DashboardContext = createContext<DashboardContextValue | null>(null);
 export function DashboardProvider({ data, config: baseConfig, children }: { data: DashboardData; config: KpiConfig; children: React.ReactNode }) {
   const counter = useRef(0);
   const [targets, setTargetState] = useState<Partial<Pick<KpiConfig, TargetField>>>({});
-  const [checks, setChecks] = useState<Partial<Record<QualificationCheckId, boolean>>>({});
-  const config = useMemo<KpiConfig>(
-    () => ({ ...baseConfig, ...targets, qualificationChecks: { ...baseConfig.qualificationChecks, ...checks } }),
-    [baseConfig, targets, checks],
-  );
+  const config = useMemo<KpiConfig>(() => ({ ...baseConfig, ...targets }), [baseConfig, targets]);
   const [targetLog, setTargetLog] = useState<TargetChange[]>([]);
   const setTargets = useCallback(
     (next: Partial<Pick<KpiConfig, TargetField>>, who: string) => {
@@ -100,7 +129,6 @@ export function DashboardProvider({ data, config: baseConfig, children }: { data
     },
     [baseConfig, targets],
   );
-  const setCheck = useCallback((id: QualificationCheckId, on: boolean) => setChecks((c) => ({ ...c, [id]: on })), []);
   const [notes, setNotes] = useState<Annotation[]>([]);
   const [removedNotes, setRemovedNotes] = useState<Set<string>>(() => new Set());
   const [schedule, setSchedule] = useState<ReportSchedule>(DEFAULT_SCHEDULE);
@@ -109,14 +137,39 @@ export function DashboardProvider({ data, config: baseConfig, children }: { data
     setNotes((n) => [...n, { ...note, id }]);
   }, []);
   const removeAnnotation = useCallback((id: string) => setRemovedNotes((r) => new Set(r).add(id)), []);
+  const router = useRouter();
+  const live = data.source !== "demo";
   const [addedEvents, setAddedEvents] = useState<MarketingEvent[]>([]);
-  const addEvent = useCallback((event: Omit<MarketingEvent, "id">) => {
-    const id = `event-local-${(counter.current += 1)}`;
-    setAddedEvents((e) => [...e, { ...event, id }]);
-  }, []);
-  const removeEvent = useCallback((id: string) => setAddedEvents((e) => e.filter((x) => x.id !== id)), []);
-  const [eventEdits, setEventEdits] = useState<Record<string, Partial<Omit<MarketingEvent, "id">>>>({});
-  const updateEvent = useCallback((id: string, patch: Partial<Omit<MarketingEvent, "id">>) => setEventEdits((c) => ({ ...c, [id]: { ...c[id], ...patch } })), []);
+  const [eventEdits, setEventEdits] = useState<Record<string, EventInput>>({});
+  const [removedEvents, setRemovedEvents] = useState<Set<string>>(() => new Set());
+  const addEvent = useCallback(
+    async (event: EventInput) => {
+      let id = `event-local-${(counter.current += 1)}`;
+      if (live) {
+        const stored = await writeEvent("POST", "/api/events", toApi(event));
+        id = stored.id;
+      }
+      setAddedEvents((e) => [...e, { ...event, id, leads: 0, qualified: 0 }]);
+      if (live) router.refresh();
+    },
+    [live, router],
+  );
+  const updateEvent = useCallback(
+    async (id: string, values: EventInput) => {
+      if (live) await writeEvent("PUT", `/api/events/${encodeURIComponent(id)}`, toApi(values));
+      setEventEdits((c) => ({ ...c, [id]: values }));
+      if (live) router.refresh();
+    },
+    [live, router],
+  );
+  const removeEvent = useCallback(
+    async (id: string) => {
+      if (live) await writeEvent("DELETE", `/api/events/${encodeURIComponent(id)}`);
+      setRemovedEvents((r) => new Set(r).add(id));
+      if (live) router.refresh();
+    },
+    [live, router],
+  );
   const [added, setAdded] = useState<SpendEntry[]>([]);
   const [removed, setRemoved] = useState<Set<string>>(() => new Set());
   const addSpend = useCallback((entry: Omit<SpendEntry, "id">) => {
@@ -136,11 +189,13 @@ export function DashboardProvider({ data, config: baseConfig, children }: { data
     return {
       data,
       config,
-      spend: [...data.spend, ...added].filter((e) => !removed.has(e.id)),
+      spend: mergeSpend(data.spend, added, removed),
       addSpend,
       removeSpend,
       importSpend,
-      events: [...data.events, ...addedEvents].map((e) => (e.id in eventEdits ? { ...e, ...eventEdits[e.id] } : e)),
+      events: [...data.events, ...addedEvents.filter((a) => !data.events.some((d) => d.id === a.id))]
+        .filter((e) => !removedEvents.has(e.id))
+        .map((e) => (e.id in eventEdits ? { ...e, ...eventEdits[e.id] } : e)),
       addEvent,
       updateEvent,
       removeEvent,
@@ -149,14 +204,13 @@ export function DashboardProvider({ data, config: baseConfig, children }: { data
       removeAnnotation,
       setTargets,
       targetLog,
-      setCheck,
       schedule,
       setSchedule,
       months: monthRange(defaultMonth, 12),
       defaultMonth,
       today: data.syncedAt,
     };
-  }, [data, config, added, removed, addSpend, removeSpend, importSpend, addedEvents, addEvent, removeEvent, eventEdits, updateEvent, notes, removedNotes, addAnnotation, removeAnnotation, setTargets, targetLog, setCheck, schedule]);
+  }, [data, config, added, removed, addSpend, removeSpend, importSpend, addedEvents, removedEvents, addEvent, removeEvent, eventEdits, updateEvent, notes, removedNotes, addAnnotation, removeAnnotation, setTargets, targetLog, schedule]);
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
 }
