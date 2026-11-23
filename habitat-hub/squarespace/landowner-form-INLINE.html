@@ -1,4 +1,4 @@
-<!-- LANDOWNER FORM v2 - /landowners, green "Chat to Chris" section (replaces the
+<!-- LANDOWNER FORM v2.1 - /landowners, green "Chat to Chris" section (replaces the
      Landowner Contact Form Pipedrive embed, webforms.pipedrive.com/f/6Ovk4bAi...).
      Same questions as that embed: name, email, phone (with a country-code
      picker: compact flag + code button, a searchable list below it the width
@@ -8,16 +8,22 @@
      proportions (14px labels, 36px inputs, square corners, full-width button,
      muted footer notes) so the site's fluid base font does not inflate it.
      Paste into the Code Block where the embed sits.
+     v2.1 (23 Nov 2026): adds the optional "Where did you hear about us?" the contact/about/corporates
+     forms ask (same answers, same keys, an "Other" box), in this block's own styling; nothing else changes.
+     The API accepts it on the landowner route from the same date.
      Posts to https://biofarm-api.onrender.com (lead DB + Pipedrive + GA4). -->
 <style>
   @font-face{font-family:'RATI_v2';src:url('https://static1.squarespace.com/static/69145a3301c5b8505ba96fac/t/692088b0f9ba550c5a4e78c6/1763739824272/BauhausRatiDisplay-ExtraLight_v2.woff2') format('woff2');font-weight:300;font-display:swap;}
-  .bf-form{max-width:490px;margin:0;color:#212121;font-size:14px;line-height:1.4;} /* the embed's width, flush left in its column */
+  .bf-form{max-width:640px;margin:0 auto;color:#212121;font-size:14px;line-height:1.4;} /* as tuned on the live page (640px, centred in its column), read back 23 Nov 2026 */
   .bf-form h3{margin:0 0 14px;font-size:24px;line-height:1.2;color:#212121;} /* typeface inherited from the site theme, size pinned */
   .bf-form label,.bf-form legend{display:block;font-size:14px;line-height:1.4;margin:0 0 5px;color:#212121;}
   .bf-form .req{color:#212121;}
   .bf-field{margin:0 0 18px;}
   .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{box-sizing:border-box;font-family:inherit;font-size:14px;line-height:1.4;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.2);border-radius:3px;}
   .bf-form input[type=text],.bf-form input[type=email],.bf-form input[type=tel],.bf-form textarea{width:100%;padding:7px 10px;}
+  .bf-form select{display:block;width:100%;box-sizing:border-box;height:36px;padding:0 34px 0 10px;font-family:inherit;font-size:14px;line-height:1.4;color:#212121;background:#fff;border:1px solid rgba(33,33,33,.2);border-radius:3px;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23212121' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:12px;}
+  .bf-form select:focus{outline:none;border-color:#212121;box-shadow:0 0 0 2px rgba(33,33,33,.22);}
+  .bf-field[hidden]{display:none;}
   .bf-form textarea{min-height:96px;resize:vertical;}
   .bf-phone{position:relative;display:flex;gap:8px;}
   .bf-phone input[type=tel]{flex:1 1 auto;min-width:0;}
@@ -83,6 +89,25 @@
       </div>
     </div>
     <div class="bf-field">
+      <label for="bfHeardAbout">Where did you hear about us? (optional)</label>
+      <select id="bfHeardAbout" name="heard_about">
+        <option value="">Please choose</option>
+        <option value="search">Search engine</option>
+        <option value="linkedin">LinkedIn</option>
+        <option value="referral">Recommended by someone</option>
+        <option value="event">Event or trade show</option>
+        <option value="newsletter">Biofarm newsletter</option>
+        <option value="press">Press or article</option>
+        <option value="marketplace">BNG marketplace or listing site</option>
+        <option value="ai">AI assistant (like ChatGPT)</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="bf-field" id="bfHeardOtherField" hidden>
+      <label for="bfHeardOther">Tell us where (optional)</label>
+      <input type="text" id="bfHeardOther" name="heard_about_other" maxlength="200" autocomplete="off">
+    </div>
+    <div class="bf-field">
       <label for="bfMessage">Your Message (optional)</label>
       <textarea id="bfMessage" name="message" maxlength="5000"></textarea>
     </div>
@@ -117,6 +142,15 @@
 
   // wake a sleeping backend while the visitor is still typing
   try { fetch(API_BASE + '/healthz').catch(function () {}); } catch (e) {}
+
+  // "Other" opens a box for their own words; any other answer hides and empties it.
+  // Focus stays on the dropdown (WCAG 3.2.2: changing a control must not move focus).
+  var heardOtherField = document.getElementById('bfHeardOtherField');
+  form.heard_about.addEventListener('change', function () {
+    var other = form.heard_about.value === 'other';
+    heardOtherField.hidden = !other;
+    if (!other) form.heard_about_other.value = '';
+  });
 
   form.addEventListener('focusin', function () {
     if (!startedAt) startedAt = Date.now();
@@ -284,6 +318,8 @@
       email: form.email.value.trim(),
       phone: phoneValue(),
       message: form.message.value.trim() || null,
+      heard_about: form.heard_about.value || null,
+      heard_about_other: form.heard_about.value === 'other' ? (form.heard_about_other.value.trim().slice(0, 200) || null) : null,
       newsletter_opt_in: newsletter.value === 'yes',
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,

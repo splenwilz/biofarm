@@ -357,6 +357,40 @@ async def test_landowner_requires_name_and_email_only(client):
     assert mocks["lead"].called
 
 
+@respx.mock
+async def test_landowner_stores_where_they_heard_about_us_and_tells_pipedrive(client):
+    """The landowner form asks the contact form's "Where did you hear about us?"
+    (v3, Nov 2026): stored on the lead and repeated in the Pipedrive note."""
+    mocks = mock_pipedrive_happy_path()
+    r = await client.post(
+        "/v1/leads/landowner",
+        json={"name": "Dan", "email": "dan@example.com", "heard_about": "other", "heard_about_other": "A farming podcast"},
+    )
+    assert r.status_code == 202
+    lead = await get_single_lead(client)
+    assert lead.heard_about == "other"
+    assert lead.heard_about_other == "A farming podcast"
+    note = json.loads(mocks["note"].calls.last.request.content)["content"]
+    assert "<p><b>Heard about us</b>: Other (A farming podcast)</p>" in note
+
+
+@respx.mock
+async def test_landowner_heard_about_is_optional_and_validated_like_the_contact_form(client):
+    mock_pipedrive_happy_path()
+    base = {"name": "Dan", "email": "dan@example.com"}
+    assert (await client.post("/v1/leads/landowner", json=base)).status_code == 202
+    assert (await get_single_lead(client)).heard_about is None
+    for bad in ("facebook", "", "LinkedIn", 3):
+        assert (await client.post("/v1/leads/landowner", json=dict(base, heard_about=bad))).status_code == 422, bad
+    # their own words are only accepted with "other"
+    assert (await client.post("/v1/leads/landowner", json=dict(base, heard_about="linkedin", heard_about_other="x"))).status_code == 422
+    # an empty box with "other" is just "other": the words are stored as NULL, not "   "
+    assert (await client.post("/v1/leads/landowner", json=dict(base, heard_about="other", heard_about_other="   "))).status_code == 202
+    async with client.app.state.sessionmaker() as session:
+        stored = (await session.execute(select(Lead).where(Lead.heard_about == "other"))).scalars().all()
+    assert len(stored) == 1 and stored[0].heard_about_other is None
+
+
 async def test_fold_requires_habitat_bank_and_location(client):
     r = await client.post("/v1/leads/fold", json={"name": "Ed", "email": "ed@example.com"})
     assert r.status_code == 422

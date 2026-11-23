@@ -141,11 +141,26 @@ class CpdSubmission(LeadSubmissionBase):
 class LandownerSubmission(LeadSubmissionBase):
     """The landowner page's form: the old Pipedrive embed's questions (name,
     email, phone, message, newsletter) with no field chips - the page itself
-    says landowner, so the route fixes fields=["landowner"]."""
+    says landowner, so the route fixes fields=["landowner"]. Since v3 of the
+    block (Nov 2026) it also asks the contact form's "Where did you hear
+    about us?", with the same answers and the same rules."""
 
     phone: str | None = Field(default=None, max_length=50)
     message: str | None = Field(default=None, max_length=5000)
     newsletter_opt_in: bool = False
+    heard_about: HeardAbout | None = None
+    heard_about_other: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] | None = None
+
+    @field_validator("heard_about_other", mode="after")
+    @classmethod
+    def _empty_words_are_none(cls, value: str | None) -> str | None:
+        return value or None
+
+    @model_validator(mode="after")
+    def _other_words_only_with_other(self):
+        if self.heard_about_other is not None and self.heard_about != "other":
+            raise ValueError('heard_about_other is only accepted when heard_about is "other"')
+        return self
 
 
 class FoldSubmission(LeadSubmissionBase):

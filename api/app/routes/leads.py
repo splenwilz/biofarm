@@ -214,6 +214,8 @@ async def submit_landowner(
         # NEW persons, and lets the owner map route by "landowner".
         fields=["landowner"],
         newsletter_opt_in=submission.newsletter_opt_in,
+        heard_about=submission.heard_about,
+        heard_about_other=submission.heard_about_other,
         page=submission.page,
         attribution=submission.attribution.model_dump(exclude_none=True)
         if submission.attribution
