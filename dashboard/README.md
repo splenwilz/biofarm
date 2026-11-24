@@ -39,7 +39,7 @@ block, grouped navigation with a tinted active pill, person footer), a sticky
 | Route | Page |
 |---|---|
 | `/` | Overview: four tiles (qualified, cost per qualified, enquiries, speed to lead) with month-on-month change, same month last year and sparklines; 12- or 24-month trend with notes pinned to months; top-source meters; latest cohorts as a heatmap |
-| `/qualified` | Every record behind the qualified number, one row each: who, company, date, channel, how it came in, stage, and the agreed rule applied in words (inbound or not, and why it qualified). The first tile is the Overview's number, from the same code; the Overview's tile links here on its own month. Filters by month, window and audience; exports CSV. |
+| `/qualified` | Every record behind the qualified number, one row each: who, company, date, channel, how it came in, stage, and the agreed rule applied in words (inbound or not, and why it qualified). The page opens on the single month, so its first tile is the Overview's number, from the same code; the switch offers 3 and 12 months. Sources and Campaigns keep their three-month default. Filters by month, window and audience; exports CSV. |
 | `/sources` | Source meters (paid search split into Google and Microsoft), enquiries by form, and what became of marketing's opportunities by source (won, open, lost) |
 | `/campaigns` | Spend, enquiries, cost per enquiry, qualified and cost per qualified per campaign, joined on the campaign name; landing pages |
 | `/cohorts` | Cohort heatmap: twelve months by three horizons, mature average in the header |

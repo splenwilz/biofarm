@@ -113,7 +113,7 @@ describe("OverviewPage", () => {
     wrap(<OverviewPage />);
     expect(screen.getByRole("heading", { level: 1, name: /overview/i })).toBeInTheDocument();
     expect(screen.getByTestId("kpi-qualified")).toHaveTextContent(/^Qualified opportunities\d+[−+±]\d+ vs SeptemberTarget \d+ · 3-month average \d+\.\dSee every record →$/);
-    expect(within(screen.getByTestId("kpi-qualified")).getByRole("link", { name: /see every record/i })).toHaveAttribute("href", "/qualified?window=1");
+    expect(within(screen.getByTestId("kpi-qualified")).getByRole("link", { name: /see every record/i })).toHaveAttribute("href", "/qualified");
     expect(screen.getByTestId("kpi-cpqo")).toHaveTextContent(/^Cost per qualified£[\d,]+[−+±]£[\d,]+ vs September£[\d,]+ of media spend brought \d+ qualified opportunit(y|ies)$/);
     expect(screen.getByTestId("kpi-enquiries")).toHaveTextContent(/^Enquiries\d+[−+±]\d+ vs September\d+ outbound \/ network · \d+ no channel set · not counted$/);
     expect(screen.queryByTestId("kpi-speed")).not.toBeInTheDocument();
@@ -157,7 +157,7 @@ describe("OverviewPage", () => {
     expect(screen.getByText(/^Nov 2025 to Oct 2026 · the darker part qualified/)).toBeInTheDocument();
     expect(screen.getAllByText(/vs September/i).length).toBe(3);
     // the tile is one month, so its link opens the list on that month whatever breakdown window the page has
-    expect(within(screen.getByTestId("kpi-qualified")).getByRole("link", { name: /see every record/i })).toHaveAttribute("href", "/qualified?window=1");
+    expect(within(screen.getByTestId("kpi-qualified")).getByRole("link", { name: /see every record/i })).toHaveAttribute("href", "/qualified");
   });
 
   it("keeps every explanation to one line, with the detail behind info icons", async () => {
@@ -219,10 +219,13 @@ describe("QualifiedPage", () => {
   it("shows the agreed-rule count beside the wider count, and lists every record with its verdict", () => {
     wrap(<QualifiedPage />);
     expect(screen.getByRole("heading", { level: 1, name: /qualified opportunities/i })).toBeInTheDocument();
-    const months = monthRange(DEMO_LAST_MONTH, 3);
+    // the list opens on the single month, so its first number is the Overview tile's number
+    const months = monthRange(DEMO_LAST_MONTH, 1);
     const byMonth = qualifiedByMonth(data.deals, months, kpiConfig);
     const inbound = byMonth.reduce((s, m) => s + m.inbound, 0);
     const all = byMonth.reduce((s, m) => s + m.inbound + m.network + m.unattributed, 0);
+    expect(inbound).toBe(buildReport(data, data.spend, kpiConfig, { audience: "all", month: DEMO_LAST_MONTH, window: 3 }, DEMO_TODAY).headline.qualified);
+    expect(screen.getByText(/^Oct 2026 · the records behind the number/)).toBeInTheDocument();
     expect(screen.getByTestId("kpi-qualified-inbound")).toHaveTextContent(new RegExp(`^Qualified opportunities${inbound}Inbound only, the agreed rule`));
     expect(screen.getByTestId("kpi-qualified-all")).toHaveTextContent(new RegExp(`^All qualified${all}`));
     expect(screen.getByTestId("kpi-qualified-inbound")).toHaveTextContent(/Website, Info email inbox, Linkedin, Trade Show \/ Event, Marketplace/);
@@ -238,6 +241,7 @@ describe("QualifiedPage", () => {
   });
 
   it("can show only the records the rule counts, or only the others, and exports the list", () => {
+    resetNavigation("/qualified", "window=3");
     wrap(<QualifiedPage />);
     const months = monthRange(DEMO_LAST_MONTH, 3);
     const byMonth = qualifiedByMonth(data.deals, months, kpiConfig);
@@ -254,7 +258,7 @@ describe("QualifiedPage", () => {
   it("follows the audience filter from the URL", () => {
     resetNavigation("/qualified", "audience=landowner");
     wrap(<QualifiedPage />);
-    const months = monthRange(DEMO_LAST_MONTH, 3);
+    const months = monthRange(DEMO_LAST_MONTH, 1);
     const all = qualifiedByMonth(data.deals, months, kpiConfig, "landowner").reduce((s, m) => s + m.inbound + m.network + m.unattributed, 0);
     expect(screen.getByTestId("kpi-qualified-all")).toHaveTextContent(new RegExp(`^All qualified${all}`));
   });

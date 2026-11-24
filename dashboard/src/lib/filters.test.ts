@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hrefWith, parseAudience, parseMonth, parseWindow, readFilters } from "@/lib/filters";
+import { hrefWith, parseAudience, parseMonth, parseWindow, readFilters, defaultWindowFor } from "@/lib/filters";
 
 const months = ["2026-08", "2026-09", "2026-10"];
 const defaults = { audience: "all", month: "2026-10", window: 3 } as const;
@@ -50,5 +50,15 @@ describe("hrefWith", () => {
     expect(hrefWith("/sources", { audience: "landowner", month: "2026-10", window: 3 }, defaults)).toBe("/sources?audience=landowner");
     expect(hrefWith("/", { audience: "developer", month: "2026-09", window: 3 }, defaults)).toBe("/?audience=developer&month=2026-09");
     expect(hrefWith("/sources", { audience: "all", month: "2026-10", window: 12 }, defaults)).toBe("/sources?window=12");
+  });
+});
+
+describe("defaultWindowFor", () => {
+  it("opens the qualified list on one month and the breakdown pages on three", () => {
+    expect(defaultWindowFor("/qualified")).toBe(1);
+    expect(defaultWindowFor("/sources")).toBe(3);
+    expect(defaultWindowFor("/")).toBe(3);
+    expect(readFilters(new URLSearchParams(""), months, "2026-10", 1)).toEqual({ audience: "all", month: "2026-10", window: 1 });
+    expect(readFilters(new URLSearchParams("window=12"), months, "2026-10", 1)).toEqual({ audience: "all", month: "2026-10", window: 12 });
   });
 });

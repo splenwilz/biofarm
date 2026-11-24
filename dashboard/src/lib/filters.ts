@@ -13,6 +13,15 @@ export const WINDOWS: readonly WindowMonths[] = [1, 3, 12];
 /** Three months: one is too thin to split eight ways, twelve hides change. */
 export const DEFAULT_WINDOW: WindowMonths = 3;
 
+/**
+ * The window a page opens on when the URL names none. The qualified list opens
+ * on the single month, so its first number is the Overview tile's number; the
+ * breakdown pages keep three months. The switch on each page still offers all.
+ */
+export function defaultWindowFor(path: string): WindowMonths {
+  return path === "/qualified" ? 1 : DEFAULT_WINDOW;
+}
+
 export interface Filters {
   audience: AudienceFilter;
   /** The month the period ends on, "YYYY-MM". Headline tiles show this month. */
@@ -37,22 +46,23 @@ export function parseMonth(
   return value !== null && allowed.includes(value) ? value : fallback;
 }
 
-export function parseWindow(value: string | null): WindowMonths {
+export function parseWindow(value: string | null, fallback: WindowMonths = DEFAULT_WINDOW): WindowMonths {
   const n = Number(value);
   return WINDOWS.includes(n as WindowMonths)
     ? (n as WindowMonths)
-    : DEFAULT_WINDOW;
+    : fallback;
 }
 
 export function readFilters(
   params: URLSearchParams,
   allowedMonths: readonly string[],
   defaultMonth: string,
+  defaultWindow: WindowMonths = DEFAULT_WINDOW,
 ): Filters {
   return {
     audience: parseAudience(params.get("audience")),
     month: parseMonth(params.get("month"), allowedMonths, defaultMonth),
-    window: parseWindow(params.get("window")),
+    window: parseWindow(params.get("window"), defaultWindow),
   };
 }
 
