@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { kpiConfig } from "@/config/kpi";
 import { buildDemoData, DEMO_LAST_MONTH, DEMO_TODAY } from "@/data/demo";
-import { monthOf, monthRange } from "@/lib/kpi";
+import { monthOf, monthRange, qualifiedByMonth } from "@/lib/kpi";
 import { buildReport } from "@/lib/report";
 import { DashboardProvider } from "@/components/DashboardProvider";
 import { CohortsPage } from "@/components/pages/CohortsPage";
@@ -18,6 +18,7 @@ import { TrafficPage } from "@/components/pages/TrafficPage";
 import { NewsletterPage } from "@/components/pages/NewsletterPage";
 import { SearchPage } from "@/components/pages/SearchPage";
 import { conversionPct, conversionText, OverviewPage } from "@/components/pages/OverviewPage";
+import { QualifiedPage } from "@/components/pages/QualifiedPage";
 import { SourcesPage } from "@/components/pages/SourcesPage";
 import { SpendPage } from "@/components/pages/SpendPage";
 import { navState, resetNavigation } from "@/test/navigation";
@@ -84,6 +85,20 @@ describe("conversion column", () => {
   });
 });
 
+describe("OverviewPage, month in progress", () => {
+  it("says how far into the month the figures reach and labels the period to date", () => {
+    resetNavigation("/");
+    render(
+      <DashboardProvider role="admin" data={{ ...data, syncedAt: "2026-10-15T12:00:00Z" }} config={kpiConfig}>
+        <OverviewPage />
+      </DashboardProvider>,
+    );
+    expect(screen.getAllByText(/vs September, 15 days in/i).length).toBe(3);
+    expect(screen.getAllByText(/Oct 2026 to date/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/^vs September$/i)).not.toBeInTheDocument();
+  });
+});
+
 describe("OverviewPage", () => {
   beforeEach(() => resetNavigation());
 
@@ -97,7 +112,8 @@ describe("OverviewPage", () => {
   it("renders the title, three tiles that each show the month's number and the change from the previous month, and the trend", () => {
     wrap(<OverviewPage />);
     expect(screen.getByRole("heading", { level: 1, name: /overview/i })).toBeInTheDocument();
-    expect(screen.getByTestId("kpi-qualified")).toHaveTextContent(/^Qualified opportunities\d+[−+±]\d+ vs SeptemberTarget \d+ · 3-month average \d+\.\d$/);
+    expect(screen.getByTestId("kpi-qualified")).toHaveTextContent(/^Qualified opportunities\d+[−+±]\d+ vs SeptemberTarget \d+ · 3-month average \d+\.\dSee every record →$/);
+    expect(within(screen.getByTestId("kpi-qualified")).getByRole("link", { name: /see every record/i })).toHaveAttribute("href", "/qualified?window=1");
     expect(screen.getByTestId("kpi-cpqo")).toHaveTextContent(/^Cost per qualified£[\d,]+[−+±]£[\d,]+ vs September£[\d,]+ of media spend brought \d+ qualified opportunit(y|ies)$/);
     expect(screen.getByTestId("kpi-enquiries")).toHaveTextContent(/^Enquiries\d+[−+±]\d+ vs September\d+ outbound \/ network · \d+ no channel set · not counted$/);
     expect(screen.queryByTestId("kpi-speed")).not.toBeInTheDocument();
@@ -140,6 +156,8 @@ describe("OverviewPage", () => {
     wrap(<OverviewPage />);
     expect(screen.getByText(/^Nov 2025 to Oct 2026 · the darker part qualified/)).toBeInTheDocument();
     expect(screen.getAllByText(/vs September/i).length).toBe(3);
+    // the tile is one month, so its link opens the list on that month whatever breakdown window the page has
+    expect(within(screen.getByTestId("kpi-qualified")).getByRole("link", { name: /see every record/i })).toHaveAttribute("href", "/qualified?window=1");
   });
 
   it("keeps every explanation to one line, with the detail behind info icons", async () => {
@@ -192,6 +210,53 @@ describe("OverviewPage", () => {
     const land = screen.getAllByTestId("kpi-qualified")[1].textContent;
     expect(land).not.toEqual(all);
     expect(screen.getByText(/^Oct 2026 · Landowner pipeline/)).toBeInTheDocument();
+  });
+});
+
+describe("QualifiedPage", () => {
+  beforeEach(() => resetNavigation("/qualified"));
+
+  it("shows the agreed-rule count beside the wider count, and lists every record with its verdict", () => {
+    wrap(<QualifiedPage />);
+    expect(screen.getByRole("heading", { level: 1, name: /qualified opportunities/i })).toBeInTheDocument();
+    const months = monthRange(DEMO_LAST_MONTH, 3);
+    const byMonth = qualifiedByMonth(data.deals, months, kpiConfig);
+    const inbound = byMonth.reduce((s, m) => s + m.inbound, 0);
+    const all = byMonth.reduce((s, m) => s + m.inbound + m.network + m.unattributed, 0);
+    expect(screen.getByTestId("kpi-qualified-inbound")).toHaveTextContent(new RegExp(`^Qualified opportunities${inbound}Inbound only, the agreed rule`));
+    expect(screen.getByTestId("kpi-qualified-all")).toHaveTextContent(new RegExp(`^All qualified${all}`));
+    expect(screen.getByTestId("kpi-qualified-inbound")).toHaveTextContent(/Website, Info email inbox, Linkedin, Trade Show \/ Event, Marketplace/);
+    const table = screen.getByRole("table", { name: /qualified opportunities/i });
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Who", "Qualified", "Channel", "Inbound?", "How it came in", "Stage", "Status"]);
+    expect(within(table).getAllByRole("row")).toHaveLength(all + 1);
+    expect(within(table).getAllByText(/an inbound channel/i)).toHaveLength(inbound);
+    // every row links to the record in Pipedrive and names the person
+    const links = within(table).getAllByRole("link");
+    expect(links).toHaveLength(all);
+    expect(links[0]).toHaveAttribute("href", expect.stringMatching(/pipedrive\.com\/deal\/\d+$/));
+    expect(links[0]).toHaveTextContent(/\w+ \d+/);
+  });
+
+  it("can show only the records the rule counts, or only the others, and exports the list", () => {
+    wrap(<QualifiedPage />);
+    const months = monthRange(DEMO_LAST_MONTH, 3);
+    const byMonth = qualifiedByMonth(data.deals, months, kpiConfig);
+    const inbound = byMonth.reduce((s, m) => s + m.inbound, 0);
+    const other = byMonth.reduce((s, m) => s + m.network + m.unattributed, 0);
+    fireEvent.click(screen.getByRole("button", { name: /^inbound$/i }));
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(inbound + 1);
+    fireEvent.click(screen.getByRole("button", { name: /^not inbound$/i }));
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(other + 1);
+    expect(screen.getByText(new RegExp(`${other} of ${inbound + other} shown`))).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /export csv/i })).toBeInTheDocument();
+  });
+
+  it("follows the audience filter from the URL", () => {
+    resetNavigation("/qualified", "audience=landowner");
+    wrap(<QualifiedPage />);
+    const months = monthRange(DEMO_LAST_MONTH, 3);
+    const all = qualifiedByMonth(data.deals, months, kpiConfig, "landowner").reduce((s, m) => s + m.inbound + m.network + m.unattributed, 0);
+    expect(screen.getByTestId("kpi-qualified-all")).toHaveTextContent(new RegExp(`^All qualified${all}`));
   });
 });
 
@@ -683,7 +748,7 @@ describe("TrafficPage and EventsPage", () => {
   it("events accept a date after today, so an upcoming event can be set up before it happens", async () => {
     resetNavigation("/events");
     wrap(<EventsPage />);
-    const upcoming = `${data.syncedAt.slice(0, 7)}-28`; // later this month: after "today"
+    const upcoming = new Date(Date.parse(data.syncedAt) + 86_400_000).toISOString().slice(0, 10); // tomorrow: after "today"
     expect(upcoming > data.syncedAt.slice(0, 10)).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: /^add event$/i }));
     const dialog = screen.getByRole("dialog");

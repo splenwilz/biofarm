@@ -183,6 +183,55 @@ def tick_ctx(**over) -> DealContext:
     return ctx(stage_pipeline={13: 3, 14: 3, 6: 2, 7: 2, 63: 10, 23: 4}, qualified_code=QUAL, qualified_yes=1262, qualified_options={1262: "YES", 1263: "NO"}, **over)
 
 
+class TestWhoWhereAndWhy:
+    """The qualified-opportunities list shows each record with who it is, which
+    stage it sits in, how it came in and why it counts, so anyone can check a
+    number against the agreed rule."""
+
+    def who_ctx(self, **over) -> DealContext:
+        return ctx(stage_names={13: "OPPORTUNITY (Qualified)", 6: "CALL / QUALIFY", 7: "SITE VISIT"}, user_names={7: "Francis Morrison-Bell", 8: "Izzy Pitt"},
+                   person_names={501: "Ada Lovelace"}, person_orgs={501: 9}, org_names={9: "Analytical Engines Ltd"}, **over)
+
+    def test_a_deal_names_its_person_company_stage_and_the_team_member_who_created_it(self):
+        out = derive_deal(deal(title="Analytical Engines site", creator_user_id=7, owner_id=8, origin="ManuallyCreated"), [], self.who_ctx())
+        assert out.title == "Analytical Engines site"
+        assert out.person_name == "Ada Lovelace" and out.organisation == "Analytical Engines Ltd"
+        assert out.stage == "OPPORTUNITY (Qualified)"
+        assert out.origin == "team" and out.created_by == "Francis Morrison-Bell" and out.owner == "Izzy Pitt"
+
+    def test_a_deal_from_the_website_says_so_whichever_form_brought_it(self):
+        assert derive_deal(deal(origin="API", creator_user_id=7), [], self.who_ctx()).origin == "website"
+        assert derive_deal(deal(origin="WebForms", creator_user_id=7), [], self.who_ctx()).origin == "website"
+        assert derive_deal(deal(origin="Import", creator_user_id=7), [], self.who_ctx()).origin == "import"
+
+    def test_unknown_people_stages_and_users_leave_the_fields_empty_rather_than_guessing(self):
+        out = derive_deal(deal(person_id=999, stage_id=13, creator_user_id=55, owner_id=None, origin=None), [], ctx())
+        assert out.person_name is None and out.organisation is None and out.stage is None and out.created_by is None and out.owner is None and out.origin is None
+
+    def test_a_person_without_a_company_leaves_the_company_empty(self):
+        out = derive_deal(deal(person_id=501), [], ctx(person_names={501: "Ada Lovelace"}))
+        assert out.person_name == "Ada Lovelace" and out.organisation is None
+
+    def test_the_source_lead_rides_along_so_the_dashboard_can_find_the_enquiry(self):
+        assert derive_deal(deal(source_lead_id="L9"), [], ctx()).source_lead_id == "L9"
+        assert derive_deal(deal(), [], ctx()).source_lead_id is None
+
+    def test_qualified_by_explains_the_pipeline_rule_in_words(self):
+        dev = derive_deal(deal(), [], self.who_ctx())
+        assert dev.qualified_by == "Created in the Developer Pipeline: qualified on arrival"
+        moved = derive_deal(deal(pipeline_id=2, stage_id=7), [move(1, 6, 7, T + 2 * H)], self.who_ctx())
+        assert moved.qualified_by == "Landowner Pipeline: moved past CALL / QUALIFY on 29 Sep 2026"
+        waiting = derive_deal(deal(pipeline_id=2, stage_id=6), [], self.who_ctx())
+        assert waiting.qualified_at is None and waiting.qualified_by is None
+
+    def test_qualified_by_explains_the_tick_rule_in_words(self):
+        ticked = derive_deal(deal(add_time=NOV, custom_fields={QUAL: 1262}), [], tick_ctx(qualified_ticks={1: NOV + 2 * H}))
+        assert ticked.qualified_by == "Sales ticked Qualified Lead? YES on 20 Nov 2026"
+        arrived = derive_deal(deal(add_time=NOV, custom_fields={QUAL: 1262}), [], tick_ctx())
+        assert arrived.qualified_by == "Qualified Lead? YES when it came in, 20 Nov 2026"
+        assert derive_deal(deal(add_time=NOV, custom_fields={QUAL: 1263}), [], tick_ctx()).qualified_by is None
+
+
 class TestTheQualifiedTick:
     """From 17 Nov 2026 Sales tick "Qualified Lead?" and that decides, in any marketing pipeline."""
 
@@ -607,7 +656,9 @@ async def test_from_the_start_date_the_mirror_supplies_the_field_the_tick_and_th
     assert by_id["14"].qualified_at == NOV + 3 * H
     assert by_id["15"].pipeline == "developer" and by_id["15"].qualified_at == NOV
     assert by_id["L16"].model_dump(by_alias=False) == dict(id="L16", pipeline="landowner", channel="Website", created_at=NOV + 4 * H, qualified_at=NOV + 4 * H, status="open",
-                                             source_label="direct", campaign=None, person_id=None, qualification_status="YES")  # the website record, as the enquiry shows it
+                                             source_label="direct", campaign=None, person_id=None, qualification_status="YES",  # the website record, as the enquiry shows it
+                                             title="Website enquiry - Kim", person_name=None, organisation=None, stage=None, origin="website", created_by=None, owner=None,
+                                             source_lead_id=None, qualified_by="Qualified Lead? YES when it came in, 20 Nov 2026")  # a lead: no stage yet, no team member made it
     assert "L17" not in by_id and "L18" not in by_id and "L19" not in by_id
     assert by_id["16"].qualified_at == NOV + 7 * H and "L20" not in by_id  # once, as the deal, from the lead's date
     assert [e.id for e in data.enquiries if e.id in ("L20", "16")] == ["L20"]

@@ -19,7 +19,7 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from sqlalchemy import or_, select, tuple_, update
+from sqlalchemy import func, or_, select, tuple_, update
 from sqlalchemy.dialects import postgresql, sqlite
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -33,6 +33,7 @@ from app.mirror.models import (
     MarketingStatusChange,
     MirrorDeal,
     MirrorLead,
+    MirrorOrganization,
     MirrorPerson,
     MirrorUser,
     Pipeline,
@@ -79,6 +80,7 @@ class ImportCounts:
     users: int = 0
     deals: int = 0
     persons: int = 0
+    organizations: int = 0
     activities: int = 0
     leads: int = 0
     # Leads a full import no longer found in Pipedrive (converted or removed).
@@ -186,6 +188,11 @@ def person_row(p: dict, now: datetime) -> dict:
             "label_ids": _list(p.get("label_ids")), "custom_fields": _dict(p.get("custom_fields")), "is_deleted": bool(p.get("is_deleted")),
             "add_time": parse_time(p.get("add_time")), "update_time": parse_time(p.get("update_time")),
             "marketing_status": _text(p.get("marketing_status")), "doi_status": parse_int(p.get("doi_status")), "raw": p, "fetched_at": now, "flow_fetched_at": None}
+
+
+def organization_row(o: dict, now: datetime) -> dict:
+    return {"id": o["id"], "name": _text(o.get("name")), "owner_id": parse_int(o.get("owner_id")), "is_deleted": bool(o.get("is_deleted")),
+            "add_time": parse_time(o.get("add_time")), "update_time": parse_time(o.get("update_time")), "raw": o, "fetched_at": now}
 
 
 def user_row(u: dict, now: datetime) -> dict:
@@ -443,6 +450,13 @@ async def run_import(
         fetched_persons = [person_row(p, now) async for p in reader.pages("/api/v2/persons", {"include_fields": PERSON_FIELDS, **since_param(since)})]
         counts.persons = await store(MirrorPerson, fetched_persons, keep=("flow_fetched_at",))
         logger.info("persons %d", counts.persons)
+        # The organisations table arrived after the first imports (Nov 2026): an
+        # incremental run that finds it empty reads every organisation once,
+        # otherwise only the ones updated since would ever be known.
+        async with sessions() as session:
+            have_orgs = (await session.scalar(select(func.count()).select_from(MirrorOrganization))) or 0
+        counts.organizations = await store(MirrorOrganization, [organization_row(o, now) async for o in reader.pages("/api/v2/organizations", since_param(since if have_orgs else None))])
+        logger.info("organisations %d%s", counts.organizations, "" if have_orgs else " (first fill: every organisation)")
 
         counts.activities = await store(Activity, [activity_row(a, now) async for a in reader.pages("/api/v2/activities", since_param(since))])
         # Both inboxes are read whole on every run (about 1,300 leads in Nov 2026): Pipedrive

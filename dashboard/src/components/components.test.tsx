@@ -25,6 +25,13 @@ describe("KpiCard", () => {
     expect(screen.getByText("Pipedrive deals, demo data")).toBeInTheDocument();
   });
 
+  it("can carry a link to the records behind the number, kept out of print", () => {
+    render(<KpiCard label="Qualified opportunities" value="12" href="/qualified?month=2026-10" />);
+    const link = screen.getByRole("link", { name: /see every record/i });
+    expect(link).toHaveAttribute("href", "/qualified?month=2026-10");
+    expect(link).toHaveAttribute("data-print", "hide");
+  });
+
   it("caps the progress bar at 100% when the target is beaten", () => {
     render(<KpiCard label="x" value="15" progress={{ value: 15, target: 12 }} footnote="f" />);
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");

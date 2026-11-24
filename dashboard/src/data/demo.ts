@@ -8,11 +8,12 @@
  * up; the proportions are not.
  */
 
+import { dateLabel } from "@/lib/format";
 import type { DataSource } from "@/data/source";
 import { monthRange } from "@/lib/kpi";
 import type { AiAssistant, AiReferral, Annotation, Audience, Channel, DashboardData, Deal, DealStatus, Enquiry, EnquiryForm, MarketingEvent, NewsletterIssue, SearchMonth, SignupMonth, SpendEntry, SubscriberMonth, TrafficChannel, TrafficMonth } from "@/lib/types";
 
-export const DEMO_TODAY = "2026-11-01T06:00:00Z";
+export const DEMO_TODAY = "2026-10-31T18:00:00Z";
 export const DEMO_LAST_MONTH = "2026-10";
 /** Two years, so year-on-year figures exist for every selectable month. */
 export const DEMO_MONTHS = 24;
@@ -114,6 +115,18 @@ const AUDIENCES: Weighted<Audience> = [
   ["landowner", 35],
   ["other", 10],
 ];
+
+
+// Placeholder people, companies and team members for the demo's qualified list:
+// plainly made up, and picked by the person's number rather than the seeded
+// random, so adding them changed none of the demo's counts.
+const DEMO_SURNAMES = ["Ashworth", "Bellamy", "Carrow", "Dunmore", "Ellery", "Fenwick", "Garside", "Hollis", "Ingram", "Jessop", "Kendrick", "Lockwood"];
+const DEMO_COMPANIES = ["Northgate Homes", "Riverbank Developments", "Oakfield Estates", "Meridian Build", "Hartwell Land", "Castleford Partners", "Greenacre Farms", "Westbrook Group"];
+const DEMO_TEAM = ["Demo user (Sales)", "Demo user (Land)"];
+const DEMO_STAGES = ["OPPORTUNITY (Qualified)", "OPPORTUNITY (Qualified)", "PROPOSAL", "OPPORTUNITY (Qualified)", "ALLOCATION"];
+function demoPerson(n: number): { personName: string; organisation: string } {
+  return { personName: `${DEMO_SURNAMES[n % DEMO_SURNAMES.length]} ${n}`, organisation: `${DEMO_COMPANIES[(n * 7) % DEMO_COMPANIES.length]} (demo)` };
+}
 
 const STATUSES: Weighted<DealStatus> = [
   ["open", 70],
@@ -297,6 +310,13 @@ export function buildDemoData(seed = 2026): DashboardData {
             sourceLabel,
             campaign,
             personId: pid,
+            ...demoPerson(pid),
+            stage: pipeline === "developer" ? "OPPORTUNITY (Qualified)" : "SITE VISIT",
+            origin: "website",
+            createdBy: null,
+            owner: DEMO_TEAM[pipeline === "developer" ? 0 : 1],
+            sourceLeadId: `enq-${enquiryN}`,
+            qualifiedBy: pipeline === "developer" ? "Created in the Developer Pipeline: qualified on arrival" : `Landowner Pipeline: moved past CALL / QUALIFY on ${dateLabel(qualifiedAt)}`,
           });
         }
       }
@@ -307,6 +327,7 @@ export function buildDemoData(seed = 2026): DashboardData {
     for (let i = 0; i < developerDeals; i += 1) {
       const createdAt = isoDay(month, between(random, 1, monthDays), between(random, 8, 18));
       const channel = pick(random, DEAL_CHANNELS);
+      const maker = DEMO_TEAM[0];
       deals.push({
         id: `deal-${(dealN += 1)}`,
         pipeline: "developer",
@@ -317,6 +338,13 @@ export function buildDemoData(seed = 2026): DashboardData {
         sourceLabel: channel === "Website" ? pick(random, ENQUIRY_SOURCES) : null,
         campaign: null,
         personId: (personId += 1),
+        ...demoPerson(personId),
+        stage: DEMO_STAGES[personId % DEMO_STAGES.length],
+        origin: "team",
+        createdBy: maker,
+        owner: maker,
+        sourceLeadId: null,
+        qualifiedBy: "Created in the Developer Pipeline: qualified on arrival",
       });
     }
 
@@ -340,6 +368,13 @@ export function buildDemoData(seed = 2026): DashboardData {
         sourceLabel: null,
         campaign: null,
         personId: (personId += 1),
+        ...demoPerson(personId),
+        stage: qualified && qualified <= DEMO_TODAY ? "SITE VISIT" : "CALL / QUALIFY",
+        origin: "team",
+        createdBy: "Demo user (Land)",
+        owner: "Demo user (Land)",
+        sourceLeadId: null,
+        qualifiedBy: qualified && qualified <= DEMO_TODAY ? `Landowner Pipeline: moved past CALL / QUALIFY on ${dateLabel(qualified)}` : null,
       });
     }
 

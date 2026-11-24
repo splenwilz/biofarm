@@ -25,7 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import defer
 
 from app.config import Settings
-from app.mirror.models import DealChange, DealField, DealStageHistory, MirrorDeal, MirrorLead, Stage
+from app.mirror.models import DealChange, DealField, DealStageHistory, MirrorDeal, MirrorLead, MirrorOrganization, MirrorPerson, MirrorUser, Stage
 from app.reporting.schemas import Channel, DealOut, DealStatus
 from app.services.attribution import touch_label
 
@@ -55,6 +55,13 @@ class DealContext:
     qualified_yes: int | None = None
     # When the changelog first saw each deal's field set to YES.
     qualified_ticks: Mapping[int, datetime] = field(default_factory=dict)
+    # Names for the qualified-opportunities list: stages, users (creator and
+    # owner), persons and the organisation each person belongs to.
+    stage_names: Mapping[int, str] = field(default_factory=dict)
+    user_names: Mapping[int, str] = field(default_factory=dict)
+    person_names: Mapping[int, str] = field(default_factory=dict)
+    person_orgs: Mapping[int, int] = field(default_factory=dict)
+    org_names: Mapping[int, str] = field(default_factory=dict)
 
 
 def _option_id(value: object) -> int | None:
@@ -94,23 +101,51 @@ def origin_stage(deal: MirrorDeal, history: list[DealStageHistory]) -> int | Non
     return moves[0].old_stage_id if moves else deal.stage_id
 
 
-def qualified_at(deal: MirrorDeal, history: list[DealStageHistory], origin_pipeline: int, first_stage: int | None, ctx: DealContext, received: datetime | None = None):
-    """`received` is when the enquiry came in: the lead's date for a deal
+def day(at: datetime) -> str:
+    """"29 Sep 2026", the way the dashboard writes dates."""
+    return f"{at.day} {at:%b %Y}"
+
+
+def qualification(deal: MirrorDeal, history: list[DealStageHistory], origin_pipeline: int, first_stage: int | None, ctx: DealContext, received: datetime | None = None) -> tuple[datetime | None, str | None]:
+    """When the record qualified and why, in words; (None, None) while it has
+    not. `received` is when the enquiry came in: the lead's date for a deal
     converted from one, else the deal's own."""
     s = ctx.settings
     received = received or deal.add_time
     if received is not None and tick_rule_applies(received, ctx):
         if not says_yes(deal.custom_fields, ctx):
-            return None
-        return ctx.qualified_ticks.get(deal.id) or received
+            return None, None
+        tick = ctx.qualified_ticks.get(deal.id)
+        if tick is not None:
+            return tick, f"Sales ticked {s.pipedrive_qualified_field_name} {s.pipedrive_qualified_yes_label} on {day(tick)}"
+        return received, f"{s.pipedrive_qualified_field_name} {s.pipedrive_qualified_yes_label} when it came in, {day(received)}"
     if origin_pipeline == s.pipedrive_developer_pipeline_id:
-        return deal.add_time
+        return deal.add_time, "Created in the Developer Pipeline: qualified on arrival"
     if origin_pipeline == s.pipedrive_landowner_pipeline_id:
         if first_stage != s.pipedrive_landowner_qualify_stage_id:
-            return deal.add_time
+            return deal.add_time, "Landowner Pipeline: created past CALL / QUALIFY, qualified on arrival"
         past = [h for h in history if h.old_stage_id == s.pipedrive_landowner_qualify_stage_id and ctx.stage_pipeline.get(h.new_stage_id) == origin_pipeline]
-        return min(past, key=lambda h: h.changed_at).changed_at if past else None
-    return None
+        if not past:
+            return None, None
+        at = min(past, key=lambda h: h.changed_at).changed_at
+        return at, f"Landowner Pipeline: moved past CALL / QUALIFY on {day(at)}"
+    return None, None
+
+
+def qualified_at(deal: MirrorDeal, history: list[DealStageHistory], origin_pipeline: int, first_stage: int | None, ctx: DealContext, received: datetime | None = None):
+    return qualification(deal, history, origin_pipeline, first_stage, ctx, received)[0]
+
+
+def origin_kind(origin: str | None, s: Settings) -> Literal["website", "team", "import"] | None:
+    """How a record came in, from Pipedrive's origin: a web form or our API is
+    the website, a bulk import is an import, anything else was made by hand."""
+    if origin is None:
+        return None
+    if origin in s.enquiry_website_origins:
+        return "website"
+    if origin in s.enquiry_excluded_deal_origins:
+        return "import"
+    return "team"
 
 
 def derive_deal(deal: MirrorDeal, history: list[DealStageHistory], ctx: DealContext, *, received: datetime | None = None) -> DealOut | None:
@@ -133,22 +168,36 @@ def derive_deal(deal: MirrorDeal, history: list[DealStageHistory], ctx: DealCont
     source = touch_label({key: fields.get(code) for key, code in ctx.touch_codes.items()})
     if source is None and deal.channel_id and "/" in deal.channel_id:
         source = deal.channel_id  # already a "source/medium" label
+    at, why = qualification(deal, history, origin_pipeline, first_stage, ctx, received)
+    org_id = ctx.person_orgs.get(deal.person_id) if deal.person_id is not None else None
     return DealOut(
         id=str(deal.id),
         pipeline=audience,
         channel=label if label in CHANNELS else None,
         created_at=deal.add_time,
-        qualified_at=qualified_at(deal, history, origin_pipeline, first_stage, ctx, received),
+        qualified_at=at,
         status=deal.status,
         source_label=source,
         campaign=campaign,
         person_id=deal.person_id,
         qualification_status=qualification_status(deal.custom_fields, ctx),
+        title=deal.title,
+        person_name=ctx.person_names.get(deal.person_id) if deal.person_id is not None else None,
+        organisation=ctx.org_names.get(org_id) if org_id is not None else None,
+        stage=ctx.stage_names.get(deal.stage_id) if deal.stage_id is not None else None,
+        origin=origin_kind(deal.origin, ctx.settings),
+        created_by=ctx.user_names.get(deal.creator_user_id) if deal.creator_user_id is not None else None,
+        owner=ctx.user_names.get(deal.owner_id) if deal.owner_id is not None else None,
+        source_lead_id=deal.source_lead_id,
+        qualified_by=why,
     )
 
 
 async def load_context(session: AsyncSession, settings: Settings) -> DealContext:
-    stages = (await session.execute(select(Stage.id, Stage.pipeline_id))).all()
+    stages = (await session.execute(select(Stage.id, Stage.pipeline_id, Stage.name))).all()
+    users = {uid: name for uid, name in (await session.execute(select(MirrorUser.id, MirrorUser.name))).all() if name}
+    persons = (await session.execute(select(MirrorPerson.id, MirrorPerson.name, MirrorPerson.org_id).where(MirrorPerson.is_deleted.is_(False)))).all()
+    orgs = {oid: name for oid, name in (await session.execute(select(MirrorOrganization.id, MirrorOrganization.name).where(MirrorOrganization.is_deleted.is_(False)))).all() if name}
     channel_field = await session.get(DealField, "channel")
     labels: dict[int, str] = {}
     for option in (channel_field.options if channel_field and channel_field.options else []):
@@ -161,7 +210,9 @@ async def load_context(session: AsyncSession, settings: Settings) -> DealContext
     touch = {key: codes[name] for key, name in (("utm_source", "UTM Source"), ("utm_medium", "UTM Medium"), ("referrer", "Referrer")) if name in codes}
     qualified_code, qualified_options, qualified_yes = await _qualified_field(session, settings)
     return DealContext(stage_pipeline={s.id: s.pipeline_id for s in stages if s.pipeline_id is not None}, channel_labels=labels, utm_campaign_code=codes.get("UTM Campaign"),
-                       settings=settings, touch_codes=touch, field_codes=codes, qualified_code=qualified_code, qualified_options=qualified_options, qualified_yes=qualified_yes)
+                       settings=settings, touch_codes=touch, field_codes=codes, qualified_code=qualified_code, qualified_options=qualified_options, qualified_yes=qualified_yes,
+                       stage_names={s.id: s.name for s in stages if s.name}, user_names=users,
+                       person_names={pid: name for pid, name, _ in persons if name}, person_orgs={pid: org for pid, _, org in persons if org is not None}, org_names=orgs)
 
 
 async def _qualified_field(session: AsyncSession, settings: Settings) -> tuple[str | None, dict[int, str], int | None]:

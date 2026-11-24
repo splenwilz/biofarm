@@ -33,7 +33,7 @@ from sqlalchemy.orm import defer
 from app.config import Settings
 from app.mirror.models import Activity, MirrorDeal, MirrorLead, MirrorPerson
 from app.models import Lead
-from app.reporting.deals import DealContext, MarketingDeals, load_marketing_deals, tick_rule_applies
+from app.reporting.deals import DealContext, MarketingDeals, load_marketing_deals, tick_rule_applies, day, origin_kind
 from app.reporting.schemas import Audience, Channel, DealOut, EnquiryForm, EnquiryOut
 from app.services.attribution import source_label, touch_label
 
@@ -103,6 +103,9 @@ class Candidate:
     # A live lead whose deal the mirror already holds (read moments before
     # Sales converted it; the next import flags the lead): the deal is the record.
     has_deal: bool = False
+    # Who made and owns the record in Pipedrive (user ids), for the qualified list.
+    creator_id: int | None = None
+    owner_id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -301,7 +304,7 @@ def candidates_from(
         conv = converted.get(lead.id)
         deal = conv[0] if conv else None
         out.append(Candidate(
-            kind="lead", id=lead.id, title=lead.title, created_at=lead.add_time, origin=lead.origin,
+            kind="lead", id=lead.id, title=lead.title, created_at=lead.add_time, origin=lead.origin, creator_id=lead.creator_id, owner_id=lead.owner_id,
             channel_id=lead.channel if lead.channel is not None else (deal.channel if deal else None),
             person_id=lead.person_id if lead.person_id is not None else (deal.person_id if deal else None),
             archived=lead.is_archived, audience=conv[1] if conv else "other",
@@ -388,9 +391,16 @@ async def load_enquiries(session: AsyncSession, settings: Settings, *, deals: tu
             # A ticked lead counts from the day it came in (leads have no changelog); a lead whose
             # audience nobody knows yet counts once converted, when its pipeline says.
             if c.kind == "lead" and not c.has_deal and yes_label is not None and c.qualification == yes_label and result.audience != "other" and tick_rule_applies(c.created_at, ctx_deals):
+                org_id = ctx_deals.person_orgs.get(c.person_id) if c.person_id is not None else None
                 qualified_leads.append(DealOut(id=c.id, pipeline=result.audience, channel=result.channel, created_at=c.created_at, qualified_at=c.created_at,
                                                status="lost" if c.archived else "open", source_label=result.source_label, campaign=result.campaign,
-                                               person_id=result.person_id, qualification_status=yes_label))
+                                               person_id=result.person_id, qualification_status=yes_label,
+                                               title=c.title, person_name=ctx_deals.person_names.get(c.person_id) if c.person_id is not None else None,
+                                               organisation=ctx_deals.org_names.get(org_id) if org_id is not None else None, stage=None,
+                                               origin=origin_kind(c.origin, settings),
+                                               created_by=ctx_deals.user_names.get(c.creator_id) if c.creator_id is not None else None,
+                                               owner=ctx_deals.user_names.get(c.owner_id) if c.owner_id is not None else None,
+                                               qualified_by=f"{settings.pipedrive_qualified_field_name} {yes_label} when it came in, {day(c.created_at)}"))
         else:
             excluded[result] += 1
             if result == "newsletter":

@@ -1,6 +1,6 @@
 import { kpiConfig, type KpiConfig } from "@/config/kpi";
 import { dateLabel, gbp, integer, monthLabel, pct, windowLabel } from "@/lib/format";
-import { cpqo, isDirectDeal, monthOf, monthRange, qualifiedInbound, SOURCE_GROUPS, sourceOf, type MonthlyQualified } from "@/lib/kpi";
+import { cpqo, isDirectDeal, monthOf, monthRange, qualifiedInbound, SOURCE_GROUPS, sourceOf, type MonthlyQualified, monthProgress } from "@/lib/kpi";
 import type { Report } from "@/lib/report";
 import { channelName, type ChannelName } from "@/lib/channelNames";
 import type { DashboardData, Deal, Enquiry, EnquiryForm, MarketingEvent, SourceGroup, SpendEntry, TrafficChannel, TrafficMonth } from "@/lib/types";
@@ -426,6 +426,7 @@ export const ALERT_RULES: readonly AlertRule[] = [
     id: "deals-no-qualification", group: "data", title: "Deals with no qualification status after 14 days", enabled: kpiConfig.qualificationStatusInPipedrive,
     note: kpiConfig.qualificationStatusInPipedrive ? undefined : "Off until the field exists in Pipedrive",
   },
+  { id: "month-in-progress", group: "data", title: "The month is still in progress, so target, cost and spend verdicts wait for it to close", enabled: true },
   { id: "spend-missing", group: "data", title: "No spend entered for the month", enabled: true },
   { id: "below-target", group: "performance", title: "Qualified opportunities more than 25% below target", enabled: true },
   { id: "cpqo-up", group: "performance", title: "Cost per qualified opportunity more than 30% above the trailing 3-month average", enabled: true },
@@ -509,6 +510,21 @@ export function buildAlerts({ report, quality, config, now, googleSyncedAt }: Al
         href: "/data-quality",
       });
     }
+  }
+  // A month still running cannot be judged against monthly targets or a full
+  // month's spend: say so once, and hold the verdicts below until it closes.
+  const progress = monthProgress(report.syncedAt, report.reportMonth);
+  if (progress.partial) {
+    alerts.push({
+      id: "month-in-progress",
+      group: "data",
+      severity: "info",
+      title: `${month} is still in progress`,
+      detail: `The figures cover ${progress.day} of ${progress.days} days. Target, cost and spend alerts for ${month} start once the month has closed.`,
+      href: "/",
+    });
+    const order: Record<AlertSeverity, number> = { critical: 0, warning: 1, info: 2 };
+    return alerts.sort((a, b) => order[a.severity] - order[b.severity]);
   }
   if (quality.monthsNoSpend.includes(report.reportMonth)) {
     alerts.push({ id: "spend-missing", group: "data", severity: "warning", title: `No spend entered for ${month}`, detail: "Cost per qualified opportunity is blank until the month's spend is in.", href: "/spend" });

@@ -107,6 +107,13 @@ def lead(id, **over):
     return base
 
 
+def organization(id, **over):
+    base = {"id": id, "name": f"Org {id}", "owner_id": 11, "label_ids": [], "is_deleted": False, "address": None,
+            "add_time": "2026-09-01T08:00:00Z", "update_time": "2026-09-02T08:00:00Z", "custom_fields": {}, "visible_to": 3}
+    base.update(over)
+    return base
+
+
 def campaign_stat(campaign_id, name, sent, opens=0, clicks=0, links=None):
     return {"object": "marketing_campaign_stat", "timestamp": sent, "data": {"item_type": "marketing_campaign_stat", "prio": 2, "id": campaign_id, "name": name, "type": "regular",
             "owner_id": 11, "clicked_links": links or [], "total_clicks": clicks, "open_stat": {"timestamp": sent + ".000000"} if opens else None, "total_opens": opens, "timestamp": sent + ".000000"}}
@@ -133,6 +140,7 @@ class FakePipedrive:
         self.archived = []
         self.deleted = []
         self.persons = [person(501, marketing_status="subscribed", doi_status=1), person(502, marketing_status="no_consent", doi_status=0)]
+        self.organizations = [organization(9, name="Acme Developments Ltd")]
         self.users = list(USERS)
         self.activities = [activity(1), activity(2, person_id=502, deal_id=None, type="task", done=False, marked_as_done_time=None, participants=[{"person_id": 502, "primary": True}])]
         self.leads = [lead("8cb2ba00-a95d-11ee-aec4-f3424f5b4dde")]
@@ -155,6 +163,7 @@ class FakePipedrive:
         self.deals_route = router.get(f"{BASE}/api/v2/deals").mock(side_effect=self._deals)
         router.get(f"{BASE}/api/v2/deals/archived").mock(side_effect=lambda r: httpx.Response(200, json=ok(self.archived)))
         self.persons_route = router.get(f"{BASE}/api/v2/persons").mock(side_effect=self._persons)
+        self.organizations_route = router.get(f"{BASE}/api/v2/organizations").mock(side_effect=self._organizations)
         self.changelog_route = router.get(url__regex=rf"{BASE}/api/v1/deals/(?P<id>\d+)/changelog").mock(side_effect=self._changelog)
         router.get(f"{BASE}/api/v1/users").mock(side_effect=lambda r: httpx.Response(200, json={"success": True, "data": self.users}))
         self.activities_route = router.get(f"{BASE}/api/v2/activities").mock(side_effect=self._activities)
@@ -179,6 +188,11 @@ class FakePipedrive:
         rows = [p for p in self.persons if since is None or datetime.fromisoformat(p["update_time"]) >= since]
         wanted = set((request.url.params.get("include_fields") or "").split(","))
         rows = [{k: v for k, v in p.items() if k not in ("marketing_status", "doi_status") or k in wanted} for p in rows]
+        return httpx.Response(200, json=ok(rows))
+
+    def _organizations(self, request):
+        since = self._since(request)
+        rows = [o for o in self.organizations if since is None or datetime.fromisoformat(o["update_time"]) >= since]
         return httpx.Response(200, json=ok(rows))
 
     def _activities(self, request):
@@ -595,3 +609,40 @@ async def test_rows_left_running_by_a_dead_process_are_closed_on_request(session
         row = (await s.execute(select(ImportRun))).scalars().one()
         assert row.status == "failed" and "restart" in (row.error or "")
         assert await close_runs_left_running(s, now=T0) == 0
+
+
+async def test_organisations_are_mirrored_with_their_names_and_read_incrementally(sessions, pipedrive):
+    """The dashboard's qualified-opportunities list names each deal's company, so
+    the mirror keeps Pipedrive's organisations like it keeps persons."""
+    from app.mirror.models import MirrorOrganization
+
+    counts = await do_run(sessions)
+    assert counts.organizations == 1
+    async with sessions() as session:
+        org = await session.get(MirrorOrganization, 9)
+        assert org is not None and org.name == "Acme Developments Ltd" and org.owner_id == 11 and org.is_deleted is False
+    pipedrive.organizations.append(organization(10, name="Beech Homes", update_time="2026-11-06T09:40:00Z"))
+    pipedrive.organizations_route.calls.reset()
+    second = await do_run(sessions, now=T0 + timedelta(hours=1))
+    assert second.organizations == 1
+    assert "updated_since" in pipedrive.organizations_route.calls.last.request.url.params
+
+
+async def test_an_incremental_run_that_finds_no_organisations_yet_reads_them_all(sessions, pipedrive):
+    """The table was added after the mirror had been running: the next
+    incremental run must fill it whole, not just with recently updated rows."""
+    from app.mirror.models import MirrorOrganization
+
+    pipedrive.organizations = []
+    await do_run(sessions)
+    assert await count(sessions, MirrorOrganization) == 0
+    # organisations last updated long before the incremental window
+    pipedrive.organizations = [organization(9, update_time="2025-01-01T08:00:00Z"), organization(10, update_time="2025-06-01T08:00:00Z")]
+    pipedrive.organizations_route.calls.reset()
+    counts = await do_run(sessions, now=T0 + timedelta(hours=1))
+    assert counts.organizations == 2
+    assert "updated_since" not in pipedrive.organizations_route.calls.last.request.url.params
+    # once filled, the next run is incremental again
+    pipedrive.organizations_route.calls.reset()
+    await do_run(sessions, now=T0 + timedelta(hours=2))
+    assert "updated_since" in pipedrive.organizations_route.calls.last.request.url.params

@@ -27,6 +27,31 @@ export function monthRange(end: string, count: number): string[] {
   return months;
 }
 
+/** Days in a calendar month ("YYYY-MM"). */
+export function daysInMonth(month: string): number {
+  const [year, m] = month.split("-").map(Number);
+  return new Date(Date.UTC(year, m, 0)).getUTCDate();
+}
+
+export interface MonthProgress {
+  /** True when `month` is the month the data was synced in and that month has not finished. */
+  partial: boolean;
+  /** Days of the month the data covers (the sync date's day of month when partial, else the full month). */
+  day: number;
+  days: number;
+}
+
+/**
+ * How much of `month` the data covers, from the sync date. A sync on the last
+ * day of the month counts as complete: the comparison lines and alerts treat
+ * only an unfinished month as partial.
+ */
+export function monthProgress(syncedAt: string, month: string): MonthProgress {
+  const days = daysInMonth(month);
+  const day = monthOf(syncedAt) === month ? Number(syncedAt.slice(8, 10)) : days;
+  return { partial: monthOf(syncedAt) === month && day < days, day, days };
+}
+
 function monthEndMs(month: string): number {
   const [year, m] = month.split("-").map(Number);
   // the first instant of the next month
@@ -85,6 +110,11 @@ export function qualifiedTargetForMonth(cfg: KpiConfig, month: string): number {
   const done = monthIndex(month) - monthIndex(fromMonth);
   const steps = monthIndex(toMonth) - monthIndex(fromMonth);
   return Math.round(fromValue + ((target - fromValue) * done) / steps);
+}
+
+/** Every qualified record in the configured pipelines, whatever its channel: what the qualified-opportunities list shows. */
+export function qualifiedRecords(deals: Deal[], cfg: KpiConfig, pipeline?: Pipeline): Array<Deal & { qualifiedAt: string }> {
+  return deals.filter((d): d is Deal & { qualifiedAt: string } => isQualified(d, cfg, pipeline));
 }
 
 /** Qualified deals that count for marketing: inbound channel, configured pipeline. */

@@ -189,7 +189,10 @@ export function DashboardProvider({ data, config: baseConfig, role, children }: 
   }, []);
 
   const value = useMemo<DashboardContextValue>(() => {
-    const defaultMonth = monthRange(monthOf(data.syncedAt), 2)[0];
+    // The month the data was synced in is the default, even part-way through
+    // (the user asked to see the month in progress); the pages label it "to
+    // date" and the alerts hold their performance verdicts until it closes.
+    const defaultMonth = monthOf(data.syncedAt);
     return {
       data,
       config,
@@ -212,7 +215,7 @@ export function DashboardProvider({ data, config: baseConfig, role, children }: 
       targetLog,
       schedule,
       setSchedule,
-      months: monthRange(defaultMonth, 12),
+      months: monthRange(defaultMonth, 13), // the current month plus the twelve complete ones before it
       defaultMonth,
       today: data.syncedAt,
     };

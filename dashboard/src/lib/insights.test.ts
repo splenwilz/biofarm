@@ -247,6 +247,20 @@ describe("dataQuality and alerts", () => {
     expect(q.monthsNoSpend).toEqual([]);
   });
 
+  it("holds the target, cost and spend verdicts while the report month is still running", () => {
+    // the same report, but synced mid-month: October is the month in progress
+    const running = { ...report, syncedAt: "2026-10-15T12:00:00Z" };
+    const alerts = buildAlerts({ report: running, quality: { ...q, monthsNoSpend: [DEMO_LAST_MONTH] }, config: { ...kpiConfig, targetQualifiedPerMonth: 1000 }, now: "2026-10-15T12:00:00Z" });
+    expect(alerts.find((a) => a.id === "month-in-progress")).toMatchObject({ group: "data", severity: "info", title: "Oct 2026 is still in progress" });
+    expect(alerts.find((a) => a.id === "month-in-progress")?.detail).toMatch(/15 of 31 days/);
+    expect(alerts.some((a) => a.id === "below-target" || a.id === "spend-missing" || a.id === "cpqo-up" || a.id.startsWith("paid-no-qualified"))).toBe(false);
+    // once the month has closed the same conditions fire again
+    const closed = buildAlerts({ report, quality: { ...q, monthsNoSpend: [DEMO_LAST_MONTH] }, config: { ...kpiConfig, targetQualifiedPerMonth: 1000 }, now: DEMO_TODAY });
+    expect(closed.some((a) => a.id === "below-target")).toBe(true);
+    expect(closed.some((a) => a.id === "spend-missing")).toBe(true);
+    expect(closed.some((a) => a.id === "month-in-progress")).toBe(false);
+  });
+
   it("groups alerts into data and performance and keeps the rules that stayed", () => {
     const alerts = buildAlerts({ report, quality: q, config: kpiConfig, now: DEMO_TODAY });
     expect(alerts.every((a) => a.group === "data" || a.group === "performance")).toBe(true);

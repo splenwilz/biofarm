@@ -95,7 +95,7 @@ the reader class has no method but GET, so nothing can be written back.
 Tables (all `pd_`-prefixed, each row keeping the raw API record in `raw`):
 pipelines, stages, deal field definitions (names and option labels behind
 the custom-field hashes and enum ids), users, deals, persons (with their
-Campaigns `marketing_status`), activities, the Leads inbox, deal stage
+Campaigns `marketing_status`), organisations, activities, the Leads inbox, deal stage
 history, every deal field change, each person's consent changes
 (`pd_marketing_status_changes`) and per-campaign opens and clicks
 (`pd_campaign_stats`), and one row per import run.
@@ -111,8 +111,10 @@ uv run python scripts/import_google.py               # Google Ads, GA4, Search C
 
 Every write is an upsert on the Pipedrive id and the history tables have
 natural keys, so running it again creates no duplicates. An incremental run
-reads deals and persons updated since the previous good run's start minus
-ten minutes, plus deals deleted in the last 30 days, then re-reads the
+reads deals, persons and organisations updated since the previous good run's start minus
+ten minutes (organisations are read whole on the first run that finds the table
+empty, since the table arrived after the mirror had been running), plus deals
+deleted in the last 30 days, then re-reads the
 changelog only of deals whose `update_time` moved. Activities use the same
 window; both lead inboxes (open and archived) are read whole on every run, so
 a lead Pipedrive has converted or removed is flagged within the run interval.

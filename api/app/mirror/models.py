@@ -125,6 +125,22 @@ class MirrorPerson(Base):
     flow_fetched_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
 
 
+class MirrorOrganization(Base):
+    """Pipedrive organisations (v2 API), the company behind a person or deal.
+    Read like persons: whole on the first run, by update_time after."""
+
+    __tablename__ = "pd_organizations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    name: Mapped[str | None] = mapped_column(String(512))
+    owner_id: Mapped[int | None] = mapped_column(Integer)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    add_time: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    update_time: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    raw: Mapped[dict] = mapped_column(JsonCol)
+    fetched_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+
 class MirrorUser(Base):
     __tablename__ = "pd_users"
 

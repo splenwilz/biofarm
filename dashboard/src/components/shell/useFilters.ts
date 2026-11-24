@@ -23,7 +23,8 @@ export function useFilters() {
     [router, pathname, filters, defaults],
   );
 
-  const linkTo = useCallback((path: string) => hrefWith(path, filters, defaults), [filters, defaults]);
+  /** A link to another page carrying the current filters, with any of them overridden (e.g. a tile linking to its month alone). */
+  const linkTo = useCallback((path: string, overrides: Partial<Filters> = {}) => hrefWith(path, { ...filters, ...overrides }, defaults), [filters, defaults]);
 
   return { filters, setFilters, linkTo, months };
 }

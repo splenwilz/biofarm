@@ -106,13 +106,15 @@ export function OverviewPage() {
     audience,
     data,
     period,
+    progress,
   } = useReport();
   const { annotations, addAnnotation, removeAnnotation, canEdit } = useDashboard();
   const [range, setRange] = useState<Range>(12);
   const lastYearMonth = monthRange(report.reportMonth, 13)[0];
   const h = report.headline;
   const month = period.month;
-  const prev = `vs ${monthName(report.prevMonth)}`;
+  // A month in progress is compared with a whole month, so say how far in it is.
+  const prev = progress.partial ? `vs ${monthName(report.prevMonth)}, ${progress.day} ${progress.day === 1 ? "day" : "days"} in` : `vs ${monthName(report.prevMonth)}`;
   const lastYear = monthLabel(lastYearMonth);
   const audienceNote =
     filters.audience === "all" ? "" : ` · ${audience.title.toLowerCase()}`;
@@ -165,6 +167,7 @@ export function OverviewPage() {
             testId="kpi-qualified"
             label="Qualified opportunities"
             value={integer(h.qualified)}
+            href={linkTo("/qualified", { window: 1 })} // the tile is one month; open the list on that month, not the breakdown window
             delta={{ value: h.qualifiedDelta, note: prev }}
             footnote={`Target ${integer(config.targetQualifiedPerMonth)} · ${config.trailingMonths}-month average ${h.trailingAvg.toFixed(1)}`}
             info={[

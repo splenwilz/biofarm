@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { dateLabel, gbp, integer, monthLabel, monthName, pct, signed, windowLabel } from "@/lib/format";
+import { dateLabel, gbp, integer, monthLabel, monthName, monthOptionLabel, pct, signed, windowLabel } from "@/lib/format";
 
 describe("format", () => {
   it("labels months", () => {
     expect(monthLabel("2026-10")).toBe("Oct 2026");
     expect(monthLabel("2026-01", false)).toBe("Jan");
     expect(monthName("2026-09")).toBe("September");
+  });
+  it("marks the unfinished sync month as to date in the picker, and nothing else", () => {
+    expect(monthOptionLabel("2026-11", "2026-11-23T13:46:01Z")).toBe("Nov 2026 (to date)");
+    expect(monthOptionLabel("2026-10", "2026-11-23T13:46:01Z")).toBe("Oct 2026");
+    expect(monthOptionLabel("2026-11", "2026-11-30T20:00:00Z")).toBe("Nov 2026");
   });
   it("labels a window of months, repeating the year only when it changes", () => {
     expect(windowLabel(["2026-10"])).toBe("Oct 2026");

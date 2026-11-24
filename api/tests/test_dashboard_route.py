@@ -29,7 +29,9 @@ async def test_returns_the_records_with_the_right_token(client):
     body = r.json()
     assert body["source"] == "pipedrive" and body["syncedAt"] == "2026-10-07T13:47:29Z"
     assert body["deals"] == [{"id": "1", "pipeline": "developer", "channel": None, "createdAt": "2026-10-07T13:47:29Z", "qualifiedAt": "2026-10-07T13:47:29Z",
-                              "status": "open", "sourceLabel": None, "campaign": None, "personId": None, "qualificationStatus": None}]
+                              "status": "open", "sourceLabel": None, "campaign": None, "personId": None, "qualificationStatus": None,
+                              "title": None, "personName": None, "organisation": None, "stage": "OPPORTUNITY (Qualified)", "origin": None, "createdBy": None, "owner": None,
+                              "sourceLeadId": None, "qualifiedBy": "Created in the Developer Pipeline: qualified on arrival"}]
     assert r.headers["cache-control"] == "no-store"
 
 

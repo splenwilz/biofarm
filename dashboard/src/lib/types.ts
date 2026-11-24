@@ -48,6 +48,20 @@ export interface Deal {
    * ticked YES before conversion is a record here under its lead id.
    */
   qualificationStatus?: string | null;
+  /** Who and where, for the qualified-opportunities list. Absent on demo data and older feeds; null when the mirror cannot say. */
+  title?: string | null;
+  personName?: string | null;
+  organisation?: string | null;
+  /** The Pipedrive stage the deal sits in; null for a lead not yet converted. */
+  stage?: string | null;
+  /** How the record came in: a website form or our API, made by hand by the team, or a bulk import. */
+  origin?: "website" | "team" | "import" | null;
+  createdBy?: string | null;
+  owner?: string | null;
+  /** The lead this deal was converted from, which is the enquiry's id. */
+  sourceLeadId?: string | null;
+  /** Why it counts, in words, from the rule that applied. */
+  qualifiedBy?: string | null;
 }
 
 export type EnquiryForm = "contact" | "newsletter" | "cpd" | "fold" | "landowner";

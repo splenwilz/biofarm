@@ -34,7 +34,7 @@ import { Icon } from "@/components/shell/icons";
 import { DRAWER_WIDTH, isActiveHref, NAV_SECTIONS, OVERVIEW, TOP_BAR_HEIGHT, type NavItem } from "@/components/shell/nav";
 import { useFilters } from "@/components/shell/useFilters";
 import { AUDIENCE_LABEL, type AudienceFilter } from "@/lib/filters";
-import { dateLabel, monthLabel } from "@/lib/format";
+import { dateLabel, monthOptionLabel } from "@/lib/format";
 
 /**
  * Dashboard shell, after the BoothIQ layout: a persistent labelled sidebar
@@ -218,6 +218,7 @@ function AudienceSwitcher() {
 
 function MonthSelect() {
   const { filters, setFilters, months } = useFilters();
+  const { today } = useDashboard();
   const id = useId();
   return (
     <TextField
@@ -232,7 +233,7 @@ function MonthSelect() {
     >
       {[...months].reverse().map((m) => (
         <option key={m} value={m}>
-          {monthLabel(m)}
+          {monthOptionLabel(m, today)}
         </option>
       ))}
     </TextField>

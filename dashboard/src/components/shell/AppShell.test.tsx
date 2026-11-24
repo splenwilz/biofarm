@@ -63,19 +63,36 @@ describe("AppShell", () => {
     expect(navState.replace).toHaveBeenCalledWith("/sources?audience=landowner", { scroll: false });
   });
 
-  it("the month selector rewrites the URL and lists the twelve months of data", () => {
+  it("the month selector rewrites the URL and lists the current month plus the twelve complete months before it", () => {
     renderShell();
     expect(screen.queryByLabelText(/period ending/i)).not.toBeInTheDocument();
     const select = screen.getByLabelText(/^month$/i) as HTMLSelectElement;
-    expect(select.options).toHaveLength(12);
+    expect(select.options).toHaveLength(13);
+    // demo data is synced on the last day of October, so October is complete and carries no "to date"
+    expect(select.options[0]!.text).toBe("Oct 2026");
     fireEvent.change(select, { target: { value: "2026-08" } });
     expect(navState.replace).toHaveBeenCalledWith("/?month=2026-08", { scroll: false });
+  });
+
+  it("labels the unfinished sync month to date in the picker and makes it the default", () => {
+    resetNavigation("/");
+    render(
+      <DashboardProvider role="admin" data={{ ...data, syncedAt: "2026-10-15T12:00:00Z" }} config={kpiConfig}>
+        <AppShell>
+          <p>page body</p>
+        </AppShell>
+      </DashboardProvider>,
+    );
+    const select = screen.getByLabelText(/^month$/i) as HTMLSelectElement;
+    expect(select.options[0]!.text).toBe("Oct 2026 (to date)");
+    expect(select.options[1]!.text).toBe("Sep 2026");
+    expect(select.value).toBe("2026-10");
   });
 
   it("says the numbers are demo data and when they were synced", () => {
     renderShell();
     expect(screen.getAllByText(/demo data/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/synced 1 Nov 2026/i)).toBeInTheDocument();
+    expect(screen.getByText(/synced 31 Oct 2026/i)).toBeInTheDocument();
   });
 
   it("shows a demo data banner above every page, and none once live data is connected", () => {

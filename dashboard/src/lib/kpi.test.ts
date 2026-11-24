@@ -20,6 +20,8 @@ import {
   spendByMonth,
   type SourceRow,
   trailingSum,
+  daysInMonth,
+  monthProgress,
 } from "@/lib/kpi";
 import type { Deal, Enquiry, SpendEntry } from "@/lib/types";
 
@@ -495,5 +497,21 @@ describe("inboundSourceGroups", () => {
   it("names the inbound channels by the shared channel names, Website split into the groups it becomes", () => {
     expect(inboundSourceGroups(cfg)).toEqual(["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website (source not tracked)", "Info email inbox", "Marketplace", "Direct/unknown"]);
     expect(inboundSourceGroups({ ...cfg, inboundChannels: ["Linkedin"] })).toEqual(["LinkedIn posts"]);
+  });
+});
+
+describe("monthProgress", () => {
+  it("knows how long each month is", () => {
+    expect(daysInMonth("2026-02")).toBe(28);
+    expect(daysInMonth("2028-02")).toBe(29);
+    expect(daysInMonth("2026-11")).toBe(30);
+    expect(daysInMonth("2026-12")).toBe(31);
+  });
+
+  it("calls the sync month partial until its last day, and every other month complete", () => {
+    expect(monthProgress("2026-11-23T13:46:01Z", "2026-11")).toEqual({ partial: true, day: 23, days: 30 });
+    expect(monthProgress("2026-11-01T00:30:00Z", "2026-11")).toEqual({ partial: true, day: 1, days: 30 });
+    expect(monthProgress("2026-11-30T09:00:00Z", "2026-11")).toEqual({ partial: false, day: 30, days: 30 });
+    expect(monthProgress("2026-11-23T13:46:01Z", "2026-10")).toEqual({ partial: false, day: 31, days: 31 });
   });
 });

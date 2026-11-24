@@ -47,6 +47,22 @@ class DealOut(Wire):
     # or before the field existed. A lead ticked YES before conversion is a
     # record here too, under its lead id (see app/reporting/deals.py).
     qualification_status: str | None = None
+    # Who and where, for the qualified-opportunities list: the deal's title, the
+    # person and their organisation as Pipedrive names them, the stage the deal
+    # sits in (None for a lead not yet converted), how the record came in
+    # (website = a form or our API, team = created by hand, import = bulk) and
+    # which team member created and owns it. Empty when the mirror cannot say.
+    title: str | None = None
+    person_name: str | None = None
+    organisation: str | None = None
+    stage: str | None = None
+    origin: Literal["website", "team", "import"] | None = None
+    created_by: str | None = None
+    owner: str | None = None
+    # The lead this deal was converted from, so the enquiry it came in as can be found.
+    source_lead_id: str | None = None
+    # Why it counts, in words, from the rule that applied (None while unqualified).
+    qualified_by: str | None = None
 
 
 class EnquiryOut(Wire):

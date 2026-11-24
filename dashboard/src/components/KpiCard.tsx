@@ -1,8 +1,10 @@
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
+import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import NextLink from "next/link";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
 
 import { chart } from "@/components/charts/palette";
@@ -35,6 +37,9 @@ export interface KpiCardProps {
   textValue?: boolean;
   /** The longer explanation, kept behind an info icon; an array is shown as separate short lines. */
   info?: string | string[];
+  /** Where the records behind the number are listed, as a small link at the foot of the card. */
+  href?: string;
+  hrefLabel?: string;
 }
 
 function deltaColor(delta: KpiDelta): string {
@@ -60,6 +65,8 @@ export function KpiCard({
   testId,
   textValue = false,
   info,
+  href,
+  hrefLabel = "See every record",
 }: KpiCardProps) {
   const percent = progress
     ? Math.min(100, Math.round((progress.value / progress.target) * 100))
@@ -164,6 +171,11 @@ export function KpiCard({
           <Typography data-testid="kpi-footnote" variant="caption" color="text.secondary" sx={{ pt: 0.5, mt: "auto" }}>
             {footnote}
           </Typography>
+        )}
+        {href && (
+          <Link component={NextLink} href={href} data-print="hide" underline="hover" variant="caption" sx={{ fontWeight: 600, color: "text.primary", pt: 0.5, ...(footnote ? {} : { mt: "auto" }) }}>
+            {hrefLabel} &rarr;
+          </Link>
         )}
       </Stack>
     </Paper>

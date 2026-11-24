@@ -19,6 +19,7 @@ export const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: "Performance",
     items: [
+      { name: "Qualified opportunities", href: "/qualified", icon: "check", description: "Every record behind the qualified number, with the agreed rule applied to each one." },
       { name: "Sources", href: "/sources", icon: "globe", description: "Enquiries and qualified opportunities by where they came from, by form, and what became of them." },
       { name: "Campaigns", href: "/campaigns", icon: "megaphone", description: "Spend, enquiries and qualified opportunities per campaign, and by landing page." },
       { name: "Enquiry to qualified", href: "/cohorts", icon: "trending", description: "How each month's enquiries matured into qualified opportunities." },

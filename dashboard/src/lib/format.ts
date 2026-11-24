@@ -1,3 +1,4 @@
+import { monthProgress } from "@/lib/kpi";
 import type { SpendPlatform } from "@/lib/types";
 
 export const PLATFORM_LABEL: Record<SpendPlatform, string> = {
@@ -26,6 +27,11 @@ const MONTHS = [
 export function monthLabel(month: string, withYear = true): string {
   const [y, m] = month.split("-").map(Number);
   return withYear ? `${MONTHS[m - 1]} ${y}` : MONTHS[m - 1];
+}
+
+/** The month picker's wording: the unfinished month says so, e.g. "Nov 2026 (to date)". */
+export function monthOptionLabel(month: string, syncedAt: string): string {
+  return monthProgress(syncedAt, month).partial ? `${monthLabel(month)} (to date)` : monthLabel(month);
 }
 
 const MONTH_NAMES = [
