@@ -138,7 +138,9 @@ var PIPELINE_SITES = [
   {"name":"Thoulstone Park","lpa":"Wiltshire","nca":"Avon Vales","region":"south west","lat":51.262,"lng":-2.1823,"area":"24.65 ha","kind":"planned habitat bank","habitats":"grassland enhancement, woodland, pond"},
   {"name":"Arthur Rickwood Farm","lpa":"East Cambridgeshire","nca":"The Fens","region":"south east","lat":52.4063,"lng":0.2236,"area":"15.6 ha","kind":"planned habitat bank","habitats":"grassland enhancement, scrub, ditches and temporary ponds"},
   {"name":"Priory Farm","lpa":"Babergh","nca":"South Suffolk & North Essex Clayland","region":"south east","lat":51.985,"lng":0.885,"area":"20.89 ha","kind":"planned habitat bank","habitats":"grassland enhancement, scrub, trees"},
-  {"name":"Dennington Hall","lpa":"East Suffolk","nca":"South Norfolk and High Suffolk Claylands","region":"south east","lat":52.2555,"lng":1.3375,"area":"22.6 ha","kind":"planned habitat bank","habitats":"neutral grassland, mixed scrub, rural trees, hedgerows"}
+  {"name":"Dennington Hall","lpa":"East Suffolk","nca":"South Norfolk and High Suffolk Claylands","region":"south east","lat":52.2555,"lng":1.3375,"area":"22.6 ha","kind":"planned habitat bank","habitats":"neutral grassland, mixed scrub, rural trees, hedgerows"},
+  {"name":"Banks Farm","lpa":"Somerset","nca":"Yeovil Scarplands","region":"south west","lat":51.1694,"lng":-2.4857,"area":"27 ha","kind":"planned habitat bank","habitats":"traditional orchard, neutral grassland, mixed scrub, hedgerows"},
+  {"name":"Beech Tor Farm","lpa":"South Hams","nca":"South Devon","region":"south west","lat":50.3153,"lng":-3.9137,"area":"20.4 ha","kind":"planned habitat bank","habitats":"neutral grassland, mixed scrub, individual trees, hedgerows"}
 ];
 
 
@@ -245,7 +247,7 @@ var BF_PREVIEWS = {};
     } catch (e) {}
   }
   fillStats(); document.addEventListener('DOMContentLoaded', fillStats);
-  var SOON_LIMIT = 7, soonExpanded = false, moreBtn = null; // 7 = show all launch coming-soon cards; reveal button only appears if the list grows past this
+  var SOON_LIMIT = 9, soonExpanded = false, moreBtn = null; // 9 = show all coming-soon cards (7 launch sites + Banks Farm + Beech Tor Farm, 24 Nov 2026); reveal button only appears if the list grows past this
   var sortMode = 'featured', gridHead = null, ghCount = null, ghSort = null;
   function buildGridHead(){
     gridHead = document.createElement('div');

@@ -21,7 +21,7 @@ const cardCss = read('./cards-custom-css.css');
 const soon = [
   ['Broadlands','broadlands'], ['Highfold','highfold'], ['Worth Abbey','worth-abbey'],
   ['Dennington','dennington'], ['Thoulstone','thoulstone'],
-  ['Arthur Rickwood','arthur-rickwood'], ['Priory Farm','priory-farm'],
+  ['Arthur Rickwood','arthur-rickwood'], ['Priory Farm','priory-farm'], ['Banks Farm','banks-farm'], ['Beech Tor Farm','beech-tor-farm'],
   // removed-from-launch site: must be auto-hidden by the finder's unmatched rule
   ['Cookridge (should be hidden)','cookridge'],
 ];
