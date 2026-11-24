@@ -219,7 +219,7 @@ const REFERRER_NAMES: Record<string, string> = {
 };
 
 const CHANNEL_SOURCE: Record<Channel, SourceKey> = {
-  Website: { group: "Website (source not tracked)", platform: "Website" },
+  Website: { group: "Website", platform: "Website" },
   "Info email inbox": { group: "Info email inbox", platform: "Info email inbox" },
   Linkedin: { group: "LinkedIn posts", platform: "LinkedIn" },
   "Trade Show / Event": { group: "Events", platform: "Trade show or event" },
@@ -285,7 +285,7 @@ export function sourceOf(label: string | null, channel: Channel | null): SourceK
     if (medium === "referral" && SEARCH_HOST.test(source)) {
       return { group: "Organic search", platform: isGoogle(source) ? "Google" : isMicrosoft(source) ? "Bing" : "Other search engines" };
     }
-    if (label === "direct") return CHANNEL_SOURCE.Website;
+    if (label === "direct") return CHANNEL_SOURCE.Website; // arrived with nothing to record: the "Website" group, with the untracked
     if (medium === "referral" || medium === "social") return { group: "Referral", platform: REFERRER_NAMES[source] ?? source };
   }
   return channel ? CHANNEL_SOURCE[channel] : { group: "Direct/unknown", platform: "Unknown" };

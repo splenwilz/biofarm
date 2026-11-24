@@ -362,6 +362,21 @@ class TestEnquiryRules:
     def test_test_campaigns_and_test_people_are_left_out(self):
         assert derive(cand(utm_campaign="go-live-check"), ectx()) == "test_campaign"
         assert derive(cand(website=website(attribution={"utm_campaign": "tracking-test"})), ectx()) == "test_campaign"
+
+    def test_submissions_made_from_googles_tag_debugger_are_tests(self):
+        """Tag Assistant is Google's tag-debugging tool: a referrer from it means
+        someone was checking the tracking, not enquiring."""
+        assert derive(cand(touch={"referrer": "https://tagassistant.google.com/"}), ectx()) == "test_referrer"
+        assert derive(cand(touch={"referrer": "tagassistant.google.com"}), ectx()) == "test_referrer"
+        assert derive(cand(website=website(attribution={"referrer": "https://tagassistant.google.com/#/?source=TAG_MANAGER"})), ectx()) == "test_referrer"
+        assert not isinstance(derive(cand(touch={"referrer": "https://www.google.com/"}), ectx()), str)
+        assert not isinstance(derive(cand(touch={"referrer": "https://nottagassistant.google.com.example/"}), ectx()), str)
+        assert derive(cand(touch={"referrer": "https://www.tagassistant.google.com/"}), ectx()) == "test_referrer"
+        assert derive(cand(touch={"referrer": "//tagassistant.google.com/"}), ectx()) == "test_referrer"
+        # free text in Pipedrive: a value urlsplit rejects must not take the whole payload down
+        assert not isinstance(derive(cand(touch={"referrer": "https://[not-a-host/"}), ectx()), str)
+        assert not isinstance(derive(cand(website=website(attribution={"referrer": "[["})), ectx()), str)
+        assert derive(cand(touch={"referrer": "https://tagassistant.google.com/"}), ectx(settings=settings(enquiry_test_referrers=[]))) != "test_referrer"
         assert derive(cand(person_id=503), ectx()) == "test_person"  # biofarm-test.dev
         assert derive(cand(person_id=504, title="Website enquiry - Godswill William"), ectx()) == "test_person"  # the address, any case
         assert derive(cand(person_id=504, title="Heath Farm", origin="ManuallyCreated", kind="deal", id="9"), ectx()) == "test_person"

@@ -180,8 +180,8 @@ describe("sourceOf", () => {
     [null, "Info email inbox", "Info email inbox", "Info email inbox"],
     [null, "Marketplace", "Marketplace", "Marketplace"],
     [null, "Campaigns / Outreach", "Direct/unknown", "Campaigns / Outreach"],
-    ["direct", null, "Website (source not tracked)", "Website"], // "direct" is what the lead API writes when nothing about the visit is known
-    [null, "Website", "Website (source not tracked)", "Website"],
+    ["direct", null, "Website", "Website"], // "direct" is what the lead API writes when nothing about the visit is known
+    [null, "Website", "Website", "Website"],
     [null, null, "Direct/unknown", "Unknown"],
     ["something/odd", null, "Direct/unknown", "Unknown"],
   ])("label %s with channel %s -> %s / %s", (label, channel, group, platform) => {
@@ -193,7 +193,7 @@ describe("sourceOf", () => {
   });
 
   it("lists the reporting groups in their fixed order; nothing with a known channel is Direct/unknown", () => {
-    expect(SOURCE_GROUPS).toEqual(["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website (source not tracked)", "Info email inbox", "Marketplace", "Direct/unknown"]);
+    expect(SOURCE_GROUPS).toEqual(["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website", "Info email inbox", "Marketplace", "Direct/unknown"]);
   });
 });
 
@@ -222,7 +222,7 @@ describe("enquiriesBySource", () => {
   it("groups enquiries, qualified opportunities and spend, with the platforms inside each group", () => {
     const rows = enquiriesBySource(enquiries, deals, spend, months, cfg);
     // ties (one enquiry, nothing qualified) fall back to the fixed group order, so Newsletter comes before the untracked website row
-    expect(rows.map((r) => r.group)).toEqual(["Paid search", "Newsletter", "Website (source not tracked)", "Info email inbox", "Organic search", "LinkedIn ads", "LinkedIn posts", "Referral", "Events", "Marketplace", "Direct/unknown"]);
+    expect(rows.map((r) => r.group)).toEqual(["Paid search", "Newsletter", "Website", "Info email inbox", "Organic search", "LinkedIn ads", "LinkedIn posts", "Referral", "Events", "Marketplace", "Direct/unknown"]);
     expect(rows[0]).toEqual({
       group: "Paid search",
       enquiries: 2,
@@ -239,7 +239,7 @@ describe("enquiriesBySource", () => {
       ],
     });
     expect(rows[2]).toEqual({
-      group: "Website (source not tracked)",
+      group: "Website",
       enquiries: 1,
       leads: 1,
       qualified: 0,
@@ -273,7 +273,7 @@ describe("enquiriesBySource", () => {
     ];
     const qualified: Deal[] = [deal({ id: "q1", createdAt: "2026-10-05", personId: 1 }), deal({ id: "77", createdAt: "2026-10-03", personId: 3 })];
     const row = enquiriesBySource(list, qualified, [], months, cfg)[0];
-    expect(row.group).toBe("Website (source not tracked)");
+    expect(row.group).toBe("Website");
     expect([row.enquiries, row.qualified]).toEqual([3, 2]);
     expect([row.leads, row.qualifiedFromLeads, row.notYetJudged]).toEqual([2, 1, 1]);
   });
@@ -358,7 +358,7 @@ describe("October 2026, as the live feed had it on 12 Nov 2026", () => {
     const sum = (pick: (r: SourceRow) => number) => rows.reduce((s, r) => s + pick(r), 0);
     expect([sum((r) => r.enquiries), sum((r) => r.leads), sum((r) => r.qualified), sum((r) => r.qualifiedFromLeads), sum((r) => r.notYetJudged)]).toEqual([33, 30, 10, 6, 24]);
     // the landowner lead whose deal is still in CALL / QUALIFY is one of the 24: not yet judged, not unqualified
-    expect(rows.find((r) => r.group === "Website (source not tracked)")!.notYetJudged).toBe(24);
+    expect(rows.find((r) => r.group === "Website")!.notYetJudged).toBe(24);
   });
 });
 
@@ -495,7 +495,7 @@ describe("qualifiedTargetForMonth", () => {
 
 describe("inboundSourceGroups", () => {
   it("names the inbound channels by the shared channel names, Website split into the groups it becomes", () => {
-    expect(inboundSourceGroups(cfg)).toEqual(["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website (source not tracked)", "Info email inbox", "Marketplace", "Direct/unknown"]);
+    expect(inboundSourceGroups(cfg)).toEqual(["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website", "Info email inbox", "Marketplace", "Direct/unknown"]);
     expect(inboundSourceGroups({ ...cfg, inboundChannels: ["Linkedin"] })).toEqual(["LinkedIn posts"]);
   });
 });

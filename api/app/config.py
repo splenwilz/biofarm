@@ -226,6 +226,11 @@ class Settings(BaseSettings):
     enquiry_website_origins: Annotated[list[str], NoDecode] = ["WebForms", "API"]
     # A record whose UTM campaign is one of these was a tracking test.
     enquiry_test_campaigns: Annotated[list[str], NoDecode] = ["tracking-test", "go-live-check", "field-map", "final-check"]
+    # A record whose visit came from one of these referrer hosts was someone
+    # checking the tracking, not enquiring: Google Tag Assistant is the tag
+    # debugger the agency uses in GTM preview mode (compared lower-cased, on
+    # the host alone).
+    enquiry_test_referrers: Annotated[list[str], NoDecode] = ["tagassistant.google.com"]
     # Persons with an address at one of these domains, or one of these
     # addresses, are the team testing the forms (compared lower-cased). The
     # team's own addresses belong in the environment, not here: set
@@ -369,7 +374,7 @@ class Settings(BaseSettings):
     # with it the website forms) from booting. Bad values are logged and the
     # default kept.
     @field_validator(
-        "enquiry_excluded_deal_origins", "enquiry_website_origins", "enquiry_test_campaigns",
+        "enquiry_excluded_deal_origins", "enquiry_website_origins", "enquiry_test_campaigns", "enquiry_test_referrers",
         "enquiry_test_domains", "enquiry_test_emails", "enquiry_staff_domains",
         mode="before",
     )

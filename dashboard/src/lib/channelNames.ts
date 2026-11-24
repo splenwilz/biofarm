@@ -13,8 +13,8 @@ export const CHANNEL_NAMES = {
   newsletter: "Newsletter",
   referral: "Referral",
   events: "Events",
-  /** Website leads whose visit carried no source or medium (the lead API's "direct", Pipedrive web forms, leads typed in by the team). */
-  websiteUntracked: "Website (source not tracked)",
+  /** Website enquiries whose route is not known: the visitor arrived direct (typed address, bookmark, an app passing no referrer) or the record carries no source. The other website routes are named by source above. */
+  websiteUntracked: "Website",
   infoInbox: "Info email inbox",
   marketplace: "Marketplace",
   /** Only records with no channel at all; anything with a known channel has its own group. */

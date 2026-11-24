@@ -413,10 +413,11 @@ describe("KpiRulePage", () => {
     wrap(<KpiRulePage />);
     expect(screen.getByRole("heading", { level: 1, name: /kpi rule/i })).toBeInTheDocument();
     const inbound = screen.getByText("Inbound source channels").parentElement!;
-    for (const name of ["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website (source not tracked)", "Info email inbox", "Marketplace", "Direct/unknown"]) {
+    for (const name of ["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website", "Info email inbox", "Marketplace", "Direct/unknown"]) {
       expect(within(inbound).getByText(name)).toBeInTheDocument();
     }
-    expect(within(inbound).queryByText("Website")).not.toBeInTheDocument();
+    // the plain channel name appears once, as the group for website enquiries with no known route; never twice
+    expect(within(inbound).getAllByText("Website")).toHaveLength(1);
     expect(screen.queryByText("Landowner enquiries will have their own checklist.")).not.toBeInTheDocument();
     expect(screen.queryByText("Draft, not yet agreed")).not.toBeInTheDocument();
     expect(screen.queryByRole("switch")).not.toBeInTheDocument();

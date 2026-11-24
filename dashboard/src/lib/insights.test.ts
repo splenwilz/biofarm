@@ -115,7 +115,7 @@ describe("outcomesBySource", () => {
   it("lists every source group, busiest first, even those with no qualified opportunities", () => {
     const rows = outcomesBySource(data.deals, months, kpiConfig);
     expect(rows).toHaveLength(11);
-    expect(new Set(rows.map((r) => r.group))).toEqual(new Set(["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website (source not tracked)", "Info email inbox", "Marketplace", "Direct/unknown"]));
+    expect(new Set(rows.map((r) => r.group))).toEqual(new Set(["Paid search", "Organic search", "LinkedIn ads", "LinkedIn posts", "Newsletter", "Referral", "Events", "Website", "Info email inbox", "Marketplace", "Direct/unknown"]));
     for (let i = 1; i < rows.length; i += 1) {
       const total = (r: (typeof rows)[number]) => r.won + r.open + r.lost;
       expect(total(rows[i - 1])).toBeGreaterThanOrEqual(total(rows[i]));

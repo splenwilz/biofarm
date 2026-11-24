@@ -35,7 +35,7 @@ from app.mirror.models import Activity, MirrorDeal, MirrorLead, MirrorPerson
 from app.models import Lead
 from app.reporting.deals import DealContext, MarketingDeals, load_marketing_deals, tick_rule_applies, day, origin_kind
 from app.reporting.schemas import Audience, Channel, DealOut, EnquiryForm, EnquiryOut
-from app.services.attribution import source_label, touch_label
+from app.services.attribution import source_label, touch_label, referrer_host
 
 logger = logging.getLogger("app.reporting")
 
@@ -44,7 +44,7 @@ FORMS: frozenset[str] = frozenset(EnquiryForm.__args__)
 CONTACT_TYPES = frozenset({"call", "email", "meeting"})
 Kind = Literal["lead", "deal"]
 # Why a record was left out; the loader logs a count per reason.
-Reason = Literal["imported", "test_title", "test_campaign", "test_person", "staff", "newsletter"]
+Reason = Literal["imported", "test_title", "test_campaign", "test_referrer", "test_person", "staff", "newsletter"]
 
 
 # ---- first contact -----------------------------------------------------------------------
@@ -131,6 +131,10 @@ class EnquiryContext:
     def test_campaigns(self) -> frozenset[str]:
         return frozenset(c.strip().lower() for c in self.settings.enquiry_test_campaigns)
 
+    @cached_property
+    def test_referrers(self) -> frozenset[str]:
+        return frozenset(h.strip().lower().removeprefix("www.") for h in self.settings.enquiry_test_referrers if h.strip())
+
 
 def audience_of(fields: object) -> Audience:
     chosen = set(fields) if isinstance(fields, list) else set()
@@ -155,6 +159,24 @@ def _clean(value: object) -> str | None:
 
 def _domain(email: str) -> str:
     return email.rsplit("@", 1)[-1] if "@" in email else ""
+
+
+def referrer_host_of(c: Candidate) -> str | None:
+    """The host the visit came from, from Pipedrive's Referrer field or our own
+    website record (the same parser the lead API uses); None when neither
+    recorded one, or the value cannot be read."""
+    values = [c.touch.get("referrer") if c.touch else None]
+    if c.website is not None and isinstance(c.website.attribution, dict):
+        values.append(c.website.attribution.get("referrer"))
+    for value in values:
+        text = _clean(value)
+        if not text:
+            continue
+        # a bare host or a protocol-relative value gets a scheme so the splitter sees a netloc
+        host = referrer_host(text if "://" in text else f"https:{text}" if text.startswith("//") else f"https://{text}")
+        if host:
+            return host
+    return None
 
 
 def campaign_of(c: Candidate) -> str | None:
@@ -219,6 +241,9 @@ def derive(c: Candidate, ctx: EnquiryContext) -> EnquiryOut | Reason:
     campaign = campaign_of(c)
     if campaign and campaign.lower() in ctx.test_campaigns:
         return "test_campaign"
+    host = referrer_host_of(c)
+    if host and host in ctx.test_referrers:
+        return "test_referrer"
     emails = [e.lower() for e in ctx.person_emails.get(c.person_id, [])] if c.person_id is not None else []
     if c.website is not None and c.website.email:
         emails.append(c.website.email.lower())

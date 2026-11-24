@@ -38,7 +38,10 @@ def _part(value: object) -> str | None:
     return text[:_MAX_PART] or None
 
 
-def _referrer_host(referrer: object) -> str | None:
+def referrer_host(referrer: object) -> str | None:
+    """The host a visit came from, lower-cased, without a leading www.; None for
+    nothing, our own hosts, or a value urlsplit cannot parse (a malformed
+    bracketed host raises ValueError, and the field is free text)."""
     if not referrer:
         return None
     try:
@@ -64,7 +67,7 @@ def _label(touch: Mapping[str, object] | None) -> str | None:
     for key, (src, med) in _CLICK_IDS:
         if touch.get(key):
             return f"{src}/{med}"
-    host = _referrer_host(touch.get("referrer"))
+    host = referrer_host(touch.get("referrer"))
     if host:
         return f"{_part(host)}/referral"
     return None

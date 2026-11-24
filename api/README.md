@@ -167,7 +167,8 @@ the Leads inbox (open and archived; archived ones are marked) plus every deal
 created directly in a marketing pipeline. Left out, with a count per reason
 in the log: deals with origin `Import`; titles matching the test pattern
 ("Test Valley" and "Testway" are real places and stay in); records whose UTM
-campaign is a tracking test, or whose person has a test address or domain;
+campaign is a tracking test, whose visit came from a tag-debugging referrer
+(Google Tag Assistant), or whose person has a test address or domain;
 website sign-ups by people at a staff domain; and newsletter sign-ups, which
 the feed reports by month under `newsletter.signups` instead. A deal
 converted from a lead (`source_lead_id`, which v2 deals return on request)
@@ -294,6 +295,7 @@ to bump `ADS_API_VERSION`). No developer token: they were sunset on
 | `BIOFARM_ENQUIRY_EXCLUDED_DEAL_ORIGINS` | no | JSON list of Pipedrive deal origins that are not enquiries, default `["Import"]` |
 | `BIOFARM_ENQUIRY_WEBSITE_ORIGINS` | no | JSON list of origins that mean "came through the website" (default Website channel; form read from the title, except that a Pipedrive web form named `Landowner Contact Form` - the landowner page's embed until November 2026 - counts as the `landowner` form so the by-form table stays in one row across the switch), default `["WebForms","API"]` |
 | `BIOFARM_ENQUIRY_TEST_CAMPAIGNS` | no | JSON list of UTM campaigns that were tracking tests, default `["tracking-test","go-live-check","field-map","final-check"]` |
+| `BIOFARM_ENQUIRY_TEST_REFERRERS` | no | JSON list of referrer hosts that mean a tracking test, default `["tagassistant.google.com"]` (Google's tag debugger, used in GTM preview mode) |
 | `BIOFARM_ENQUIRY_TEST_DOMAINS` / `BIOFARM_ENQUIRY_TEST_EMAILS` | yes, for real figures | JSON lists; a person with such an address was the team testing the forms (lower-cased before comparing). Default domains `["biofarm-test.dev"]`, default emails none: the team's own domains and addresses are set in the environment, never in the code, and a value replaces the default (so include `biofarm-test.dev` again) |
 | `BIOFARM_ENQUIRY_STAFF_DOMAINS` | no | JSON list; website sign-ups by people at these domains are staff trying the forms, default `["biofarm.co.uk"]` |
 | `BIOFARM_ENQUIRY_TEST_TITLE_PATTERN` | no | case-insensitive regex for test titles, default `\btest\b(?!\s+valley)` |
