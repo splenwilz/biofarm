@@ -4,6 +4,7 @@ import { unstable_rethrow } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 
+import { requireSession } from "@/auth/session";
 import { DashboardProvider } from "@/components/DashboardProvider";
 import { FeedUnavailable } from "@/components/FeedUnavailable";
 import { AppShell } from "@/components/shell/AppShell";
@@ -35,9 +36,14 @@ function ShellFallback() {
  * token, no answer) is shown with the API's own explanation rather than
  * thrown: in production Next hands the error boundary a generic message and
  * a digest, which would leave the reader guessing. The demo source never fails.
+ *
+ * The session is checked here as well as in proxy.ts (the authentication
+ * guide's rule: the check nearest the data is the one that counts); the role
+ * it carries decides which controls the pages show.
  */
 async function DashboardRoot({ children }: { children: React.ReactNode }) {
   await connection();
+  const session = await requireSession();
   let data: DashboardData;
   try {
     data = await getDataSource().getDashboardData();
@@ -47,7 +53,7 @@ async function DashboardRoot({ children }: { children: React.ReactNode }) {
     return <FeedUnavailable message={err instanceof Error ? err.message : String(err)} />;
   }
   return (
-    <DashboardProvider data={data} config={kpiConfig}>
+    <DashboardProvider data={data} config={kpiConfig} role={session.role}>
       <AppShell>{children}</AppShell>
     </DashboardProvider>
   );

@@ -53,6 +53,3 @@ export function isActiveHref(pathname: string, href: string): boolean {
 
 export const DRAWER_WIDTH = 256;
 export const TOP_BAR_HEIGHT = 64;
-
-/** Placeholder until sign-in exists; the footer then shows the signed-in person. */
-export const SHELL_USER = { name: "Godswill William", role: "Marketing", initials: "GW" };

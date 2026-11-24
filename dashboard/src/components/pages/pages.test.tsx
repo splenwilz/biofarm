@@ -28,7 +28,7 @@ const data = buildDemoData();
 
 function wrap(ui: React.ReactNode) {
   return render(
-    <DashboardProvider data={data} config={kpiConfig}>
+    <DashboardProvider role="admin" data={data} config={kpiConfig}>
       {ui}
     </DashboardProvider>,
   );
@@ -36,7 +36,7 @@ function wrap(ui: React.ReactNode) {
 
 function wrapWithoutSpend(ui: React.ReactNode) {
   return render(
-    <DashboardProvider data={{ ...data, spend: [] }} config={kpiConfig}>
+    <DashboardProvider role="admin" data={{ ...data, spend: [] }} config={kpiConfig}>
       {ui}
     </DashboardProvider>,
   );
@@ -285,7 +285,7 @@ describe("SpendPage", () => {
 
   it("adds spend through the shared provider so the overview sees it", () => {
     render(
-      <DashboardProvider data={data} config={kpiConfig}>
+      <DashboardProvider role="admin" data={data} config={kpiConfig}>
         <OverviewPage />
         <SpendPage />
       </DashboardProvider>,
@@ -326,7 +326,7 @@ describe("SpendPage removals", () => {
 
   it("removing a line changes the month's cost per qualified opportunity on the overview", () => {
     render(
-      <DashboardProvider data={data} config={kpiConfig}>
+      <DashboardProvider role="admin" data={data} config={kpiConfig}>
         <OverviewPage />
         <SpendPage />
       </DashboardProvider>,
@@ -364,12 +364,12 @@ describe("KpiRulePage", () => {
     expect(screen.queryByText(/is not counted either way/i)).not.toBeInTheDocument();
   });
 
-  it("shows the targets, the ramp and this month's target, with no admin role", () => {
+  it("shows the targets, the ramp and this month's target, and that admin access can change them", () => {
     wrap(<KpiRulePage />);
     expect(screen.getByLabelText(/brand searches a month/i)).toHaveValue(90);
     expect(screen.getByText(/rising to 12 a month by Jan 2027/i)).toBeInTheDocument();
     expect(screen.getByText(/target for oct 2026: 8/i)).toBeInTheDocument();
-    expect(screen.queryByText(/admin/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/admin access can change them/i)).toBeInTheDocument();
     expect(screen.getByRole("table", { name: /target changes/i })).toHaveTextContent(/no changes yet/i);
   });
 
@@ -708,7 +708,7 @@ describe("TrafficPage and EventsPage", () => {
     vi.stubGlobal("fetch", fetchMock);
     try {
       render(
-        <DashboardProvider data={{ ...data, source: "pipedrive" }} config={kpiConfig}>
+        <DashboardProvider role="admin" data={{ ...data, source: "pipedrive" }} config={kpiConfig}>
           <EventsPage />
         </DashboardProvider>,
       );
@@ -755,7 +755,7 @@ describe("TrafficPage and EventsPage", () => {
   it("events ask for costs when none have been entered", () => {
     resetNavigation("/events");
     render(
-      <DashboardProvider data={{ ...data, events: data.events.map((x) => ({ ...x, costGbp: null })) }} config={kpiConfig}>
+      <DashboardProvider role="admin" data={{ ...data, events: data.events.map((x) => ({ ...x, costGbp: null })) }} config={kpiConfig}>
         <EventsPage />
       </DashboardProvider>,
     );
@@ -826,7 +826,7 @@ describe("KpiRulePage targets", () => {
   function both() {
     resetNavigation("/kpi-rule");
     return render(
-      <DashboardProvider data={data} config={kpiConfig}>
+      <DashboardProvider role="admin" data={data} config={kpiConfig}>
         <KpiRulePage />
         <OverviewPage />
       </DashboardProvider>,
@@ -843,7 +843,7 @@ describe("KpiRulePage targets", () => {
     expect(await screen.findByRole("tooltip")).toHaveTextContent(/Target 15/);
     const log = screen.getByRole("table", { name: /target changes/i });
     const row = within(log).getAllByRole("row")[1];
-    expect(row).toHaveTextContent(/Godswill William/);
+    expect(row).toHaveTextContent(/Admin/);
     expect(row).toHaveTextContent(/Qualified a month by Jan 2027/);
     expect(row).toHaveTextContent(/12/);
     expect(row).toHaveTextContent(/15/);
@@ -864,5 +864,60 @@ describe("KpiRulePage targets", () => {
   it("the data status card notes that leads converted before the mirror existed carry their conversion date", () => {
     both();
     expect(screen.getByText(/Enquiries that were converted to deals before 8 Nov 2026 carry the date they became a deal/i)).toBeInTheDocument();
+  });
+});
+
+describe("view-only access", () => {
+  beforeEach(() => resetNavigation());
+
+  function asViewer(ui: React.ReactNode) {
+    return render(
+      <DashboardProvider role="viewer" data={data} config={kpiConfig}>
+        {ui}
+      </DashboardProvider>,
+    );
+  }
+
+  it("shows the events without the add button or row edit controls", () => {
+    resetNavigation("/events");
+    asViewer(<EventsPage />);
+    expect(screen.getByRole("table", { name: /events/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /add event/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^edit /i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /export csv/i })).toBeInTheDocument();
+  });
+
+  it("shows spend without add, import or remove", () => {
+    resetNavigation("/spend");
+    asViewer(<SpendPage />);
+    expect(screen.queryByRole("button", { name: /add spend/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /import csv/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^remove /i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /export csv/i })).toBeInTheDocument();
+  });
+
+  it("shows the targets read only and says the admin password is needed to change them", () => {
+    resetNavigation("/kpi-rule");
+    asViewer(<KpiRulePage />);
+    const fields = screen.getAllByRole("spinbutton");
+    expect(fields.length).toBeGreaterThan(0);
+    for (const f of fields) expect(f).toBeDisabled();
+    expect(screen.getByText(/changing them needs the admin password/i)).toBeInTheDocument();
+  });
+
+  it("shows chart notes without the add form or remove buttons", () => {
+    asViewer(<OverviewPage />);
+    expect(screen.getByRole("heading", { name: /notes on the chart/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /add note/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^remove note/i })).not.toBeInTheDocument();
+  });
+
+  it("logs an admin's target change under the access level, not a person's name", () => {
+    resetNavigation("/kpi-rule");
+    wrap(<KpiRulePage />);
+    const field = screen.getAllByRole("spinbutton")[0]!;
+    fireEvent.change(field, { target: { value: "15" } });
+    fireEvent.blur(field);
+    expect(screen.getByRole("table", { name: /target changes/i })).toHaveTextContent(/Admin/);
   });
 });

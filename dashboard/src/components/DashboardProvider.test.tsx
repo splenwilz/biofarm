@@ -28,7 +28,7 @@ const EVENT: EventInput = {
 };
 
 function hook(data: DashboardData) {
-  return renderHook(() => useDashboard(), { wrapper: ({ children }) => <DashboardProvider data={data} config={kpiConfig}>{children}</DashboardProvider> });
+  return renderHook(() => useDashboard(), { wrapper: ({ children }) => <DashboardProvider role="admin" data={data} config={kpiConfig}>{children}</DashboardProvider> });
 }
 
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 
+import type { Role } from "@/auth/roles";
 import type { KpiConfig } from "@/config/kpi";
 import { monthOf, monthRange } from "@/lib/kpi";
 import { mergeSpend } from "@/lib/spendMerge";
@@ -41,6 +42,9 @@ async function writeEvent(method: "POST" | "PUT" | "DELETE", url: string, body?:
 export interface DashboardContextValue {
   data: DashboardData;
   config: KpiConfig;
+  /** What the signed-in password unlocks. The pages show write controls only to an admin; the server refuses writes from anyone else regardless. */
+  role: Role;
+  canEdit: boolean;
   /** Loaded spend plus anything entered this session. */
   spend: SpendEntry[];
   addSpend: (entry: Omit<SpendEntry, "id">) => void;
@@ -111,7 +115,7 @@ const DashboardContext = createContext<DashboardContextValue | null>(null);
  * fetches once and the pages share one copy. Spend entered by hand lives here
  * too until the backend persists it, so the Spend page and the Overview agree.
  */
-export function DashboardProvider({ data, config: baseConfig, children }: { data: DashboardData; config: KpiConfig; children: React.ReactNode }) {
+export function DashboardProvider({ data, config: baseConfig, role, children }: { data: DashboardData; config: KpiConfig; role: Role; children: React.ReactNode }) {
   const counter = useRef(0);
   const [targets, setTargetState] = useState<Partial<Pick<KpiConfig, TargetField>>>({});
   const config = useMemo<KpiConfig>(() => ({ ...baseConfig, ...targets }), [baseConfig, targets]);
@@ -189,6 +193,8 @@ export function DashboardProvider({ data, config: baseConfig, children }: { data
     return {
       data,
       config,
+      role,
+      canEdit: role === "admin",
       spend: mergeSpend(data.spend, added, removed),
       addSpend,
       removeSpend,
@@ -210,7 +216,7 @@ export function DashboardProvider({ data, config: baseConfig, children }: { data
       defaultMonth,
       today: data.syncedAt,
     };
-  }, [data, config, added, removed, addSpend, removeSpend, importSpend, addedEvents, removedEvents, addEvent, removeEvent, eventEdits, updateEvent, notes, removedNotes, addAnnotation, removeAnnotation, setTargets, targetLog, schedule]);
+  }, [data, config, role, added, removed, addSpend, removeSpend, importSpend, addedEvents, removedEvents, addEvent, removeEvent, eventEdits, updateEvent, notes, removedNotes, addAnnotation, removeAnnotation, setTargets, targetLog, schedule]);
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
 }

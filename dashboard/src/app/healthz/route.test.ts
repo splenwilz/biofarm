@@ -23,7 +23,7 @@ describe("GET /healthz", () => {
     const res = await GET();
     expect(res.status).toBe(200);
     expect(res.headers.get("cache-control")).toBe("no-store");
-    await expect(res.json()).resolves.toEqual({ status: "ok", data: "demo", missing: ["DASHBOARD_API_URL", "DASHBOARD_API_TOKEN"], seen: [] });
+    await expect(res.json()).resolves.toEqual({ status: "ok", data: "demo", missing: ["DASHBOARD_API_URL", "DASHBOARD_API_TOKEN"], seen: [], signIn: { configured: false, missing: ["DASHBOARD_PASSWORD_VIEW_HASH", "DASHBOARD_PASSWORD_ADMIN_HASH", "DASHBOARD_SESSION_SECRET"] } });
   });
 
   it("lists the names of look-alike settings so a misspelt key shows up, values never", async () => {
@@ -42,7 +42,7 @@ describe("GET /healthz", () => {
     process.env.DASHBOARD_API_URL = "https://api.example.test";
     process.env.DASHBOARD_API_TOKEN = "very-secret";
     const body = await (await GET()).json();
-    expect(body).toEqual({ status: "ok", data: "feed", missing: [], seen: ["DASHBOARD_API_TOKEN", "DASHBOARD_API_URL"] });
+    expect(body).toMatchObject({ status: "ok", data: "feed", missing: [], seen: ["DASHBOARD_API_TOKEN", "DASHBOARD_API_URL"] });
     expect(JSON.stringify(body)).not.toContain("very-secret");
     expect(JSON.stringify(body)).not.toContain("api.example.test");
   });
@@ -50,6 +50,21 @@ describe("GET /healthz", () => {
   it("names the one that is missing or blank", async () => {
     process.env.DASHBOARD_API_URL = "https://api.example.test";
     process.env.DASHBOARD_API_TOKEN = "   ";
-    await expect((await GET()).json()).resolves.toEqual({ status: "ok", data: "demo", missing: ["DASHBOARD_API_TOKEN"], seen: ["DASHBOARD_API_TOKEN", "DASHBOARD_API_URL"] });
+    await expect((await GET()).json()).resolves.toMatchObject({ status: "ok", data: "demo", missing: ["DASHBOARD_API_TOKEN"], seen: ["DASHBOARD_API_TOKEN", "DASHBOARD_API_URL"] });
+  });
+});
+
+describe("GET /healthz sign-in settings", () => {
+  it("says sign-in is configured only when both hashes parse and the secret is long enough, naming what is missing", async () => {
+    process.env.DASHBOARD_PASSWORD_VIEW_HASH = "scrypt:15:8:3:c2FsdHNhbHRzYWx0c2Fs:aGFzaGhhc2hoYXNoaGFzaGhhc2hoYXNoaGFzaGhhc2g";
+    process.env.DASHBOARD_PASSWORD_ADMIN_HASH = "not-a-hash";
+    process.env.DASHBOARD_SESSION_SECRET = "short";
+    let body = await (await GET()).json();
+    expect(body.signIn).toEqual({ configured: false, missing: ["DASHBOARD_PASSWORD_ADMIN_HASH", "DASHBOARD_SESSION_SECRET"] });
+    expect(JSON.stringify(body)).not.toContain("c2FsdHNhbHQ");
+    process.env.DASHBOARD_PASSWORD_ADMIN_HASH = process.env.DASHBOARD_PASSWORD_VIEW_HASH;
+    process.env.DASHBOARD_SESSION_SECRET = "x".repeat(32);
+    body = await (await GET()).json();
+    expect(body.signIn).toEqual({ configured: true, missing: [] });
   });
 });

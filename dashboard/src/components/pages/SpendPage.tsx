@@ -25,7 +25,7 @@ import { feedCovers, splitByFeedCoverage } from "@/lib/spendMerge";
 import type { SpendEntry, SpendPlatform } from "@/lib/types";
 
 export function SpendPage() {
-  const { data, spend, addSpend, removeSpend, importSpend } = useDashboard();
+  const { data, spend, addSpend, removeSpend, importSpend, canEdit } = useDashboard();
   const { report, config, period } = useReport();
   const [adding, setAdding] = useState(false);
   const [imported, setImported] = useState<ImportResult | null>(null);
@@ -67,10 +67,12 @@ export function SpendPage() {
         subtitle="Campaign and media spend only, never team cost. Google Ads comes from the account each day; Microsoft and LinkedIn are entered by hand or imported from the agency's CSV."
         actions={
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap" }}>
-            <Button variant="outlined" color="inherit" onClick={() => setAdding(true)} startIcon={<Icon name="plus" size={16} />} data-print="hide" sx={{ height: 40, borderColor: "divider", fontWeight: 500, whiteSpace: "nowrap" }}>
-              Add spend
-            </Button>
-            <SpendImport months={report.months} onImport={importUnlessFed} onResult={reportImport} />
+            {canEdit && (
+              <Button variant="outlined" color="inherit" onClick={() => setAdding(true)} startIcon={<Icon name="plus" size={16} />} data-print="hide" sx={{ height: 40, borderColor: "divider", fontWeight: 500, whiteSpace: "nowrap" }}>
+                Add spend
+              </Button>
+            )}
+            {canEdit && <SpendImport months={report.months} onImport={importUnlessFed} onResult={reportImport} />}
             <ExportButton filename={`biofarm-media-spend-${report.months[0]}-to-${report.reportMonth}`} rows={exportRows} />
           </Stack>
         }
@@ -157,7 +159,7 @@ export function SpendPage() {
               )}
             </Alert>
           )}
-          <SpendPanel months={report.months} entries={spend} onRemove={removeSpend} />
+          <SpendPanel months={report.months} entries={spend} onRemove={canEdit ? removeSpend : undefined} />
         </Stack>
       </Section>
       {adding && (

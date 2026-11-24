@@ -11,8 +11,8 @@ KPI rule, is in the private artifact linked from the project memory.
 Frontend first. v1 runs on **demo data** generated in `src/data/demo.ts`,
 shaped like the real Pipedrive account (same pipelines, channels, volumes and
 attribution labels). Every number on screen is marked "Demo data" until the
-backend-backed source replaces it. Nothing here is behind a login yet; do not
-deploy it with real data until it is.
+backend-backed source replaces it. Every page sits behind a shared-password
+sign-in with two levels, view-only and admin (see **Sign-in** below).
 
 ## Stack
 
@@ -79,7 +79,10 @@ bar rewrite the current URL; every sidebar link preserves the filters. Defaults
 | `src/components/DashboardProvider.tsx` | Client context: the loaded records, KPI config, and what was entered this session: spend, chart notes, events and their edits (`events`, `addEvent`, `updateEvent`, `removeEvent`), target changes with their log (`setTargets(patch, who)`, `targetLog`) and the draft check switches (`setCheck`). |
 | `src/components/SpendDialog.tsx`, `SpendImport.tsx`, `SpendPanel.tsx` | Media spend entry: the "Add spend" dialog and "Import CSV" button in the page header, and the month's lines with a remove control. |
 | `src/components/EventDialog.tsx` | One dialog for adding an event and editing it later: name, date (future allowed), type, attendees, cost (stand, travel, fees), notes, and how its enquiries are found in Pipedrive (words in the title, the Trade Show / Event channel, a date window). Opened from the Events header button and from each row's edit control. |
-| `src/app/api/events/` | `POST /api/events`, `PUT` and `DELETE /api/events/[id]`: forward event writes to the lead API (`src/data/eventsApi.ts`, server-only, token never in the browser); 501 on demo data. No sign-in yet, so anyone with the dashboard URL can use them. |
+| `src/app/api/events/` | `POST /api/events`, `PUT` and `DELETE /api/events/[id]`: forward event writes to the lead API (`src/data/eventsApi.ts`, server-only, token never in the browser); 501 on demo data. Admin session required (401 without a session, 403 for a viewer). |
+| `src/auth/` | Sign-in. `password.ts` hashes and checks the two shared passwords with Node's scrypt (OWASP N=2^15, r=8, p=3, constant-time compare). `config.ts` reads the three settings by name and fails closed. `sessionCodec.ts` seals the role into the cookie with iron-session (30 days, HttpOnly, Secure, SameSite=Lax). `session.ts` is the Data Access Layer: `getSession`, `requireSession` (pages), `requireAdminForRoute` (write routes). `actions.ts` holds the `signIn` and `signOut` Server Actions; `limiter.ts` counts failed attempts (5 per address, 30 overall, per 15 minutes). |
+| `src/proxy.ts` | The front door: every page without a valid session cookie goes to `/sign-in?next=…`. API routes, `/healthz` and static files are outside its matcher; the routes refuse on their own. |
+| `src/app/sign-in/` | The sign-in page (`SignInForm`: one password field, a Server Action, works before JavaScript loads). |
 | `src/components/shell/` | `AppShell` (sidebar, top bar, drawer), `nav.ts` (the menu), `useFilters` (URL filters), inline Heroicons. |
 | `src/components/charts/` | `BarTable` (bar in its own column, printed numbers, optional sparkline column and expandable child rows), `MeterList`, `CohortHeatmap`, `ColumnChart`, `JoinedLeftChart` (joined above zero, left below, net written above each month), `ChartNotes` (the shared note markers), `OutcomeBars` and `palette.ts` (one hue does the work; grey for context; a light-to-dark ramp for magnitude). |
 | `src/components/pages/` | One client component per route, all reading `useReport()`, which also returns `period` (the month and the breakdown window as words) so every card and section can name the window it covers. `WindowToggle` sits on the Sources and Campaigns headers. |
@@ -93,9 +96,26 @@ bar rewrite the current URL; every sidebar link preserves the filters. Defaults
    persisted spend) and set `source: "pipedrive"`.
 2. Point `src/data/index.ts` at it. Under Cache Components, give the fetch a
    `'use cache'` + `cacheLife`, or the layout's Suspense boundary will stream it.
-3. Move spend (`addSpend`, `removeSpend`, `importSpend`), notes, events and their costs (`addEvent`, `updateEvent`), targets with their change log, the check switches and the report schedule in `DashboardProvider` from local state to the API (the log's "who" comes from the sidebar placeholder until sign-in exists); the demo-data banner in `AppShell` goes by itself once `data.source` is not `demo`; the scheduler that sends the summary is server-side.
-4. Add the login before any real data is served, and replace `SHELL_USER` in
-   `src/components/shell/nav.ts` with the signed-in person.
+3. Move spend (`addSpend`, `removeSpend`, `importSpend`), notes, events and their costs (`addEvent`, `updateEvent`), targets with their change log, the check switches and the report schedule in `DashboardProvider` from local state to the API (the log's "who" is the access level, "Admin", until sign-in knows people); the demo-data banner in `AppShell` goes by itself once `data.source` is not `demo`; the scheduler that sends the summary is server-side.
+4. Replace the shared passwords with named accounts when the team needs to know who changed what or to revoke one person (WorkOS AuthKit was the recommended route; the role checks in the write routes and pages stay as they are).
+
+## Sign-in
+
+Two shared passwords, one for viewing and one for admin (add or edit events, spend, chart notes and targets). The server keeps only scrypt hashes of them, in environment variables, and a secret that seals the session cookie:
+
+```bash
+npm run password-hash       # type a password; prints its hash and a fresh session secret
+```
+
+| Variable | What |
+|---|---|
+| `DASHBOARD_PASSWORD_VIEW_HASH` | hash of the view-only password |
+| `DASHBOARD_PASSWORD_ADMIN_HASH` | hash of the admin password |
+| `DASHBOARD_SESSION_SECRET` | 32+ characters; changing it signs everyone out |
+
+With any of the three missing or malformed nobody can sign in, and `/healthz` reports `signIn.missing`. Sessions last 30 days. Five attempts from one address, or thirty from anywhere, inside fifteen minutes, and sign-in waits (an attempt is counted as it arrives and forgiven when it succeeds, so a burst of parallel guesses cannot slip past). The production build marks the cookie `Secure`, which browsers accept on `localhost` but not on a bare IP or another hostname over plain http; run the production build locally on `http://localhost:<port>` or use `npm run dev`. The cookie carries only the role, sealed, so the browser cannot read or forge it. To rotate a password, run the script again, replace the hash on Render and redeploy; to sign everyone out at once, replace the secret.
+
+What a shared password cannot do: name who made a change (the log says "Admin"), or lock one person out without changing the password for everyone.
 
 ## Design notes
 

@@ -5,11 +5,14 @@
  * and never by value, so "why is it showing demo data" has a one-line answer:
  * `missing` names what is absent or blank, `seen` lists every variable whose
  * name contains DASHBOARD (whitespace shown as ␠) so a misspelt key stands out.
+ * `signIn` does the same for the password settings, since with any of them
+ * missing nobody can get past the sign-in page.
  */
 import { connection } from "next/server";
 
-const FEED_SETTINGS = ["DASHBOARD_API_URL", "DASHBOARD_API_TOKEN"] as const;
+import { readAuthConfig } from "@/auth/config";
 
+const FEED_SETTINGS = ["DASHBOARD_API_URL", "DASHBOARD_API_TOKEN"] as const;
 
 /**
  * Answered per request, never prerendered. A GET route that reads no request
@@ -25,5 +28,7 @@ export async function GET(): Promise<Response> {
     .filter((name) => name.toUpperCase().includes("DASHBOARD"))
     .map((name) => name.replace(/\s/g, "␠"))
     .sort();
-  return Response.json({ status: "ok", data: missing.length ? "demo" : "feed", missing, seen }, { headers: { "cache-control": "no-store" } });
+  const auth = readAuthConfig(process.env);
+  const signIn = auth.ok ? { configured: true, missing: [] } : { configured: false, missing: auth.missing };
+  return Response.json({ status: "ok", data: missing.length ? "demo" : "feed", missing, seen, signIn }, { headers: { "cache-control": "no-store" } });
 }

@@ -107,7 +107,7 @@ export function OverviewPage() {
     data,
     period,
   } = useReport();
-  const { annotations, addAnnotation, removeAnnotation } = useDashboard();
+  const { annotations, addAnnotation, removeAnnotation, canEdit } = useDashboard();
   const [range, setRange] = useState<Range>(12);
   const lastYearMonth = monthRange(report.reportMonth, 13)[0];
   const h = report.headline;
@@ -268,6 +268,7 @@ export function OverviewPage() {
           notes={annotations}
           onAdd={addAnnotation}
           onRemove={removeAnnotation}
+          readOnly={!canEdit}
         />
       </Section>
 

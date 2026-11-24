@@ -3,6 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
+// The session check is the Data Access Layer's; here it is a switch: null = admin, a Response = the refusal to send back.
+const denial = vi.fn<() => Promise<Response | null>>(async () => null);
+vi.mock("@/auth/session", () => ({ requireAdminForRoute: () => denial() }));
+
 import { DELETE, PUT } from "@/app/api/events/[id]/route";
 import { POST } from "@/app/api/events/route";
 
@@ -11,6 +15,8 @@ const fetchMock = vi.fn();
 beforeEach(() => {
   vi.stubGlobal("fetch", fetchMock);
   fetchMock.mockReset();
+  denial.mockReset();
+  denial.mockResolvedValue(null);
   process.env.DASHBOARD_API_URL = "https://api.example.test/";
   process.env.DASHBOARD_API_TOKEN = "very-secret";
 });
@@ -59,6 +65,18 @@ describe("/api/events", () => {
     const down = await PUT(new Request("http://dash/api/events/e1", { method: "PUT", body: JSON.stringify(EVENT) }), { params: Promise.resolve({ id: "e1" }) });
     expect(down.status).toBe(502);
     await expect(down.json()).resolves.toEqual({ detail: "The lead API could not be reached; nothing was changed" });
+  });
+
+  it("refuses every write without an admin session, before reading the body or calling the lead API", async () => {
+    denial.mockResolvedValue(Response.json({ detail: "View-only access cannot make changes." }, { status: 403 }));
+    const post = await POST(new Request("http://dash/api/events", { method: "POST", body: JSON.stringify(EVENT) }));
+    expect(post.status).toBe(403);
+    await expect(post.json()).resolves.toEqual({ detail: "View-only access cannot make changes." });
+    denial.mockResolvedValue(Response.json({ detail: "Your sign-in has expired." }, { status: 401 }));
+    expect((await PUT(new Request("http://dash/api/events/e1", { method: "PUT", body: "{nope" }), { params: Promise.resolve({ id: "e1" }) })).status).toBe(401);
+    expect((await DELETE(new Request("http://dash/api/events/e1", { method: "DELETE" }), { params: Promise.resolve({ id: "e1" }) })).status).toBe(401);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(denial).toHaveBeenCalledTimes(3);
   });
 
   it("answers 501 on demo data, without calling anything", async () => {

@@ -20,7 +20,7 @@ import { sessionsChange, trafficReport } from "@/lib/insights";
 import { monthRange } from "@/lib/kpi";
 
 export function TrafficPage() {
-  const { data, annotations, addAnnotation, removeAnnotation } = useDashboard();
+  const { data, annotations, addAnnotation, removeAnnotation, canEdit } = useDashboard();
   const { report, provenance, filters, audience, config } = useReport();
   const t = useMemo(() => trafficReport(data.traffic, report.months, report.enquiriesByMonth), [data.traffic, report.months, report.enquiriesByMonth]);
   const month = monthLabel(report.reportMonth);
@@ -85,7 +85,7 @@ export function TrafficPage() {
         <ColumnChart months={report.months} values={t.sessionsByMonth} label="Sessions by month" height={240} yAxisWidth={52} annotations={annotations} />
         {/* the overview chart's legend keeps its notes clear of the axis; this chart has none, so add the room */}
         <Box sx={{ pt: 3 }}>
-          <AnnotationNotes months={report.months} notes={annotations} onAdd={addAnnotation} onRemove={removeAnnotation} />
+          <AnnotationNotes months={report.months} notes={annotations} onAdd={addAnnotation} onRemove={removeAnnotation} readOnly={!canEdit} />
         </Box>
       </Section>
 

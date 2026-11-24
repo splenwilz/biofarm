@@ -26,10 +26,12 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { useId, useState } from "react";
 
+import { signOut } from "@/auth/actions";
+import { ROLE_LABEL } from "@/auth/roles";
 import { useDashboard } from "@/components/DashboardProvider";
 import { useAlerts } from "@/components/pages/useAlerts";
 import { Icon } from "@/components/shell/icons";
-import { DRAWER_WIDTH, isActiveHref, NAV_SECTIONS, OVERVIEW, SHELL_USER, TOP_BAR_HEIGHT, type NavItem } from "@/components/shell/nav";
+import { DRAWER_WIDTH, isActiveHref, NAV_SECTIONS, OVERVIEW, TOP_BAR_HEIGHT, type NavItem } from "@/components/shell/nav";
 import { useFilters } from "@/components/shell/useFilters";
 import { AUDIENCE_LABEL, type AudienceFilter } from "@/lib/filters";
 import { dateLabel, monthLabel } from "@/lib/format";
@@ -91,7 +93,7 @@ function Sidebar({ onNavigate }: { onNavigate: () => void }) {
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column", bgcolor: "background.paper" }}>
       <Box sx={{ height: TOP_BAR_HEIGHT, px: 2.5, display: "flex", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
         <NextLink href={linkTo("/")} onClick={onNavigate} aria-label="Biofarm marketing dashboard, overview" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Image src="/biofarm-wordmark.png" alt="" width={126} height={24} priority style={{ height: 22, width: "auto" }} />
+          <Image src="/biofarm-wordmark.png" alt="" width={126} height={24} preload style={{ height: 22, width: "auto" }} />
           <Typography variant="caption" sx={{ color: "text.secondary", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 600, pt: "2px" }}>
             Marketing
           </Typography>
@@ -111,19 +113,38 @@ function Sidebar({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </Box>
 
-      <Box sx={{ borderTop: 1, borderColor: "divider", p: 1.5 }}>
-        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", p: 1 }}>
-          <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main", color: "primary.contrastText", fontSize: "0.8125rem", fontWeight: 600 }}>{SHELL_USER.initials}</Avatar>
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-              {SHELL_USER.name}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block" }}>
-              {SHELL_USER.role} · no sign-in yet
-            </Typography>
-          </Box>
-        </Stack>
-      </Box>
+      <SessionFooter />
+    </Box>
+  );
+}
+
+/**
+ * Who is signed in, as far as a shared password can say: the access level.
+ * Sign out is a form posting to the signOut Server Action, so it works without
+ * JavaScript and never from a GET link.
+ */
+function SessionFooter() {
+  const { role, canEdit } = useDashboard();
+  return (
+    <Box sx={{ borderTop: 1, borderColor: "divider", p: 1.5 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", p: 1 }}>
+        <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main", color: "primary.contrastText", fontSize: "0.8125rem", fontWeight: 600 }} aria-hidden>
+          {canEdit ? "A" : "V"}
+        </Avatar>
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+            {ROLE_LABEL[role]}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block" }}>
+            {canEdit ? "Can change events, spend and targets" : "Shared password · read only"}
+          </Typography>
+        </Box>
+        <Box component="form" action={signOut} data-print="hide">
+          <Button type="submit" size="small" color="inherit" sx={{ minWidth: 0, px: 1, fontWeight: 500, color: "text.secondary" }}>
+            Sign out
+          </Button>
+        </Box>
+      </Stack>
     </Box>
   );
 }

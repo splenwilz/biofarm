@@ -95,3 +95,13 @@ services:
       # Baked into the page at build time; only builds "open in Pipedrive" links.
       - key: NEXT_PUBLIC_PIPEDRIVE_COMPANY_DOMAIN
         value: biofarm
+      # Sign-in: two shared passwords as scrypt hashes (`npm run password-hash`
+      # in dashboard/) and the secret that seals the session cookie. Set in the
+      # Render dashboard, never here; with any of them missing nobody can sign in
+      # and /healthz names which.
+      - key: DASHBOARD_PASSWORD_VIEW_HASH
+        sync: false
+      - key: DASHBOARD_PASSWORD_ADMIN_HASH
+        sync: false
+      - key: DASHBOARD_SESSION_SECRET
+        sync: false

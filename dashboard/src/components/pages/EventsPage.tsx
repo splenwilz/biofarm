@@ -20,7 +20,7 @@ import { dateLabel, gbp, integer, monthLabel, pct } from "@/lib/format";
 import { EVENT_TYPE_LABEL, eventsReport, type EventRow } from "@/lib/insights";
 
 export function EventsPage() {
-  const { events, addEvent, updateEvent, removeEvent, today } = useDashboard();
+  const { events, addEvent, updateEvent, removeEvent, today, canEdit } = useDashboard();
   // null: closed · "add": the empty dialog · an event: that event's dialog
   const [dialog, setDialog] = useState<null | "add" | EventRow>(null);
   const { report, provenance, config } = useReport();
@@ -35,9 +35,11 @@ export function EventsPage() {
         subtitle={`Trade shows, CPD sessions and webinars · ${window}`}
         actions={
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap" }}>
-            <Button variant="outlined" color="inherit" onClick={() => setDialog("add")} startIcon={<Icon name="plus" size={16} />} data-print="hide" sx={{ height: 40, borderColor: "divider", fontWeight: 500, whiteSpace: "nowrap" }}>
-              Add event
-            </Button>
+            {canEdit && (
+              <Button variant="outlined" color="inherit" onClick={() => setDialog("add")} startIcon={<Icon name="plus" size={16} />} data-print="hide" sx={{ height: 40, borderColor: "divider", fontWeight: 500, whiteSpace: "nowrap" }}>
+                Add event
+              </Button>
+            )}
             <ExportButton filename={`biofarm-events-${report.months[0]}-to-${report.reportMonth}`} rows={() => [...e.events].reverse().map((x) => ({ date: x.date.slice(0, 10), event: x.name, type: EVENT_TYPE_LABEL[x.type], attendees: x.attendees, leads: x.leads, qualified: x.qualified, cost_gbp: x.costGbp ?? null }))} />
           </Stack>
         }
@@ -87,11 +89,11 @@ export function EventsPage() {
             fill: x.qualified,
             cells: [x.attendees === null ? "–" : integer(x.attendees), integer(x.leads), integer(x.qualified), typeof x.costGbp === "number" ? gbp(x.costGbp) : "–", x.cpqo === null ? "–" : gbp(x.cpqo)],
             muted: !x.mature,
-            action: (
+            action: canEdit ? (
               <IconButton size="small" aria-label={`Edit ${x.name}`} onClick={() => setDialog(x)} sx={{ color: "text.secondary" }}>
                 <Icon name="pencil" size={16} />
               </IconButton>
-            ),
+            ) : undefined,
           }))}
           emptyText="No events in this window."
         />

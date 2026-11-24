@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useDashboard, type TargetChange, type TargetField } from "@/components/DashboardProvider";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
-import { SHELL_USER } from "@/components/shell/nav";
+import { ROLE_LABEL } from "@/auth/roles";
 import { useFilters } from "@/components/shell/useFilters";
 import type { KpiConfig } from "@/config/kpi";
 import { dateLabel, monthLabel } from "@/lib/format";
@@ -50,6 +50,8 @@ interface TargetFieldProps {
   label: string;
   value: number;
   max?: number;
+  /** Read only for a viewer: the value shows, the box does not take input. */
+  disabled?: boolean;
   onCommit: (value: number) => void;
 }
 
@@ -64,7 +66,7 @@ function TargetField(props: TargetFieldProps) {
   return <TargetInput key={props.value} {...props} />;
 }
 
-function TargetInput({ label, value, max, onCommit }: TargetFieldProps) {
+function TargetInput({ label, value, max, disabled, onCommit }: TargetFieldProps) {
   const [draft, setDraft] = useState(String(value));
   const commit = () => {
     const n = Number(draft);
@@ -87,6 +89,7 @@ function TargetInput({ label, value, max, onCommit }: TargetFieldProps) {
         if (e.key === "Enter") (e.target as HTMLInputElement).blur();
       }}
       slotProps={{ htmlInput: { min: 1, max, step: 1 } }}
+      disabled={disabled}
       fullWidth
     />
   );
@@ -156,10 +159,10 @@ function ChangeLog({ log, config }: { log: TargetChange[]; config: KpiConfig }) 
 }
 
 export function KpiRulePage() {
-  const { config, data, setTargets, targetLog } = useDashboard();
+  const { config, data, setTargets, targetLog, role, canEdit } = useDashboard();
   const { filters } = useFilters();
-  // Until sign-in exists the person in the sidebar footer is who made the change.
-  const who = SHELL_USER.name;
+  // A shared password knows the access level, not the person: the log says "Admin".
+  const who = ROLE_LABEL[role];
   const ramp = config.qualifiedRamp;
   const monthTarget = qualifiedTargetForMonth(config, filters.month);
 
@@ -167,19 +170,19 @@ export function KpiRulePage() {
     <Stack spacing={3}>
       <PageHeader title="KPI rule & targets" subtitle="What counts, held in one config file so changing the definition is an edit there, not to the screens. Proposed; to be confirmed with Phil and Vix." />
 
-      <Section id="targets" title="Targets" subtitle="Used on every page. Anyone can change them. Every change is logged below.">
+      <Section id="targets" title="Targets" subtitle={canEdit ? "Used on every page. Admin access can change them. Every change is logged below." : "Used on every page. Changing them needs the admin password."}>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <TargetField label={targetLabel("targetQualifiedPerMonth", config)} value={config.targetQualifiedPerMonth} onCommit={(v) => setTargets({ targetQualifiedPerMonth: v }, who)} />
+            <TargetField label={targetLabel("targetQualifiedPerMonth", config)} value={config.targetQualifiedPerMonth} disabled={!canEdit} onCommit={(v) => setTargets({ targetQualifiedPerMonth: v }, who)} />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <TargetField label={targetLabel("qualifiedRamp", config)} value={ramp.fromValue} onCommit={(v) => setTargets({ qualifiedRamp: { ...ramp, fromValue: v } }, who)} />
+            <TargetField label={targetLabel("qualifiedRamp", config)} value={ramp.fromValue} disabled={!canEdit} onCommit={(v) => setTargets({ qualifiedRamp: { ...ramp, fromValue: v } }, who)} />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <TargetField label={targetLabel("brandSearchTargetPerMonth", config)} value={config.brandSearchTargetPerMonth} onCommit={(v) => setTargets({ brandSearchTargetPerMonth: v }, who)} />
+            <TargetField label={targetLabel("brandSearchTargetPerMonth", config)} value={config.brandSearchTargetPerMonth} disabled={!canEdit} onCommit={(v) => setTargets({ brandSearchTargetPerMonth: v }, who)} />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <TargetField label="AI mention share (%)" value={Math.round(config.aiMentionShareTarget * 100)} max={100} onCommit={(v) => setTargets({ aiMentionShareTarget: v / 100 }, who)} />
+            <TargetField label="AI mention share (%)" value={Math.round(config.aiMentionShareTarget * 100)} max={100} disabled={!canEdit} onCommit={(v) => setTargets({ aiMentionShareTarget: v / 100 }, who)} />
           </Grid>
         </Grid>
         <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 0.5, md: 3 }} sx={{ mt: 2.5, alignItems: { md: "baseline" } }}>

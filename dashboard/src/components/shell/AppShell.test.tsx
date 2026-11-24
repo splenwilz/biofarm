@@ -8,12 +8,13 @@ import { AppShell } from "@/components/shell/AppShell";
 import { navState, resetNavigation } from "@/test/navigation";
 
 vi.mock("next/navigation", async () => (await import("@/test/navigation")).navigationMock);
+vi.mock("@/auth/actions", () => ({ signOut: vi.fn() }));
 
 const data = buildDemoData();
 
 function renderShell() {
   return render(
-    <DashboardProvider data={data} config={kpiConfig}>
+    <DashboardProvider role="admin" data={data} config={kpiConfig}>
       <AppShell>
         <p>page body</p>
       </AppShell>
@@ -84,12 +85,40 @@ describe("AppShell", () => {
     expect(banner.compareDocumentPosition(screen.getByRole("main")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     unmount();
     render(
-      <DashboardProvider data={{ ...data, source: "pipedrive" }} config={kpiConfig}>
+      <DashboardProvider role="admin" data={{ ...data, source: "pipedrive" }} config={kpiConfig}>
         <AppShell>
           <p>page body</p>
         </AppShell>
       </DashboardProvider>,
     );
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+});
+
+describe("AppShell session footer", () => {
+  it("names the access level and offers sign out as a form, admin and viewer alike", () => {
+    const admin = render(
+      <DashboardProvider role="admin" data={data} config={kpiConfig}>
+        <AppShell>
+          <p>page body</p>
+        </AppShell>
+      </DashboardProvider>,
+    );
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+    expect(screen.getByText(/can change events, spend and targets/i)).toBeInTheDocument();
+    const signOut = screen.getByRole("button", { name: /sign out/i });
+    expect(signOut).toHaveAttribute("type", "submit");
+    expect(signOut.closest("form")).not.toBeNull();
+    admin.unmount();
+    render(
+      <DashboardProvider role="viewer" data={data} config={kpiConfig}>
+        <AppShell>
+          <p>page body</p>
+        </AppShell>
+      </DashboardProvider>,
+    );
+    expect(screen.getByText("View only")).toBeInTheDocument();
+    expect(screen.getByText(/read only/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no sign-in yet/i)).not.toBeInTheDocument();
   });
 });

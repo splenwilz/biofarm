@@ -16,10 +16,12 @@ export interface AnnotationNotesProps {
   notes: Annotation[];
   onAdd: (note: Omit<Annotation, "id">) => void;
   onRemove: (id: string) => void;
+  /** A viewer sees the notes, with no form and no remove controls. */
+  readOnly?: boolean;
 }
 
 /** Notes pinned to months under the trend chart, so a change on the chart has its reason beside it. */
-export function AnnotationNotes({ months, notes, onAdd, onRemove }: AnnotationNotesProps) {
+export function AnnotationNotes({ months, notes, onAdd, onRemove, readOnly = false }: AnnotationNotesProps) {
   const id = useId();
   const [month, setMonth] = useState(months[months.length - 1]);
   const [text, setText] = useState("");
@@ -56,13 +58,16 @@ export function AnnotationNotes({ months, notes, onAdd, onRemove }: AnnotationNo
               <Typography variant="body2" sx={{ flex: 1 }}>
                 {n.text}
               </Typography>
-              <IconButton size="small" aria-label={`Remove note: ${n.text}`} onClick={() => onRemove(n.id)} sx={{ color: "text.secondary" }} data-print="hide">
-                <Icon name="trash" size={14} />
-              </IconButton>
+              {!readOnly && (
+                <IconButton size="small" aria-label={`Remove note: ${n.text}`} onClick={() => onRemove(n.id)} sx={{ color: "text.secondary" }} data-print="hide">
+                  <Icon name="trash" size={14} />
+                </IconButton>
+              )}
             </Stack>
           ))}
         </Stack>
       )}
+      {!readOnly && (
       <Stack component="form" direction={{ xs: "column", sm: "row" }} spacing={1} onSubmit={submit} noValidate data-print="hide" sx={{ alignItems: { sm: "flex-start" } }}>
         <TextField select size="small" label="Month" id={`${id}-month`} value={month} onChange={(e) => setMonth(e.target.value)} slotProps={{ select: { native: true } }} sx={{ minWidth: 130 }}>
           {[...months].reverse().map((m) => (
@@ -76,6 +81,7 @@ export function AnnotationNotes({ months, notes, onAdd, onRemove }: AnnotationNo
           Add note
         </Button>
       </Stack>
+      )}
     </Stack>
   );
 }
