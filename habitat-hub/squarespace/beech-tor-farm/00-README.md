@@ -37,7 +37,8 @@ Hedgerows; SOON_LIMIT raised to 9) and `sections-block-INLINE.html` (stat band r
      (the "neighbouring woodland" of the copy), 4:5 crop at native 768×960.
    - NOT USED: the third photo shows a person and a dog walking through barley. A recognisable
      individual needs consent for marketing use, and it does not fit the brief's shot list.
-   CDN URLs NOT YET WIRED: upload both, paste the CDN URLs into the two `src` attributes, re-paste 01/02.
+   CDN URLs WIRED (25 Nov): hero af6218d3…/beech-tor-farm-habitat-bank-south-devon.jpg,
+   opportunity 8a3ca3c6…/beech-tor-farm-opportunity.jpg. Delete any upload image blocks on the post; the Code Blocks carry the images.
 2. **Map pin is APPROXIMATE** — Kingston village, South Hams (50.3153, -3.9137, Ordnance Survey
    place via postcodes.io), per the brief's "generalised location near Kingston … without publishing
    the precise site location". Confirm with Biofarm.

@@ -108,7 +108,7 @@
 
 </style></head>
 <body>
-<div class="pv-banner">LOCAL PREVIEW — hub v3 blocks assembled from the repo · native sections are stand-ins · 2026-11-24</div>
+<div class="pv-banner">LOCAL PREVIEW — hub v3 blocks assembled from the repo · native sections are stand-ins · 2026-11-25</div>
 <div id="collection-6a687c0d5a396e73c9b9ef10">
 
   <!-- HERO — replica of the LIVE hub hero (text left, collage right) with the v3 copy -->
@@ -272,7 +272,9 @@ var PIPELINE_SITES = [
   {"name":"Priory Farm","lpa":"Babergh","nca":"South Suffolk & North Essex Clayland","region":"south east","lat":51.985,"lng":0.885,"area":"20.89 ha","kind":"planned habitat bank","habitats":"grassland enhancement, scrub, trees"},
   {"name":"Dennington Hall","lpa":"East Suffolk","nca":"South Norfolk and High Suffolk Claylands","region":"south east","lat":52.2555,"lng":1.3375,"area":"22.6 ha","kind":"planned habitat bank","habitats":"neutral grassland, mixed scrub, rural trees, hedgerows"},
   {"name":"Banks Farm","lpa":"Somerset","nca":"Yeovil Scarplands","region":"south west","lat":51.1694,"lng":-2.4857,"area":"27 ha","kind":"planned habitat bank","habitats":"traditional orchard, neutral grassland, mixed scrub, hedgerows"},
-  {"name":"Beech Tor Farm","lpa":"South Hams","nca":"South Devon","region":"south west","lat":50.3153,"lng":-3.9137,"area":"20.4 ha","kind":"planned habitat bank","habitats":"neutral grassland, mixed scrub, individual trees, hedgerows"}
+  {"name":"Beech Tor Farm","lpa":"South Hams","nca":"South Devon","region":"south west","lat":50.3153,"lng":-3.9137,"area":"20.4 ha","kind":"planned habitat bank","habitats":"neutral grassland, mixed scrub, individual trees, hedgerows"},
+  {"name":"Bodstone Barton Barnes","lpa":"North Devon","nca":"Exmoor","region":"south west","lat":51.2063,"lng":-4.1258,"area":"11 ha","kind":"planned habitat bank","habitats":"lowland meadow, mixed scrub, trees"},
+  {"name":"The Vine","lpa":"Malvern Hills","nca":"Herefordshire Plateau","region":"midlands","lat":52.3112,"lng":-2.5937,"area":"18.8 ha","kind":"planned habitat bank","habitats":"traditional orchard, grassland, trees, mixed scrub, hedgerows"}
 ];
 
 
@@ -379,7 +381,7 @@ var BF_PREVIEWS = {};
     } catch (e) {}
   }
   fillStats(); document.addEventListener('DOMContentLoaded', fillStats);
-  var SOON_LIMIT = 9, soonExpanded = false, moreBtn = null; // 9 = show all coming-soon cards (7 launch sites + Banks Farm + Beech Tor Farm, 24 Nov 2026); reveal button only appears if the list grows past this
+  var SOON_LIMIT = 11, soonExpanded = false, moreBtn = null; // 11 = show all coming-soon cards (7 launch sites + Banks Farm, Beech Tor Farm, Bodstone Barton Barnes, The Vine, 25 Nov 2026); reveal button only appears if the list grows past this
   var sortMode = 'featured', gridHead = null, ghCount = null, ghSort = null;
   function buildGridHead(){
     gridHead = document.createElement('div');
@@ -693,6 +695,22 @@ var BF_PREVIEWS = {};
     </div>
   </div>
   <div class="summary-item summary-item-record-type-text">
+    <a class="summary-thumbnail-container" href="/habitat-banks-lists/bodstone-barton-barnes">
+      <img class="summary-thumbnail-image" src="coming-soon-thumbnail.png" alt="Bodstone Barton Barnes"/></a>
+    <div class="summary-content">
+      <div class="summary-title"><a class="summary-title-link" href="/habitat-banks-lists/bodstone-barton-barnes">Bodstone Barton Barnes</a></div>
+      <div class="summary-excerpt"><p>Mock excerpt — decorate() should hide this.</p></div>
+    </div>
+  </div>
+  <div class="summary-item summary-item-record-type-text">
+    <a class="summary-thumbnail-container" href="/habitat-banks-lists/the-vine">
+      <img class="summary-thumbnail-image" src="coming-soon-thumbnail.png" alt="The Vine"/></a>
+    <div class="summary-content">
+      <div class="summary-title"><a class="summary-title-link" href="/habitat-banks-lists/the-vine">The Vine</a></div>
+      <div class="summary-excerpt"><p>Mock excerpt — decorate() should hide this.</p></div>
+    </div>
+  </div>
+  <div class="summary-item summary-item-record-type-text">
     <a class="summary-thumbnail-container" href="/habitat-banks-lists/cookridge">
       <img class="summary-thumbnail-image" src="coming-soon-thumbnail.png" alt="Cookridge (should be hidden)"/></a>
     <div class="summary-content">
@@ -780,7 +798,7 @@ var BF_PREVIEWS = {};
     <p class="bf-lead">Our registered habitat banks are only part of the picture. With sites in development across England, our coverage is designed to meet you where you&rsquo;re building, helping you secure suitable local supply now or progress the right site for what comes next.</p>
     <div class="bf-statband">
       <div class="bf-sb"><span class="v" data-bf-stat="registered">6</span><span class="k">Registered habitat banks</span></div>
-      <div class="bf-sb"><span class="v" data-bf-stat="soon">9</span><span class="k">Habitat banks coming soon</span></div>
+      <div class="bf-sb"><span class="v" data-bf-stat="soon">11</span><span class="k">Habitat banks coming soon</span></div>
       <div class="bf-sb"><span class="v"><span data-bf-stat="units">1,274</span><span class="u">+</span></span><span class="k">BNG units across our registered habitat banks</span></div>
       <div class="bf-sb"><span class="v">378<span class="u">ha</span></span><span class="k">Under long-term management</span></div>
     </div>
