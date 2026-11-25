@@ -9,7 +9,8 @@ import type { Channel, Pipeline } from "@/lib/types";
  * the Developer or Landowner pipeline whose Source channel is one of the
  * inbound channels, counted in the month it qualified. Until 17 November 2026
  * a developer deal qualified the day it was created and a landowner deal when
- * it moved past CALL / QUALIFY. From that day Sales tick "Qualified Lead?"
+ * it moved past CALL / QUALIFY (a deal filed in another pipeline first, from
+ * the day it entered the marketing pipeline). From that day Sales tick "Qualified Lead?"
  * (YES / NO) on every lead and deal, and the tick decides, in either pipeline
  * and in the NSIP pipeline (developer work): a lead ticked before it becomes
  * a deal counts too, from the day it came in. A deal Sales later turns down

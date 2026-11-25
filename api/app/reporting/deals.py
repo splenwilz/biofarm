@@ -1,9 +1,11 @@
 """Deals as the dashboard counts them.
 
-A deal belongs to the audience of the pipeline it was created in, found from
-its stage history (the stage before its first move, else its current stage),
-so a deal parked in a DORMANT pipeline or moved on to Legal keeps its
-origin. Qualification follows the KPI rule in the config. Until 17 Nov 2026:
+A deal belongs to the audience of the first marketing pipeline it entered,
+found from its stage history: usually where it was created, otherwise the
+pipeline it was moved into after being filed somewhere else first (Pipedrive's
+hosted web form once put a website enquiry in Legal Workflow). A deal parked
+in a DORMANT pipeline or moved on to Legal afterwards keeps its origin.
+Qualification follows the KPI rule in the config. Until 17 Nov 2026:
 Developer Pipeline deals qualify at creation; Landowner Pipeline deals qualify
 when they first leave CALL / QUALIFY for another stage of that pipeline. From
 that day Sales tick a "Qualified Lead?" field on every lead and deal, and the
@@ -96,9 +98,54 @@ def tick_rule_applies(received: datetime, ctx: DealContext) -> bool:
     return start is not None and ctx.qualified_code is not None and received.date() >= start
 
 
-def origin_stage(deal: MirrorDeal, history: list[DealStageHistory]) -> int | None:
+def ordered_moves(history: list[DealStageHistory]) -> list[DealStageHistory]:
+    """Stage moves oldest first. Pipedrive logs to the second, so an automation
+    can leave two moves with the same time and the database returns those in
+    any order; within a tie the chain decides, each move's old stage being the
+    previous move's new stage."""
     moves = sorted((h for h in history if h.old_stage_id is not None), key=lambda h: h.changed_at)
-    return moves[0].old_stage_id if moves else deal.stage_id
+    out: list[DealStageHistory] = []
+    i = 0
+    while i < len(moves):
+        j = i
+        while j < len(moves) and moves[j].changed_at == moves[i].changed_at:
+            j += 1
+        tie = moves[i:j]
+        if len(tie) > 1:
+            destinations = {h.new_stage_id for h in tie}
+            chain = [h for h in tie if h.old_stage_id not in destinations][:1]  # the move nothing in the tie leads into
+            rest = [h for h in tie if h not in chain]
+            while chain and rest:
+                following = next((h for h in rest if h.old_stage_id == chain[-1].new_stage_id), None)
+                if following is None:
+                    break
+                chain.append(following)
+                rest.remove(following)
+            tie = chain + rest
+        out.extend(tie)
+        i = j
+    return out
+
+
+def origin_stage(deal: MirrorDeal, history: list[DealStageHistory], ctx: DealContext) -> tuple[int | None, datetime | None]:
+    """The stage a deal started in for the dashboard, and when it got there.
+    It is the first stage on the deal's path that lies in a marketing pipeline,
+    with None for "it was created there" and else the time of the move that
+    brought it in: a deal the web form or a colleague filed in Legal Workflow
+    first and corrected the next morning is a Landowner deal from that moment,
+    not lost for life. A deal that never touched a marketing pipeline keeps its
+    literal first stage, so it still reads as not marketing's."""
+    moves = ordered_moves(history)
+    path: list[tuple[int | None, datetime | None]] = [(m.old_stage_id, moves[i - 1].changed_at if i else None) for i, m in enumerate(moves)]
+    path.append((moves[-1].new_stage_id, moves[-1].changed_at) if moves else (deal.stage_id, None))
+    audiences = ctx.settings.pipedrive_pipeline_audiences
+    for stage, entered in path:
+        pipeline = ctx.stage_pipeline.get(stage) if stage is not None else None
+        if pipeline is None:
+            break  # a stage Pipedrive no longer has (older deals began in since-deleted stages): keep the literal reading
+        if audiences.get(pipeline) in ("developer", "landowner"):
+            return stage, entered
+    return path[0]
 
 
 def day(at: datetime) -> str:
@@ -106,10 +153,12 @@ def day(at: datetime) -> str:
     return f"{at.day} {at:%b %Y}"
 
 
-def qualification(deal: MirrorDeal, history: list[DealStageHistory], origin_pipeline: int, first_stage: int | None, ctx: DealContext, received: datetime | None = None) -> tuple[datetime | None, str | None]:
+def qualification(deal: MirrorDeal, history: list[DealStageHistory], origin_pipeline: int, first_stage: int | None, ctx: DealContext, received: datetime | None = None,
+                  entered: datetime | None = None) -> tuple[datetime | None, str | None]:
     """When the record qualified and why, in words; (None, None) while it has
     not. `received` is when the enquiry came in: the lead's date for a deal
-    converted from one, else the deal's own."""
+    converted from one, else the deal's own. `entered` is when the deal moved
+    into its marketing pipeline from elsewhere, None when it was created there."""
     s = ctx.settings
     received = received or deal.add_time
     if received is not None and tick_rule_applies(received, ctx):
@@ -120,9 +169,13 @@ def qualification(deal: MirrorDeal, history: list[DealStageHistory], origin_pipe
             return tick, f"Sales ticked {s.pipedrive_qualified_field_name} {s.pipedrive_qualified_yes_label} on {day(tick)}"
         return received, f"{s.pipedrive_qualified_field_name} {s.pipedrive_qualified_yes_label} when it came in, {day(received)}"
     if origin_pipeline == s.pipedrive_developer_pipeline_id:
+        if entered is not None:
+            return entered, f"Entered the Developer Pipeline on {day(entered)}: qualified on arrival"
         return deal.add_time, "Created in the Developer Pipeline: qualified on arrival"
     if origin_pipeline == s.pipedrive_landowner_pipeline_id:
         if first_stage != s.pipedrive_landowner_qualify_stage_id:
+            if entered is not None:
+                return entered, f"Landowner Pipeline: entered past CALL / QUALIFY on {day(entered)}"
             return deal.add_time, "Landowner Pipeline: created past CALL / QUALIFY, qualified on arrival"
         past = [h for h in history if h.old_stage_id == s.pipedrive_landowner_qualify_stage_id and ctx.stage_pipeline.get(h.new_stage_id) == origin_pipeline]
         if not past:
@@ -132,8 +185,9 @@ def qualification(deal: MirrorDeal, history: list[DealStageHistory], origin_pipe
     return None, None
 
 
-def qualified_at(deal: MirrorDeal, history: list[DealStageHistory], origin_pipeline: int, first_stage: int | None, ctx: DealContext, received: datetime | None = None):
-    return qualification(deal, history, origin_pipeline, first_stage, ctx, received)[0]
+def qualified_at(deal: MirrorDeal, history: list[DealStageHistory], origin_pipeline: int, first_stage: int | None, ctx: DealContext, received: datetime | None = None,
+                 entered: datetime | None = None):
+    return qualification(deal, history, origin_pipeline, first_stage, ctx, received, entered)[0]
 
 
 def origin_kind(origin: str | None, s: Settings) -> Literal["website", "team", "import"] | None:
@@ -154,7 +208,7 @@ def derive_deal(deal: MirrorDeal, history: list[DealStageHistory], ctx: DealCont
     date of the lead the deal was converted from, when the mirror has it."""
     if deal.is_deleted or deal.add_time is None or deal.status not in STATUSES:
         return None
-    first_stage = origin_stage(deal, history)
+    first_stage, entered = origin_stage(deal, history, ctx)
     origin_pipeline = ctx.stage_pipeline.get(first_stage, deal.pipeline_id) if first_stage is not None else deal.pipeline_id
     audience = ctx.settings.pipedrive_pipeline_audiences.get(origin_pipeline) if origin_pipeline is not None else None
     if audience not in ("developer", "landowner"):
@@ -168,7 +222,7 @@ def derive_deal(deal: MirrorDeal, history: list[DealStageHistory], ctx: DealCont
     source = touch_label({key: fields.get(code) for key, code in ctx.touch_codes.items()})
     if source is None and deal.channel_id and "/" in deal.channel_id:
         source = deal.channel_id  # already a "source/medium" label
-    at, why = qualification(deal, history, origin_pipeline, first_stage, ctx, received)
+    at, why = qualification(deal, history, origin_pipeline, first_stage, ctx, received, entered)
     org_id = ctx.person_orgs.get(deal.person_id) if deal.person_id is not None else None
     return DealOut(
         id=str(deal.id),

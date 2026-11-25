@@ -144,8 +144,10 @@ section from the Pipedrive mirror; spend, traffic, search and conversions
 from the Google daily tables (step 4); events from `marketing_events`. The dashboard's server reads it with
 the shared token in `x-dashboard-token`; the browser never sees the token or
 this endpoint. `app/reporting/` applies the KPI rule: a deal belongs to the
-audience of the pipeline it was created in (found from its stage history, so
-a deal parked in DORMANT or moved to Legal keeps its origin). Until 17 Nov
+audience of the first marketing pipeline it entered (found from its stage
+history: usually where it was created, else the pipeline it was moved into
+after being filed in Legal Workflow or similar first; a deal parked in DORMANT
+or moved to Legal afterwards keeps its origin). Until 17 Nov
 2026 a Developer Pipeline deal is qualified at creation, a Landowner Pipeline
 deal when it first leaves CALL / QUALIFY for another stage of that pipeline.
 From that day Sales tick a "Qualified Lead?" field (YES / NO) on every lead

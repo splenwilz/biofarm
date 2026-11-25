@@ -113,6 +113,71 @@ class TestLandownerDeals:
         assert out.pipeline == "landowner" and out.qualified_at is None
 
 
+class TestDealsFiledInTheWrongPipelineFirst:
+    """A deal's origin is the first marketing pipeline it entered, not the first
+    stage someone clicked. Pipedrive's hosted web form filed deal 1043 in Legal
+    Workflow (stage 23) on 1 Jun 2026; Chris moved it to CALL / QUALIFY the
+    next morning and it is a Landowner deal from then on. Reading the literal
+    first stage locked such deals out of the dashboard for life."""
+
+    def test_moved_from_legal_to_call_qualify_is_a_landowner_deal_still_waiting(self):
+        out = derive_deal(deal(pipeline_id=2, stage_id=6), [move(1, 23, 6, LATER)], ctx())
+        assert out is not None
+        assert out.pipeline == "landowner" and out.qualified_at is None and out.qualified_by is None
+
+    def test_and_qualifies_when_it_later_moves_past_call_qualify(self):
+        out = derive_deal(deal(pipeline_id=2, stage_id=7), [move(1, 23, 6, LATER), move(1, 6, 7, LATER + 3 * H)], ctx())
+        assert out.pipeline == "landowner" and out.qualified_at == LATER + 3 * H
+        assert out.qualified_by == f"Landowner Pipeline: moved past CALL / QUALIFY on {LATER.day} {LATER:%b %Y}"
+
+    def test_moved_from_legal_straight_past_call_qualify_qualifies_when_it_entered(self):
+        # deal 1044: SOLICITOR INSTRUCTED -> the stage after CALL / QUALIFY, same day
+        out = derive_deal(deal(pipeline_id=2, stage_id=7), [move(1, 23, 7, LATER)], ctx())
+        assert out.pipeline == "landowner" and out.qualified_at == LATER and out.created_at == T
+        assert out.qualified_by == f"Landowner Pipeline: entered past CALL / QUALIFY on {LATER.day} {LATER:%b %Y}"
+
+    def test_moved_from_legal_into_the_developer_pipeline_qualifies_when_it_entered(self):
+        out = derive_deal(deal(pipeline_id=3, stage_id=13), [move(1, 23, 13, LATER)], ctx())
+        assert out.pipeline == "developer" and out.qualified_at == LATER
+        assert out.qualified_by == f"Entered the Developer Pipeline on {LATER.day} {LATER:%b %Y}: qualified on arrival"
+
+    def test_a_deal_that_only_ever_lived_in_legal_is_still_not_marketings(self):
+        assert derive_deal(deal(pipeline_id=4, stage_id=23), [], ctx()) is None
+        assert derive_deal(deal(pipeline_id=4, stage_id=23), [move(1, 23, 23, LATER)], ctx()) is None
+
+    def test_a_first_stage_pipedrive_no_longer_has_keeps_the_old_reading(self):
+        # 2023-24 deals began in stages deleted when the pipelines were rebuilt; they
+        # are read against their current pipeline and qualified at creation, as before
+        out = derive_deal(deal(pipeline_id=2, stage_id=7, add_time=T), [move(1, 999, 7, LATER)], ctx())
+        assert out.pipeline == "landowner" and out.qualified_at == T
+        assert out.qualified_by == "Landowner Pipeline: created past CALL / QUALIFY, qualified on arrival"
+
+    def test_two_moves_in_the_same_second_are_read_in_chain_order_whatever_order_they_arrive(self):
+        # an automation can log Legal -> SITE VISIT -> PROPOSAL inside one second; the
+        # database returns the rows in any order, the chain says which came first
+        forwards = [move(1, 23, 7, LATER), move(1, 7, 10, LATER)]
+        for history in (forwards, forwards[::-1]):
+            out = derive_deal(deal(pipeline_id=2, stage_id=10), history, ctx())
+            assert out.pipeline == "landowner" and out.qualified_at == LATER
+            assert out.qualified_by == f"Landowner Pipeline: entered past CALL / QUALIFY on {LATER.day} {LATER:%b %Y}"
+
+    def test_a_tie_that_starts_in_a_deleted_stage_reads_the_same_whatever_order_the_rows_arrive(self):
+        # deal 455: created in a since-deleted stage, then moved into OPPORTUNITY and on to
+        # QUOTED in the same second when the pipelines were rebuilt, later a Landowner deal;
+        # the chain puts the deleted stage first, so the literal reading applies every time
+        forwards = [move(1, 999, 13, LATER), move(1, 13, 14, LATER), move(1, 14, 7, LATER + H)]
+        for history in (forwards, forwards[::-1], [forwards[1], forwards[0], forwards[2]]):
+            out = derive_deal(deal(pipeline_id=2, stage_id=7), history, ctx())
+            assert out.pipeline == "landowner" and out.qualified_at == T
+            assert out.qualified_by == "Landowner Pipeline: created past CALL / QUALIFY, qualified on arrival"
+
+    def test_a_deal_created_in_a_marketing_pipeline_keeps_its_creation_as_origin(self):
+        # the first marketing stage is the creation stage, so nothing changes for the common case
+        out = derive_deal(deal(pipeline_id=4, stage_id=23), [move(1, 6, 7, LATER), move(1, 7, 23, LATER + H)], ctx())
+        assert out.pipeline == "landowner" and out.qualified_at == LATER
+        assert out.qualified_by == f"Landowner Pipeline: moved past CALL / QUALIFY on {LATER.day} {LATER:%b %Y}"
+
+
 class TestDealSourceLabel:
     """The deal's "source/medium" comes from its UTM Source, UTM Medium and Referrer
     fields (the lead API writes them and they survive conversion); the channel id

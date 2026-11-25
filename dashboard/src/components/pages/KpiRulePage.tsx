@@ -209,7 +209,7 @@ export function KpiRulePage() {
                 <Typography variant="body2" component="ul" sx={{ m: 0, pl: 2.5, "& li": { mb: 0.5 } }}>
                   <li>From {dateLabel(config.qualificationStatusFrom)} Sales tick &ldquo;Qualified Lead?&rdquo; (YES or NO) on every lead and deal, and the tick decides: YES counts, in the Developer, Landowner or NSIP pipeline, from the moment of the tick.</li>
                   <li>A lead ticked YES before it becomes a deal counts from the day it came in; its deal takes over once converted.</li>
-                  <li>Before that day: a developer deal counted from the day it was created, a landowner deal once it moved past &ldquo;CALL / QUALIFY&rdquo;. Those older deals keep that rule.</li>
+                  <li>Before that day: a developer deal counted from the day it was created, a landowner deal once it moved past &ldquo;CALL / QUALIFY&rdquo;. A deal filed in another pipeline first counts from the day it entered the marketing pipeline. Those older deals keep that rule.</li>
                   <li>A qualified deal still counts if Sales later turn it down, for price, no local bank or any other reason.</li>
                   <li>Job seekers, suppliers and other non-buyers never count.</li>
                 </Typography>
