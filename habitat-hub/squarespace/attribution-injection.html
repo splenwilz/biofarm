@@ -1,14 +1,15 @@
 <!-- SITE-WIDE ATTRIBUTION CAPTURE (Settings > Advanced > Code Injection > HEADER).
      REPLACES the current "UTM source attribute" snippet - backwards compatible:
      keeps writing the same sessionStorage utm_* keys, and adds:
-       - click IDs (gclid/fbclid/msclkid), referrer, landing page
+       - click IDs (gclid/gbraid/wbraid/fbclid/msclkid), referrer, landing page
+         (gbraid and wbraid added 27 Nov 2026: Google's iOS / app click ids)
        - bf_attr_last  (sessionStorage JSON): last-touch for this visit
        - bf_attr_first (localStorage JSON):  first-touch ever, write-once
      The form blocks read these and send them with each lead. -->
 <script>
 (function () {
   var UTM = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
-  var CLICK = ['gclid','fbclid','msclkid'];
+  var CLICK = ['gclid','gbraid','wbraid','fbclid','msclkid'];
   var params = new URLSearchParams(window.location.search);
 
   // Storage can throw (Safari private mode, blocked cookies) - never abort.

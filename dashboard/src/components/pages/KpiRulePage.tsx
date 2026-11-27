@@ -235,7 +235,7 @@ export function KpiRulePage() {
           <Stack spacing={2}>
             <Section id="sources" title="Where each number comes from">
               <Row term="Qualified opportunities" termWidth={150}>Pipedrive deals (v2) with per-deal stage history. Pipedrive updates arrive through webhooks as they happen.</Row>
-              <Row term="Enquiries" termWidth={150}>Pipedrive: every lead in the Leads inbox plus every deal created directly in a marketing pipeline, back to 2024. Left out: bulk-imported deals, test and staff submissions, newsletter sign-ups. Website records add form, source and medium and landing page. Counted when the source channel is inbound.</Row>
+              <Row term="Enquiries" termWidth={150}>Pipedrive: every lead in the Leads inbox plus every deal created directly in a marketing pipeline, back to 2024. Left out: bulk-imported deals, test and staff submissions, newsletter sign-ups, and CPD session bookings, which have their own page. Website records add form, source and medium and landing page. Counted when the source channel is inbound.</Row>
               <Row term="Spend" termWidth={150}>Pulled from the Google Ads and LinkedIn APIs once a day. Entered by hand only for events and other costs.</Row>
               <Row term="Newsletter" termWidth={150}>Subscribers from Pipedrive persons; opens and clicks per issue from the Pipedrive Campaigns export, which has no API</Row>
               <Row term="Search and AI" termWidth={150}>Search Console for brand queries; GA4 for AI-referred sessions; mention share by prompt sampling</Row>

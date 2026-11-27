@@ -24,6 +24,7 @@ from app.mirror.models import (
 from app.models import Lead
 from app.reporting.deals import DealContext, derive_deal, load_context, load_deals
 from app.reporting.enquiries import (
+    form_of,
     Candidate,
     EnquiryContext,
     candidates_from,
@@ -396,7 +397,7 @@ class TestEnquiryRules:
         assert derive(cand(touch={"utm_source": "bing", "utm_medium": "cpc"}, website=website()), ectx()).source_label == "google/cpc"
 
     def test_form_is_read_from_the_title_of_website_records_only(self):
-        assert derive(cand(title="CPD session request - Jo"), ectx()).form == "cpd"
+        assert form_of(cand(title="CPD session request - Jo"), ectx()) == "cpd"  # classified as CPD, then kept out of enquiries (its own line)
         assert derive(cand(title="Fold enquiry - Jo"), ectx()).form == "fold"
         assert derive(cand(title="Landowner enquiry - Jo"), ectx()).form == "landowner"  # the landowner page's tracked form
         assert derive(cand(title="Landowner Web Enquiry Rob", origin="WebForms"), ectx()).form == "contact"  # a web form the mirror has no form name for
@@ -844,3 +845,39 @@ async def test_build_dashboard_data_refuses_before_the_first_import(sessions):
     async with sessions() as s:
         with pytest.raises(NoImportYet):
             await build_dashboard_data(s, settings())
+
+
+# ---- CPD bookings: their own line, not enquiries (26 Nov 2026) ---------------------------------
+
+
+class TestCpdBookingsAreNotEnquiries:
+    def test_a_cpd_session_request_is_left_out_with_its_own_reason(self):
+        assert derive(cand(title="CPD session request - Jo"), ectx()) == "cpd"
+        assert derive(cand(website=website(form="cpd")), ectx()) == "cpd"
+
+    def test_the_tests_and_staff_rules_still_come_first(self):
+        # a CPD request from a test address is a test, not a booking
+        assert derive(cand(title="CPD session request - Jo", person_id=503), ectx()) == "test_person"
+        assert derive(cand(title="CPD session request - Jo", website=website(form="cpd", email="hello@agency-test.example", pipedrive_lead_id="L9")), ectx(settings=settings(enquiry_test_domains=["agency-test.example"]))) == "test_person"
+        assert derive(cand(title="CPD session request test"), ectx()) == "test_title"
+
+    def test_months_run_from_july_2026_to_the_import_month_with_zeros(self):
+        from app.reporting.cpd import cpd_months
+
+        rows = cpd_months([], up_to=datetime(2026, 10, 7, tzinfo=UTC))
+        assert [(r.month, r.bookings) for r in rows] == [("2026-07", 0), ("2026-08", 0), ("2026-09", 0), ("2026-10", 0)]
+        rows = cpd_months([datetime(2026, 10, 9, tzinfo=UTC), datetime(2026, 11, 12, 9, tzinfo=UTC), datetime(2026, 11, 16, tzinfo=UTC)], up_to=datetime(2026, 11, 26, tzinfo=UTC))
+        assert [(r.month, r.bookings) for r in rows] == [("2026-07", 0), ("2026-08", 0), ("2026-09", 0), ("2026-10", 1), ("2026-11", 2)]
+        # a booking after the import month, or before July, widens the range rather than vanishing
+        rows = cpd_months([datetime(2026, 6, 2, tzinfo=UTC), datetime(2026, 12, 1, tzinfo=UTC)], up_to=datetime(2026, 11, 26, tzinfo=UTC))
+        assert rows[0].month == "2026-06" and rows[-1].month == "2026-12" and sum(r.bookings for r in rows) == 2
+
+
+async def test_dashboard_payload_carries_cpd_bookings_by_month(sessions):
+    await seed(sessions)
+    async with sessions() as s:
+        data = await build_dashboard_data(s, settings())
+    payload = data.model_dump(by_alias=True, mode="json")
+    # the seed has no CPD request; the line still runs from July to the import month
+    assert payload["cpdBookings"] == [{"month": "2026-07", "bookings": 0}, {"month": "2026-08", "bookings": 0}, {"month": "2026-09", "bookings": 0}, {"month": "2026-10", "bookings": 0}]
+    assert "cpd" not in {e["form"] for e in payload["enquiries"]}

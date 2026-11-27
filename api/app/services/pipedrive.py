@@ -123,18 +123,31 @@ class PipedriveClient:
         data = await self._request("POST", "/api/v2/persons", json=body)
         return data["data"]["id"]
 
+    async def get_person_marketing_status(self, person_id: int) -> str | None:
+        """The person's Campaigns marketing status (no_consent, subscribed,
+        unsubscribed, bounced, archived, pending_*), or None when Pipedrive
+        returns none. v2 only includes the field when asked for it."""
+        data = await self._request(
+            "GET", f"/api/v2/persons/{person_id}", params={"include_fields": "marketing_status"}
+        )
+        status = (data.get("data") or {}).get("marketing_status")
+        return str(status) if status else None
+
     async def update_person(
         self,
         person_id: int,
         *,
         phone: str | None = None,
         marketing_status: str | None = None,
+        custom_fields: dict[str, Any] | None = None,
     ) -> None:
         body: dict[str, Any] = {}
         if phone:
             body["phones"] = [{"value": phone, "primary": True, "label": "work"}]
         if marketing_status:
             body["marketing_status"] = marketing_status
+        if custom_fields:
+            body["custom_fields"] = custom_fields
         if not body:
             return
         await self._request("PATCH", f"/api/v2/persons/{person_id}", json=body)

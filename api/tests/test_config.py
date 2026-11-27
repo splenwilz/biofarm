@@ -66,8 +66,9 @@ def test_enquiry_rules_have_the_agreed_defaults():
     assert s.enquiry_excluded_deal_origins == ["Import"]
     assert s.enquiry_website_origins == ["WebForms", "API"]
     assert s.enquiry_test_campaigns == ["tracking-test", "go-live-check", "field-map", "final-check"]
-    # personal addresses live in the environment, not in the code: only the synthetic test domain is a default
-    assert s.enquiry_test_domains == ["biofarm-test.dev"]
+    # personal addresses live in the environment, not in the code: the synthetic test domain and the
+    # tracking agency's domain (26 Nov 2026) are the defaults
+    assert s.enquiry_test_domains == ["biofarm-test.dev", "amandawhitedigital.com"]
     assert s.enquiry_test_emails == []
     assert s.enquiry_staff_domains == ["biofarm.co.uk"]
     assert s.enquiry_channel_by_title == {"FBI": "Trade Show / Event"}

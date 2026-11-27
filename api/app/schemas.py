@@ -36,6 +36,9 @@ class Attribution(BaseModel):
     gclid: str | None = Field(default=None, max_length=255)
     fbclid: str | None = Field(default=None, max_length=255)
     msclkid: str | None = Field(default=None, max_length=255)
+    # Google sends these instead of a gclid for many iOS and app clicks (27 Nov 2026)
+    gbraid: str | None = Field(default=None, max_length=255)
+    wbraid: str | None = Field(default=None, max_length=255)
     referrer: str | None = Field(default=None, max_length=2048)
     landing_page: str | None = Field(default=None, max_length=2048)
 
@@ -94,7 +97,12 @@ class ContactSubmission(LeadSubmissionBase):
     phone: str | None = Field(default=None, max_length=50)
     fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
     message: str | None = Field(default=None, max_length=5000)
+    # The newsletter answer. Since 26 Nov 2026 the form is soft opt-in and
+    # sends newsletter_declined (the "I'd prefer not" box). A form without
+    # it is the old Yes / No version still cached in a browser, judged by the
+    # old rule from newsletter_opt_in alone. See sync.newsletter_answer.
     newsletter_opt_in: bool = False
+    newsletter_declined: bool | None = None
     heard_about: HeardAbout | None = None
     # Their own words when heard_about is "other" (the form shows a text box then).
     heard_about_other: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] | None = None
@@ -136,6 +144,10 @@ class CpdSubmission(LeadSubmissionBase):
     fields: list[FieldChoice] = Field(default_factory=list, max_length=10)
     team_size: TeamSize | None = None
     message: str | None = Field(default=None, max_length=5000)
+    # An ordinary opt-in box (ticked = yes), added 26 Nov 2026: a CPD request
+    # is not a negotiation for units, so the soft opt-in does not apply. None
+    # = the old form, which never asked.
+    newsletter_opt_in: bool | None = None
 
 
 class LandownerSubmission(LeadSubmissionBase):
@@ -148,6 +160,7 @@ class LandownerSubmission(LeadSubmissionBase):
     phone: str | None = Field(default=None, max_length=50)
     message: str | None = Field(default=None, max_length=5000)
     newsletter_opt_in: bool = False
+    newsletter_declined: bool | None = None  # soft opt-in since 26 Nov 2026, as ContactSubmission
     heard_about: HeardAbout | None = None
     heard_about_other: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] | None = None
 
@@ -171,3 +184,6 @@ class FoldSubmission(LeadSubmissionBase):
     location: str = Field(min_length=1, max_length=200)
     units: str | None = Field(default=None, max_length=50)
     message: str | None = Field(default=None, max_length=5000)
+    # Soft opt-in since 26 Nov 2026 (a Fold enquiry is a negotiation about
+    # the landowner's habitat bank). None = the old form, which never asked.
+    newsletter_declined: bool | None = None

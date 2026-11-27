@@ -13,6 +13,7 @@ from app.google.importer import last_google_import_finished, last_google_import_
 from app.mirror.models import ImportRun
 from app.models import Lead, MarketingEvent
 from app.reporting.deals import load_marketing_deals
+from app.reporting.cpd import cpd_months
 from app.reporting.enquiries import load_enquiries
 from app.reporting.events import load_events
 from app.reporting.google import load_google_sections
@@ -54,6 +55,7 @@ async def build_dashboard_data(session: AsyncSession, settings: Settings, *, syn
     enquiries = await load_enquiries(session, settings, deals=deals)
     newsletter = await load_newsletter(session, up_to=synced_at)
     newsletter.signups = signup_months(enquiries.newsletter_signups)
+    cpd_bookings = cpd_months(enquiries.cpd_bookings, up_to=synced_at)
     google = await load_google_sections(session, settings)
     # Qualified records: the marketing deals, then the leads Sales ticked before converting them.
     qualified_records = [out for _, out in deals[1]] + enquiries.qualified_leads
@@ -62,6 +64,7 @@ async def build_dashboard_data(session: AsyncSession, settings: Settings, *, syn
     return DashboardDataOut(
         deals=qualified_records,
         enquiries=enquiries.enquiries,
+        cpd_bookings=cpd_bookings,
         newsletter=newsletter,
         spend=google.spend,
         traffic=google.traffic,

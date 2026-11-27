@@ -1,4 +1,7 @@
-<!-- LANDOWNER FORM v2.1 - /landowners, green "Chat to Chris" section (replaces the
+<!-- LANDOWNER FORM v2.2 - /landowners, green "Chat to Chris" section (replaces the
+     26 Nov 2026 SOFT OPT-IN: the Yes / No newsletter radios are gone. The form carries Vix's newsletter sentence (26 Nov) and one unticked box, "I'd prefer not to receive these updates." (PECR reg. 22(3): details
+     obtained during an enquiry, our own similar updates, a refusal offered here and in every send). The box is
+     sent as newsletter_declined; the API adds the person unless it is ticked and records how and when.
      Landowner Contact Form Pipedrive embed, webforms.pipedrive.com/f/6Ovk4bAi...).
      Same questions as that embed: name, email, phone (with a country-code
      picker: compact flag + code button, a searchable list below it the width
@@ -112,9 +115,8 @@
       <textarea id="bfMessage" name="message" maxlength="5000"></textarea>
     </div>
     <fieldset class="bf-radios">
-      <legend>Please plant me on the newsletter list - I accept the <a href="/privacy-policy" style="color:#212121;">Privacy Policy</a> <span class="req">*</span></legend>
-      <label><input type="radio" name="newsletter" value="yes" required>Yes please</label>
-      <label><input type="radio" name="newsletter" value="no">No thank you</label>
+      <legend>Keep up to date with the latest in BNG, with industry insights, practical guidance and stories from our habitat banks, delivered straight to your inbox. You can unsubscribe at any time.</legend>
+      <label><input type="checkbox" name="newsletter_declined" value="yes">I&rsquo;d prefer not to receive these updates.</label>
     </fieldset>
     <div class="bf-hp" aria-hidden="true">
       <label for="bfWebsite">Website</label>
@@ -125,7 +127,7 @@
     <div class="bf-notes">
       <p>Required fields are marked with *</p>
       <p>Never share sensitive information (bank details, passwords) through this form.</p>
-      <p>Your details are used to reply to you and, if you opt in, for the newsletter. See our <a href="/privacy-policy">Privacy Policy</a>.</p>
+      <p>Your details are used to reply to you and, unless you&rsquo;d prefer not, for the newsletter. See our <a href="/privacy-policy">Privacy Policy</a>.</p>
     </div>
   </form>
 </div>
@@ -300,16 +302,10 @@
     statusEl.className = 'bf-status';
     statusEl.textContent = '';
 
-    var newsletter = form.querySelector('input[name=newsletter]:checked');
 
     if (!form.name.value.trim() || !form.email.value.trim() || !/.+@.+\..+/.test(form.email.value)) {
       statusEl.className = 'bf-status err';
       statusEl.textContent = 'Please add your name and a valid email address.';
-      return;
-    }
-    if (!newsletter) {
-      statusEl.className = 'bf-status err';
-      statusEl.textContent = 'Please choose a newsletter preference.';
       return;
     }
 
@@ -320,7 +316,7 @@
       message: form.message.value.trim() || null,
       heard_about: form.heard_about.value || null,
       heard_about_other: form.heard_about.value === 'other' ? (form.heard_about_other.value.trim().slice(0, 200) || null) : null,
-      newsletter_opt_in: newsletter.value === 'yes',
+      newsletter_declined: form.newsletter_declined.checked, // soft opt-in: unticked = added to the newsletter
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,
       page: location.pathname,

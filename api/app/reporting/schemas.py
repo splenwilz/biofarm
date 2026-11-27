@@ -112,6 +112,13 @@ class SignupMonthOut(Wire):
     count: int
 
 
+class CpdMonthOut(Wire):
+    """CPD session requests through the website in one calendar month (not enquiries)."""
+
+    month: str
+    bookings: int
+
+
 class NewsletterOut(Wire):
     issues: list[NewsletterIssueOut] = []
     subscribers: list[SubscriberMonthOut] = []
@@ -243,6 +250,9 @@ class EventOut(Wire):
 class DashboardDataOut(Wire):
     deals: list[DealOut]
     enquiries: list[EnquiryOut]
+    # CPD session bookings by month, July 2026 to the month of the last import,
+    # every month present (zero when none). Read from Pipedrive leads only.
+    cpd_bookings: list[CpdMonthOut] = []
     spend: list[SpendEntryOut] = []
     newsletter: NewsletterOut = NewsletterOut()
     search: SearchOut = SearchOut()

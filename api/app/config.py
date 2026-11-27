@@ -30,8 +30,13 @@ _OWNER_KEY_HELP = (
 )
 
 
-# The two answers the "Newsletter Sign Up" lead field records (see sync).
-_NEWSLETTER_CHOICES = ("opted_in", "opted_out")
+# The answers the "Newsletter Sign Up" lead field records (see sync): the two
+# the old embeds wrote, plus an optional "soft_opt_in" option an admin may add
+# later (without it a soft opt-in is written as Opted In).
+_NEWSLETTER_CHOICES = ("opted_in", "opted_out", "soft_opt_in")
+_NEWSLETTER_REQUIRED = ("opted_in", "opted_out")
+# The consent record on the person: how the newsletter question was answered.
+_CONSENT_CHOICES = ("opt_in", "soft_opt_in", "declined")
 # The answers the contact form offers to "Where did you hear about us?" (schemas.HeardAbout).
 _HEARD_ABOUT_CHOICES: tuple[str, ...] = get_args(HeardAbout)
 
@@ -152,6 +157,14 @@ class Settings(BaseSettings):
     # old Pipedrive embeds did, so the team's Pipedrive filters keep working.
     pipedrive_newsletter_field: str | None = None
     pipedrive_newsletter_option_map: Annotated[dict[str, int], NoDecode] = {}
+    # The consent record on the PERSON (needs an admin to create the fields):
+    # an option field for how the newsletter question was answered, with
+    # {"opt_in": id, "soft_opt_in": id, "declined": id}, and a date field for
+    # when an opt-in happened. Written on new persons, and on existing persons
+    # when they opt in (a declined answer never overwrites an earlier record).
+    pipedrive_newsletter_consent_field: str | None = None
+    pipedrive_newsletter_consent_option_map: Annotated[dict[str, int], NoDecode] = {}
+    pipedrive_newsletter_consent_date_field: str | None = None
     # "How they heard" lead field (a multiple-option deal field Sales added on
     # 17 Nov 2026): field hash + form answer -> option id, e.g. {"search": 1261}.
     # Written on every lead whose form answered the question. Their own words
@@ -235,8 +248,10 @@ class Settings(BaseSettings):
     # addresses, are the team testing the forms (compared lower-cased). The
     # team's own addresses belong in the environment, not here: set
     # BIOFARM_ENQUIRY_TEST_DOMAINS / BIOFARM_ENQUIRY_TEST_EMAILS on Render and
-    # in .env (the defaults are then replaced, so repeat biofarm-test.dev).
-    enquiry_test_domains: Annotated[list[str], NoDecode] = ["biofarm-test.dev"]
+    # in .env (the defaults are then replaced, so repeat biofarm-test.dev and
+    # amandawhitedigital.com).
+    # amandawhitedigital.com: the agency that builds and tests the tag tracking (26 Nov 2026).
+    enquiry_test_domains: Annotated[list[str], NoDecode] = ["biofarm-test.dev", "amandawhitedigital.com"]
     enquiry_test_emails: Annotated[list[str], NoDecode] = []
     # Website sign-ups by people at these domains are staff trying the forms.
     enquiry_staff_domains: Annotated[list[str], NoDecode] = ["biofarm.co.uk"]
@@ -289,6 +304,11 @@ class Settings(BaseSettings):
     def _newsletter_option_map_lenient(cls, v: Any) -> dict[str, int]:
         return _option_map_lenient("BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP", v, _NEWSLETTER_CHOICES, "the Newsletter Sign Up field")
 
+    @field_validator("pipedrive_newsletter_consent_option_map", mode="before")
+    @classmethod
+    def _consent_option_map_lenient(cls, v: Any) -> dict[str, int]:
+        return _option_map_lenient("BIOFARM_PIPEDRIVE_NEWSLETTER_CONSENT_OPTION_MAP", v, _CONSENT_CHOICES, "the newsletter consent person field")
+
     @field_validator("pipedrive_heard_about_option_map", mode="before")
     @classmethod
     def _heard_about_option_map_lenient(cls, v: Any) -> dict[str, int]:
@@ -322,7 +342,8 @@ class Settings(BaseSettings):
     def _option_fields_are_set_up_whole(self) -> "Settings":
         """Half a setting writes nothing (or only some answers) in silence; say so at boot."""
         for prefix, field_hash, mapping, choices, what in (
-            ("BIOFARM_PIPEDRIVE_NEWSLETTER", self.pipedrive_newsletter_field, self.pipedrive_newsletter_option_map, _NEWSLETTER_CHOICES, "the Newsletter Sign Up field"),
+            ("BIOFARM_PIPEDRIVE_NEWSLETTER", self.pipedrive_newsletter_field, self.pipedrive_newsletter_option_map, _NEWSLETTER_REQUIRED, "the Newsletter Sign Up field"),
+            ("BIOFARM_PIPEDRIVE_NEWSLETTER_CONSENT", self.pipedrive_newsletter_consent_field, self.pipedrive_newsletter_consent_option_map, _CONSENT_CHOICES, "the newsletter consent person field"),
             ("BIOFARM_PIPEDRIVE_HEARD_ABOUT", self.pipedrive_heard_about_field, self.pipedrive_heard_about_option_map, _HEARD_ABOUT_CHOICES, "the How they heard field"),
         ):
             missing = [c for c in choices if c not in mapping]

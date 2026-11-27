@@ -59,6 +59,7 @@ export function createApiDataSource({ url, token }: ApiFeed): DataSource {
       const body: unknown = await res.json();
       assertShape(body);
       if (!Array.isArray(body.newsletter.signups)) body.newsletter.signups = [];
+      if (!Array.isArray(body.cpdBookings)) body.cpdBookings = []; // an API from before the CPD line
       return body;
     },
   };

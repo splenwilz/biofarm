@@ -1,4 +1,7 @@
-<!-- CPD page · "Arrange a session" form. Paste into ONE Squarespace Code Block in the right-hand
+<!-- CPD page · "Arrange a session" form (v1.1). Paste into ONE Squarespace Code Block in the right-hand
+     26 Nov 2026 (v1.1): an ordinary OPT-IN newsletter box, unticked by default ("Yes please, send me these
+     updates."), sent as newsletter_opt_in. A CPD request is not a negotiation for units, so the soft opt-in the
+     enquiry forms use does not apply here (PECR reg. 22(3)); the old form never asked.
      column of the "Arrange a session" section (cream background). Self-contained: own CSS + font.
      Posts to the lead-capture API at https://biofarm-api.onrender.com/v1/leads/cpd, which stores the
      lead and syncs it to Pipedrive as a person + lead ("CPD session request - <name>") + note holding
@@ -25,6 +28,12 @@
   .bf-cpdf .bf-btn:hover{background:#2a2a2a;}
   .bf-cpdf .bf-btn[disabled]{opacity:.6;cursor:wait;}
   .bf-cpdf .fine{font-size:13px;color:var(--muted);line-height:1.6;margin:18px 0 0;}
+  .bf-cpdf .bf-nl{margin:22px 0 4px;}
+  .bf-cpdf .bf-nl p{font-size:15px;line-height:1.6;color:var(--ink);margin:0 0 10px;}
+  .bf-cpdf .bf-nl label{display:flex;align-items:center;gap:10px;font-size:15px;letter-spacing:0;text-transform:none;font-weight:300;color:var(--ink);margin:0;min-height:44px;cursor:pointer;}
+  .bf-cpdf .bf-nl input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex:0 0 18px;margin:0;padding:0;border:1px solid var(--ink);border-radius:4px;background:#fff;cursor:pointer;}
+  .bf-cpdf .bf-nl input:checked{background:var(--ink) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1' fill='none' stroke='%23fff' stroke-width='1.8'/%3E%3C/svg%3E") center no-repeat;}
+  .bf-cpdf .bf-nl input:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
   .bf-cpdf .bf-status{margin-top:14px;font-size:15px;min-height:1.4em;}
   .bf-cpdf .bf-status.err{color:#4A1414;}
   .bf-cpdf .bf-done{padding:12px 0;}
@@ -51,6 +60,10 @@
     </div>
     <!-- honeypot: humans never see or fill this -->
     <div class="bf-hp" aria-hidden="true"><label for="bfCpdWebsite">Website</label><input type="text" id="bfCpdWebsite" name="website" tabindex="-1" autocomplete="off"></div>
+    <div class="bf-nl">
+      <p>Keep up to date with the latest in BNG, with industry insights, practical guidance and stories from our habitat banks, delivered straight to your inbox. You can unsubscribe at any time.</p>
+      <label><input type="checkbox" name="newsletter_opt_in" value="yes">Yes please, send me these updates.</label>
+    </div>
     <button type="submit" class="bf-btn" id="bfCpdSubmit">Arrange a CPD session</button>
     <p class="fine">We&rsquo;ll come back to you to agree a date and tailor the session to your team.</p>
     <div class="bf-status" id="bfCpdStatus" role="alert" aria-live="polite"></div>
@@ -113,6 +126,7 @@
       phone: form.phone.value.trim() || null,
       team_size: form.team_size.value || null,
       message: form.message.value.trim() || null,
+      newsletter_opt_in: form.newsletter_opt_in.checked, // an ordinary opt-in box: ticked = yes
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,
       page: location.pathname,

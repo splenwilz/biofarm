@@ -1,4 +1,5 @@
 import ipaddress
+from datetime import UTC, datetime
 from typing import AsyncIterator
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
@@ -14,7 +15,7 @@ from app.schemas import (
     NewsletterSubmission,
 )
 from app.services.spam import evaluate_spam
-from app.services.sync import process_lead
+from app.services.sync import newsletter_answer, process_lead
 
 
 async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
@@ -80,6 +81,16 @@ async def _accept_lead(
     return {"status": "accepted", "id": lead.id}
 
 
+def _newsletter(opt_in: bool | None, declined: bool | None, *, asked_by_default: bool) -> dict:
+    """The three Lead columns for the newsletter answer (see sync.newsletter_answer)."""
+    add, basis = newsletter_answer(opt_in=opt_in, declined=declined, asked_by_default=asked_by_default)
+    return {
+        "newsletter_opt_in": add,
+        "newsletter_consent_basis": basis,
+        "newsletter_consent_at": datetime.now(UTC) if add else None,
+    }
+
+
 @router.post("/contact", status_code=202)
 async def submit_contact(
     submission: ContactSubmission,
@@ -94,7 +105,7 @@ async def submit_contact(
         phone=submission.phone,
         message=submission.message,
         fields=list(submission.fields),
-        newsletter_opt_in=submission.newsletter_opt_in,
+        **_newsletter(submission.newsletter_opt_in, submission.newsletter_declined, asked_by_default=True),
         heard_about=submission.heard_about,
         heard_about_other=submission.heard_about_other,
         units_needed=submission.units_needed,
@@ -126,7 +137,7 @@ async def submit_newsletter(
         email=submission.email,
         fields=[submission.field] if submission.field else [],
         # signing up to the newsletter IS the consent
-        newsletter_opt_in=True,
+        **_newsletter(True, None, asked_by_default=True),
         page=submission.page,
         attribution=submission.attribution.model_dump(exclude_none=True)
         if submission.attribution
@@ -168,7 +179,7 @@ async def submit_cpd(
         phone=submission.phone,
         message=_cpd_message(submission),
         fields=list(submission.fields),
-        newsletter_opt_in=False,
+        **_newsletter(submission.newsletter_opt_in, None, asked_by_default=False),
         page=submission.page,
         attribution=submission.attribution.model_dump(exclude_none=True)
         if submission.attribution
@@ -213,7 +224,7 @@ async def submit_landowner(
         # The page is for landowners: sets the Client Type person field on
         # NEW persons, and lets the owner map route by "landowner".
         fields=["landowner"],
-        newsletter_opt_in=submission.newsletter_opt_in,
+        **_newsletter(submission.newsletter_opt_in, submission.newsletter_declined, asked_by_default=True),
         heard_about=submission.heard_about,
         heard_about_other=submission.heard_about_other,
         page=submission.page,
@@ -245,7 +256,7 @@ async def submit_fold(
         # Fold enquiries come from landowners with registered habitat banks:
         # sets the Client Type person field on NEW persons.
         fields=["landowner"],
-        newsletter_opt_in=False,
+        **_newsletter(None, submission.newsletter_declined, asked_by_default=False),
         page=submission.page,
         attribution=submission.attribution.model_dump(exclude_none=True)
         if submission.attribution

@@ -131,6 +131,12 @@ export interface SubscriberMonth {
 }
 
 /** Newsletter sign-ups through the website in a month; they are not enquiries. */
+/** CPD session requests through the website in one month: their own line, never counted as enquiries. */
+export interface CpdMonth {
+  month: string;
+  bookings: number;
+}
+
 export interface SignupMonth {
   month: string;
   count: number;
@@ -234,6 +240,8 @@ export interface Annotation {
 export interface DashboardData {
   deals: Deal[];
   enquiries: Enquiry[];
+  /** CPD bookings by month, July 2026 onwards, zero-filled; absent on a feed from before the line existed. */
+  cpdBookings?: CpdMonth[];
   spend: SpendEntry[];
   newsletter: { issues: NewsletterIssue[]; subscribers: SubscriberMonth[]; signups: SignupMonth[] };
   search: { months: SearchMonth[]; aiReferrals: AiReferral[] };

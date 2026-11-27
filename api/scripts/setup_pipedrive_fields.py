@@ -31,6 +31,8 @@ FIELDS = {
     "utm_term": ("UTM Term", "varchar"),
     "utm_content": ("UTM Content", "varchar"),
     "gclid": ("Google Ads Click ID", "varchar"),
+    "gbraid": ("Google Ads gbraid", "varchar"),
+    "wbraid": ("Google Ads wbraid", "varchar"),
     "fbclid": ("Facebook Click ID", "varchar"),
     "msclkid": ("Microsoft Click ID", "varchar"),
     "referrer": ("Referrer", "text"),

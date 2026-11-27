@@ -11,7 +11,7 @@
 import { dateLabel } from "@/lib/format";
 import type { DataSource } from "@/data/source";
 import { monthRange } from "@/lib/kpi";
-import type { AiAssistant, AiReferral, Annotation, Audience, Channel, DashboardData, Deal, DealStatus, Enquiry, EnquiryForm, MarketingEvent, NewsletterIssue, SearchMonth, SignupMonth, SpendEntry, SubscriberMonth, TrafficChannel, TrafficMonth } from "@/lib/types";
+import type { AiAssistant, AiReferral, Annotation, Audience, Channel, CpdMonth, DashboardData, Deal, DealStatus, Enquiry, EnquiryForm, MarketingEvent, NewsletterIssue, SearchMonth, SignupMonth, SpendEntry, SubscriberMonth, TrafficChannel, TrafficMonth } from "@/lib/types";
 
 export const DEMO_TODAY = "2026-10-31T18:00:00Z";
 export const DEMO_LAST_MONTH = "2026-10";
@@ -256,6 +256,7 @@ export function buildDemoData(seed = 2026): DashboardData {
   const teamRandom = rng(seed + 2);
   let teamN = 0;
   const signupCounts = new Map<string, number>();
+  const cpdCounts = new Map<string, number>();
 
   for (const month of months) {
     const [, m] = month.split("-").map(Number);
@@ -288,6 +289,11 @@ export function buildDemoData(seed = 2026): DashboardData {
         form === "newsletter" ? null : contactRoll < 0.7 ? plusDays(createdAt, between(random, 2, 30) / 24) : contactRoll < 0.95 ? plusDays(createdAt, between(random, 30, 96) / 24) : null;
       if (form === "newsletter") {
         signupCounts.set(month, (signupCounts.get(month) ?? 0) + 1);
+        continue;
+      }
+      if (form === "cpd") {
+        // a CPD session booking: its own line on the CPD bookings page, not an enquiry (26 Nov 2026)
+        cpdCounts.set(month, (cpdCounts.get(month) ?? 0) + 1);
         continue;
       }
       enquiries.push({ id: `enq-${(enquiryN += 1)}`, createdAt, kind: "lead", form, audience, channel: "Website", sourceLabel, campaign, landingPage, firstContactAt, personId: pid, archived: false, converted: false });
@@ -398,6 +404,7 @@ export function buildDemoData(seed = 2026): DashboardData {
     enquiries,
     spend,
     newsletter: { ...buildNewsletter(random, months), signups: months.map((month): SignupMonth => ({ month, count: signupCounts.get(month) ?? 0 })) },
+    cpdBookings: months.filter((month) => month >= "2026-07").map((month): CpdMonth => ({ month, bookings: cpdCounts.get(month) ?? 0 })),
     search,
     traffic: buildTraffic(random, months, search),
     events: buildEvents(random),

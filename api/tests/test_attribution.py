@@ -16,6 +16,9 @@ from app.services.attribution import source_label, touch_label
         ({"utm_medium": "email"}, "(not set)/email"),
         # click ids identify the platform when no UTM was carried
         ({"gclid": "EAIaIQob"}, "google/cpc"),
+        # Google uses gbraid / wbraid instead of gclid for many iOS and app clicks (27 Nov 2026)
+        ({"gbraid": "0AAAAAD"}, "google/cpc"),
+        ({"wbraid": "CkEKCQ"}, "google/cpc"),
         ({"msclkid": "9206b90d"}, "bing/cpc"),
         ({"fbclid": "IwAR"}, "facebook/social"),
         # referrer host, without scheme, www., port or path

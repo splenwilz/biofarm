@@ -14,7 +14,7 @@ which blocked GA4 conversion tracking and lost UTM/gclid lead-source data.
    `DATABASE_URL`); a Pipedrive outage can never lose a lead.
    Response: `202 {"status":"accepted","id":...}`.
 4. A background task then:
-   - finds-or-creates the Person in Pipedrive (API v2), setting `marketing_status=subscribed` on newsletter opt-in;
+   - finds-or-creates the Person in Pipedrive (API v2), setting `marketing_status=subscribed` when the visitor is to be added to the newsletter. Since 26 Nov 2026 the contact, about, corporates, landowner and Fold forms are **soft opt-in** (PECR reg. 22(3)): the visitor is added unless they tick "I'd prefer not to receive these updates" (`newsletter_declined`); the CPD form has an ordinary unticked opt-in box (`newsletter_opt_in`); a newsletter sign-up is the consent. Each lead keeps `newsletter_consent_basis` (`opt_in`, `soft_opt_in`, `declined`, or NULL when the form never asked) and `newsletter_consent_at`. A payload without the new field came from an older form still cached in a browser and is judged by the old rule, so nobody is added by a rule they never saw. A soft opt-in only subscribes an EXISTING person whose status is "No consent" (read first via `GET /api/v2/persons/{id}?include_fields=marketing_status`): someone who unsubscribed, bounced or is mid double opt-in keeps that status. The consent record is also written to two optional person fields (`BIOFARM_PIPEDRIVE_NEWSLETTER_CONSENT_*`, which an admin must create) and always to the note;
    - creates a Lead (API v1 - leads have no v2) with attribution custom fields, from a form that asked, the "Newsletter Sign Up" field (Opted In / Opted Out, as the old embeds wrote it; see `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD`), and the contact form's "Where did you hear about us?" answer in the "How they heard" field Sales added on 17 Nov 2026 (see `BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD`; their own words behind Other stay in the note);
    - pins a Note with the message, the ticked fields, the "Where did you hear about us?" answer the contact and landowner forms ask (`heard_about`, plus their own words in `heard_about_other` when they chose Other; both kept on the row), the three developer questions (`units_needed`, `site_location`, `units_when`: accepted for any role and kept on the row; the forms carry the fields commented out until Vix and Chris agree to ask them) and the attribution breakdown;
    - optionally fires a GA4 Measurement Protocol event (`generate_lead_server`).
@@ -85,6 +85,14 @@ prints the `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` value to set on the service. It al
 Without it, attribution still lands in the pinned note and our DB - the map
 just makes it filterable in Pipedrive.
 
+Since 27 Nov 2026 the footer script and the API also carry `gbraid` and
+`wbraid` (Google's click ids for many iOS and app clicks, sent instead of a
+gclid). The script creates "Google Ads gbraid" and "Google Ads wbraid" deal
+fields when they are missing (it needs an admin token) and reuses every field
+that exists; paste the new map it prints into `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP`.
+Until then both values are in the pinned note and our DB, and either one
+labels the lead's Source channel ID `google/cpc`.
+
 `marketing_status` is only honoured if the Pipedrive account has the
 **Campaigns add-on**; otherwise Pipedrive ignores the field (harmless).
 
@@ -139,7 +147,7 @@ last good import's finish time and the newest website record, since form
 submissions land between imports), gzipped, and the feed queries skip the raw
 API JSON on every row; a page view after an import takes the one rebuild, the
 rest are served from memory. It returns the marketing dashboard's records in its own
-`DashboardData` shape (camelCase JSON): deals, enquiries and the newsletter
+`DashboardData` shape (camelCase JSON): deals, enquiries, CPD bookings by month and the newsletter
 section from the Pipedrive mirror; spend, traffic, search and conversions
 from the Google daily tables (step 4); events from `marketing_events`. The dashboard's server reads it with
 the shared token in `x-dashboard-token`; the browser never sees the token or
@@ -171,8 +179,13 @@ in the log: deals with origin `Import`; titles matching the test pattern
 ("Test Valley" and "Testway" are real places and stay in); records whose UTM
 campaign is a tracking test, whose visit came from a tag-debugging referrer
 (Google Tag Assistant), or whose person has a test address or domain;
-website sign-ups by people at a staff domain; and newsletter sign-ups, which
-the feed reports by month under `newsletter.signups` instead. A deal
+website sign-ups by people at a staff domain; newsletter sign-ups, which
+the feed reports by month under `newsletter.signups` instead; and, since 26
+Nov 2026, CPD session requests (the leads `/v1/leads/cpd` creates, titled
+"CPD session request"), which the feed reports by month under `cpdBookings`
+(July 2026 to the import month, zero-filled) because a training booking is
+not a BNG enquiry. Google Ads counts CPD bookings separately through the
+agency's tag manager; the feed reads Pipedrive only, so nothing double counts. A deal
 converted from a lead (`source_lead_id`, which v2 deals return on request)
 is counted once. Pipedrive deletes the lead at conversion and never lists it
 again; every import reads both lead inboxes whole and flags the copy it
@@ -276,8 +289,11 @@ to bump `ADS_API_VERSION`). No developer token: they were sunset on
 | `BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP` | no | JSON from the bootstrap script |
 | `BIOFARM_PIPEDRIVE_CLIENT_TYPE_FIELD` | no | "Client Type" person-field hash; set on newly created persons only |
 | `BIOFARM_PIPEDRIVE_CLIENT_TYPE_MAP` | no | JSON: form value -> option id, e.g. `{"developer": 531}` |
-| `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD` | no | "Newsletter Sign Up" lead field hash (an option field; leads inherit deal fields). Set on every lead from a form that asks about the newsletter - contact and landowner (Opted In or Opted Out from the tick-box), newsletter (Opted In) - as the old Pipedrive embeds did; the CPD and Fold forms never ask, so their leads leave it empty |
-| `BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP` | no | JSON: `{"opted_in": <option id>, "opted_out": <option id>}`, the field's option ids from `GET /v1/dealFields` |
+| `BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD` | no | "Newsletter Sign Up" lead field hash (an option field; leads inherit deal fields). Set on every lead whose form put the newsletter question (`newsletter_consent_basis` not NULL: since 26 Nov 2026 all six forms do; rows from older contact and landowner forms count as asked, older CPD and Fold forms never asked and leave it empty), as the old Pipedrive embeds did: Opted In for an opt-in or a soft opt-in, Opted Out for a declined answer |
+| `BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP` | no | JSON: `{"opted_in": <option id>, "opted_out": <option id>}`, the field's option ids from `GET /v1/dealFields`. Optional `"soft_opt_in": <option id>` once an admin adds that option; without it a soft opt-in is written as Opted In |
+| `BIOFARM_PIPEDRIVE_NEWSLETTER_CONSENT_FIELD` | no | Person option field recording HOW the newsletter question was answered (an admin must create it, e.g. "Newsletter consent" with options Opted in / Soft opt-in / Declined). Written on new persons, and on existing persons when they opt in; a declined answer never overwrites an earlier record |
+| `BIOFARM_PIPEDRIVE_NEWSLETTER_CONSENT_OPTION_MAP` | no | JSON: `{"opt_in": <option id>, "soft_opt_in": <option id>, "declined": <option id>}` from `GET /v1/personFields` |
+| `BIOFARM_PIPEDRIVE_NEWSLETTER_CONSENT_DATE_FIELD` | no | Person date field for WHEN an opt-in happened (an admin must create it, e.g. "Newsletter consent date"); written as `YYYY-MM-DD` alongside the field above |
 | `BIOFARM_PIPEDRIVE_HEARD_ABOUT_FIELD` | no | "How they heard" lead field hash (a multiple-option deal field; one answer is written, as the text of its option id, which is how v1 leads take and return such fields). Set on every lead whose form answered "Where did you hear about us?" |
 | `BIOFARM_PIPEDRIVE_HEARD_ABOUT_OPTION_MAP` | no | JSON: form answer -> option id for `search`, `linkedin`, `referral`, `event`, `newsletter`, `press`, `marketplace`, `ai`, `other`; `scripts/setup_pipedrive_fields.py` prints it. An answer the map lacks stays in the note only |
 | `BIOFARM_GA4_MEASUREMENT_ID` | no | `G-3MS9TLLZRN` |
@@ -298,7 +314,7 @@ to bump `ADS_API_VERSION`). No developer token: they were sunset on
 | `BIOFARM_ENQUIRY_WEBSITE_ORIGINS` | no | JSON list of origins that mean "came through the website" (default Website channel; form read from the title, except that a Pipedrive web form named `Landowner Contact Form` - the landowner page's embed until November 2026 - counts as the `landowner` form so the by-form table stays in one row across the switch), default `["WebForms","API"]` |
 | `BIOFARM_ENQUIRY_TEST_CAMPAIGNS` | no | JSON list of UTM campaigns that were tracking tests, default `["tracking-test","go-live-check","field-map","final-check"]` |
 | `BIOFARM_ENQUIRY_TEST_REFERRERS` | no | JSON list of referrer hosts that mean a tracking test, default `["tagassistant.google.com"]` (Google's tag debugger, used in GTM preview mode) |
-| `BIOFARM_ENQUIRY_TEST_DOMAINS` / `BIOFARM_ENQUIRY_TEST_EMAILS` | yes, for real figures | JSON lists; a person with such an address was the team testing the forms (lower-cased before comparing). Default domains `["biofarm-test.dev"]`, default emails none: the team's own domains and addresses are set in the environment, never in the code, and a value replaces the default (so include `biofarm-test.dev` again) |
+| `BIOFARM_ENQUIRY_TEST_DOMAINS` / `BIOFARM_ENQUIRY_TEST_EMAILS` | yes, for real figures | JSON lists; a person with such an address was the team testing the forms (lower-cased before comparing). Default domains `["biofarm-test.dev", "amandawhitedigital.com"]` (the agency that tests the tracking), default emails none: the team's own domains and addresses are set in the environment, never in the code, and a value replaces the default (so include `biofarm-test.dev` again) |
 | `BIOFARM_ENQUIRY_STAFF_DOMAINS` | no | JSON list; website sign-ups by people at these domains are staff trying the forms, default `["biofarm.co.uk"]` |
 | `BIOFARM_ENQUIRY_TEST_TITLE_PATTERN` | no | case-insensitive regex for test titles, default `\btest\b(?!\s+valley)` |
 | `BIOFARM_ENQUIRY_NEWSLETTER_TITLE_PATTERN` | no | case-insensitive regex; website records whose title matches are newsletter sign-ups, default `^\s*newsletter` |

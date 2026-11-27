@@ -28,6 +28,12 @@ class Lead(Base):
     message: Mapped[str | None] = mapped_column(Text)
     fields: Mapped[list] = mapped_column(JsonCol, default=list)
     newsletter_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    # How the newsletter question was answered (the record behind opt_in):
+    # "opt_in" (a box ticked, or a sign-up form), "soft_opt_in" (the "I'd
+    # prefer not" box left unticked, PECR reg. 22(3)), "declined", or NULL
+    # when the form never asked. newsletter_consent_at: when, for an opt-in.
+    newsletter_consent_basis: Mapped[str | None] = mapped_column(String(20))
+    newsletter_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # contact form's "Where did you hear about us?": a schemas.HeardAbout key, or NULL
     heard_about: Mapped[str | None] = mapped_column(String(30))
     # their own words when heard_about is "other", else NULL

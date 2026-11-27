@@ -1,4 +1,7 @@
-<!-- CORPORATES "CHAT TO CHRIS" SECTION v4 - /corporates, the whole green section in one block (replaces the
+<!-- CORPORATES "CHAT TO CHRIS" SECTION v4.1 - /corporates, the whole green section in one block (replaces the
+     26 Nov 2026 SOFT OPT-IN: the Yes / No newsletter radios are gone. The form carries Vix's newsletter sentence (26 Nov) and one unticked box, "I'd prefer not to receive these updates." (PECR reg. 22(3): details
+     obtained during an enquiry, our own similar updates, a refusal offered here and in every send). The box is
+     sent as newsletter_declined; the API adds the person unless it is ticked and records how and when.
      native blocks on the left - "Chat to Chris", Chris Scott's photo, his title, the line - AND the last live
      Pipedrive embed on the site, webforms.pipedrive.com/f/c6xq6U2Z..., found in the 11 Nov 2026 form audit).
      Left: the headings inherit the theme's own h2/h4 sizes so the column reads as the native blocks did
@@ -55,6 +58,11 @@
   .bf-radios label{display:inline-flex;align-items:center;gap:10px;margin:0;min-height:40px;font-size:15px;letter-spacing:0;text-transform:none;font-weight:300;cursor:pointer;}
   .bf-radios input{appearance:none;-webkit-appearance:none;width:18px;height:18px;min-height:0;margin:0;border:1px solid #212121;border-radius:50%;background:#F7F8F3;padding:0;}
   .bf-radios input:checked{box-shadow:inset 0 0 0 4px #F7F8F3;background:#212121;}
+  .bf-radios input[type=checkbox]{border-radius:4px;}
+  .bf-radios input:focus-visible{outline:2px solid #212121;outline-offset:3px;}
+  .bf-radios input[type=checkbox]:checked{box-shadow:none;background:#212121 url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1' fill='none' stroke='%23F7F8F3' stroke-width='1.8'/%3E%3C/svg%3E") center no-repeat;}
+  .bf-radios .bf-privacy{display:block;font-size:13px;letter-spacing:0;text-transform:none;font-weight:300;margin:6px 0 0;}
+  .bf-radios .bf-privacy a{color:#212121;}
   .bf-closing{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
   .bf-form .bf-btn{font-family:'RATI_v2',Georgia,serif;font-weight:300;font-size:19px;letter-spacing:.03em;line-height:1.2;min-height:58px;background:#212121;color:#F7F8F3;border:0;border-radius:300px;padding:0 36px;cursor:pointer;transition:background-color .3s;}
   .bf-form .bf-btn:hover{background:#2a2a2a;}
@@ -118,11 +126,11 @@
       <textarea id="bfMessage" name="message" maxlength="5000" rows="3" placeholder="What you’re looking to do, and how we can help…"></textarea>
     </div>
     <fieldset class="bf-radios">
-      <legend>Please plant me on the newsletter list - I accept the <a href="/privacy-policy" style="color:#212121;">Privacy Policy</a> <span class="req">*</span></legend>
+      <legend>Keep up to date with the latest in BNG, with industry insights, practical guidance and stories from our habitat banks, delivered straight to your inbox. You can unsubscribe at any time.</legend>
       <div class="bf-radio-row">
-        <label><input type="radio" name="newsletter" value="yes" required>Yes please</label>
-        <label><input type="radio" name="newsletter" value="no">No thank you</label>
+        <label><input type="checkbox" name="newsletter_declined" value="yes">I&rsquo;d prefer not to receive these updates.</label>
       </div>
+      <span class="bf-privacy">See our <a href="/privacy-policy">Privacy Policy</a>.</span>
     </fieldset>
     <div class="bf-hp" aria-hidden="true">
       <label for="bfWebsite">Website</label>
@@ -192,16 +200,10 @@
     statusEl.textContent = '';
 
     var fields = []; // no "I am a" chips on this page; Client Type stays blank (see header comment)
-    var newsletter = form.querySelector('input[name=newsletter]:checked');
 
     if (!form.name.value.trim() || !form.email.value.trim() || !/.+@.+\..+/.test(form.email.value)) {
       statusEl.className = 'bf-status err';
       statusEl.textContent = 'Please add your name and a valid email address.';
-      return;
-    }
-    if (!newsletter) {
-      statusEl.className = 'bf-status err';
-      statusEl.textContent = 'Please choose a newsletter preference.';
       return;
     }
 
@@ -213,7 +215,7 @@
       message: form.message.value.trim() || null,
       heard_about: form.heard_about.value || null,
       heard_about_other: form.heard_about.value === 'other' ? (form.heard_about_other.value.trim().slice(0, 200) || null) : null,
-      newsletter_opt_in: newsletter.value === 'yes',
+      newsletter_declined: form.newsletter_declined.checked, // soft opt-in: unticked = added to the newsletter
       website: form.website.value, // honeypot
       fill_ms: startedAt ? Date.now() - startedAt : null,
       page: location.pathname,

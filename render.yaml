@@ -57,6 +57,9 @@ services:
       #   BIOFARM_PIPEDRIVE_LEAD_FIELD_MAP     (JSON from scripts/setup_pipedrive_fields.py)
       #   BIOFARM_PIPEDRIVE_NEWSLETTER_FIELD   ("Newsletter Sign Up" lead field hash) and
       #   BIOFARM_PIPEDRIVE_NEWSLETTER_OPTION_MAP (JSON: {"opted_in": id, "opted_out": id}, see api/README.md)
+      #   BIOFARM_PIPEDRIVE_NEWSLETTER_CONSENT_FIELD / _CONSENT_OPTION_MAP / _CONSENT_DATE_FIELD
+      #                                         (the soft opt-in consent record on the person; needs an admin
+      #                                         to create the two person fields first, see api/README.md)
       #   BIOFARM_GA4_MEASUREMENT_ID           (G-3MS9TLLZRN)
       #   BIOFARM_GA4_API_SECRET               (GA4 Admin > Data streams > MP API secrets)
       # Google feed for the dashboard (Ads spend, GA4 traffic, Search Console; see api/README.md "Google feed"):

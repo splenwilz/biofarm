@@ -25,6 +25,7 @@ export const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
       { name: "Enquiry to qualified", href: "/cohorts", icon: "trending", description: "How each month's enquiries matured into qualified opportunities." },
       { name: "Traffic", href: "/traffic", icon: "cursor", description: "Website sessions by channel and how many became enquiries." },
       { name: "Newsletter", href: "/newsletter", icon: "envelope", description: "Subscribers, and opens and clicks per issue." },
+      { name: "CPD bookings", href: "/cpd", icon: "clipboard", description: "CPD session requests through the website by month, kept apart from enquiries." },
       { name: "Search & AI", href: "/search", icon: "search", description: "Brand searches, AI referrals and AI mention share." },
       { name: "Events", href: "/events", icon: "calendar", description: "Trade shows, CPD sessions and webinars: attendees, leads and what qualified." },
       { name: "Media spend", href: "/spend", icon: "banknotes", description: "Campaign and media spend by month, and the cost per qualified opportunity it gives." },

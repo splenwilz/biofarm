@@ -24,6 +24,10 @@ SELF_HOSTS = frozenset({"biofarm.co.uk"})
 # click-id parameter -> (source, medium), in priority order
 _CLICK_IDS = (
     ("gclid", ("google", "cpc")),
+    # Google's iOS / app click ids, sent instead of a gclid (27 Nov 2026), in the
+    # order Google Ads itself prefers them: gclid, then wbraid, then gbraid
+    ("wbraid", ("google", "cpc")),
+    ("gbraid", ("google", "cpc")),
     ("msclkid", ("bing", "cpc")),
     ("fbclid", ("facebook", "social")),
 )

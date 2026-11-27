@@ -4,8 +4,10 @@ An enquiry is every lead in the Pipedrive Leads inbox plus every deal created
 directly in a marketing pipeline, read from the mirror so the series reaches
 back to 2024 rather than to the day our own form went live. Left out, each
 with a reason the loader counts: deals from bulk imports, test titles, test
-campaigns, test and staff people, and newsletter sign-ups (those go to the
-Newsletter page). A deal converted from a lead is counted once: as the lead,
+campaigns, test and staff people, newsletter sign-ups (those go to the
+Newsletter page) and, from 26 Nov 2026, CPD session requests (their own
+"CPD bookings" line: a training booking is not a BNG enquiry). A deal
+converted from a lead is counted once: as the lead,
 at the lead's date, while the mirror still has the lead.
 
 Our own website records add form, audience, source/medium, campaign and
@@ -44,7 +46,7 @@ FORMS: frozenset[str] = frozenset(EnquiryForm.__args__)
 CONTACT_TYPES = frozenset({"call", "email", "meeting"})
 Kind = Literal["lead", "deal"]
 # Why a record was left out; the loader logs a count per reason.
-Reason = Literal["imported", "test_title", "test_campaign", "test_referrer", "test_person", "staff", "newsletter"]
+Reason = Literal["imported", "test_title", "test_campaign", "test_referrer", "test_person", "staff", "newsletter", "cpd"]
 
 
 # ---- first contact -----------------------------------------------------------------------
@@ -255,6 +257,8 @@ def derive(c: Candidate, ctx: EnquiryContext) -> EnquiryOut | Reason:
     form = form_of(c, ctx)
     if form == "newsletter":
         return "newsletter"
+    if form == "cpd":
+        return "cpd"  # a CPD session booking, not a BNG enquiry (26 Nov 2026): its own line on the dashboard
     if c.website is not None:
         page: str | None = landing_path(c.website.page)
         label: str | None = source_label(c.website.attribution, c.website.first_touch)
@@ -372,6 +376,8 @@ class EnquiryReport:
     enquiries: list[EnquiryOut]
     # When each newsletter sign-up came in, for the Newsletter page.
     newsletter_signups: list[datetime]
+    # When each CPD session was requested, for the CPD bookings page (not enquiries).
+    cpd_bookings: list[datetime]
     excluded: dict[str, int]
     # Leads Sales ticked "Qualified Lead?" YES on but have not converted yet,
     # as qualified records under their lead id (the deal they become takes over).
@@ -405,6 +411,7 @@ async def load_enquiries(session: AsyncSession, settings: Settings, *, deals: tu
 
     enquiries: list[EnquiryOut] = []
     signups: list[datetime] = []
+    cpd: list[datetime] = []
     qualified_leads: list[DealOut] = []
     excluded: Counter[str] = Counter()
     yes_label = ctx_deals.qualified_options.get(ctx_deals.qualified_yes) if ctx_deals.qualified_yes is not None else None
@@ -430,7 +437,10 @@ async def load_enquiries(session: AsyncSession, settings: Settings, *, deals: tu
             excluded[result] += 1
             if result == "newsletter":
                 signups.append(c.created_at)
+            elif result == "cpd":
+                cpd.append(c.created_at)
     enquiries.sort(key=lambda e: (e.created_at, e.kind, e.id))
     signups.sort()
+    cpd.sort()
     logger.info("enquiries %d; left out %s", len(enquiries), dict(excluded) or "nothing")
-    return EnquiryReport(enquiries=enquiries, newsletter_signups=signups, excluded=dict(excluded), qualified_leads=qualified_leads)
+    return EnquiryReport(enquiries=enquiries, newsletter_signups=signups, cpd_bookings=cpd, excluded=dict(excluded), qualified_leads=qualified_leads)

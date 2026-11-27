@@ -1,6 +1,7 @@
 import html
 import logging
 from collections.abc import Awaitable, Callable
+from datetime import datetime
 
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -22,6 +23,8 @@ _NOTE_ATTRIBUTION_LABELS = {
     "gclid": "Google Ads click ID",
     "fbclid": "Facebook click ID",
     "msclkid": "Microsoft click ID",
+    "gbraid": "Google Ads gbraid",
+    "wbraid": "Google Ads wbraid",
     "referrer": "Referrer",
     "landing_page": "Landing page",
 }
@@ -49,6 +52,16 @@ def build_note_html(lead: Lead) -> str:
         parts.append(f"<p><b>Site location</b>: {html.escape(lead.site_location)}</p>")
     if lead.units_when:
         parts.append(f"<p><b>Units needed by</b>: {html.escape(UNITS_WHEN_LABELS.get(lead.units_when, lead.units_when))}</p>")
+    # The newsletter answer, as the record on the lead itself (the person
+    # fields need an admin to exist; this line is always there).
+    if lead.newsletter_consent_basis:
+        when = f" on {_day(lead.newsletter_consent_at)}" if lead.newsletter_consent_at else ""
+        wording = {
+            "soft_opt_in": f"added by soft opt-in{when} (the “I’d prefer not” box was left unticked)",
+            "opt_in": f"opted in{when}",
+            "declined": "declined",
+        }.get(lead.newsletter_consent_basis, lead.newsletter_consent_basis)
+        parts.append(f"<p><b>Newsletter</b>: {wording}</p>")
     rows: list[str] = []
     for source_name, data in (("Last touch", lead.attribution), ("First touch", lead.first_touch)):
         if not data:
@@ -67,20 +80,60 @@ def build_note_html(lead: Lead) -> str:
     return "".join(parts)
 
 
+def _day(at: datetime) -> str:
+    return f"{at.day} {at.strftime('%b %Y')}"
+
+
+def newsletter_answer(*, opt_in: bool | None, declined: bool | None, asked_by_default: bool) -> tuple[bool, str | None]:
+    """What the visitor answered about the newsletter: (add them?, basis).
+
+    declined is the soft opt-in form's "I'd prefer not to receive these
+    updates" box (26 Nov 2026 on): left unticked = added by soft opt-in,
+    ticked = declined. Without it the payload came from an older form. On a
+    form that always asked (asked_by_default: the old Yes / No radios) a
+    bare opt_in is that answer; on one that never used to ask (CPD, Fold)
+    only an explicit True or False is an answer, and None means no question
+    was put, so nothing is recorded and nobody is added."""
+    if declined is not None:
+        return (False, "declined") if declined else (True, "soft_opt_in")
+    if opt_in:
+        return True, "opt_in"
+    if asked_by_default or opt_in is False:
+        return False, "declined"
+    return False, None
+
+
+def _consent_custom_fields(lead: Lead, settings: Settings) -> dict:
+    """The consent record on the person: how the question was answered and,
+    for an opt-in, the day. Empty until an admin has created the fields."""
+    fields: dict = {}
+    basis = lead.newsletter_consent_basis
+    if not basis:
+        return fields
+    if settings.pipedrive_newsletter_consent_field:
+        option_id = settings.pipedrive_newsletter_consent_option_map.get(basis)
+        if option_id is not None:
+            fields[settings.pipedrive_newsletter_consent_field] = option_id
+    if settings.pipedrive_newsletter_consent_date_field and lead.newsletter_opt_in and lead.newsletter_consent_at:
+        fields[settings.pipedrive_newsletter_consent_date_field] = lead.newsletter_consent_at.strftime("%Y-%m-%d")
+    return fields
+
+
 def _person_custom_fields(lead: Lead, settings: Settings) -> dict | None:
-    """Map the form's field choices onto the required 'Client Type' person
-    field (set type - takes a list of option ids). Create-only: existing
-    persons keep whatever the team has curated."""
-    if not settings.pipedrive_client_type_field or not lead.fields:
-        return None
-    option_ids = [
-        settings.pipedrive_client_type_map[f]
-        for f in lead.fields
-        if f in settings.pipedrive_client_type_map
-    ]
-    if not option_ids:
-        return None
-    return {settings.pipedrive_client_type_field: option_ids}
+    """Custom fields for a NEW person: the required 'Client Type' (set type -
+    takes a list of option ids; existing persons keep whatever the team has
+    curated) and the newsletter consent record."""
+    fields: dict = {}
+    if settings.pipedrive_client_type_field and lead.fields:
+        option_ids = [
+            settings.pipedrive_client_type_map[f]
+            for f in lead.fields
+            if f in settings.pipedrive_client_type_map
+        ]
+        if option_ids:
+            fields[settings.pipedrive_client_type_field] = option_ids
+    fields.update(_consent_custom_fields(lead, settings))
+    return fields or None
 
 
 def resolve_owner_id(lead: Lead, settings: Settings) -> int | None:
@@ -102,10 +155,11 @@ def resolve_owner_id(lead: Lead, settings: Settings) -> int | None:
     return settings.pipedrive_owner_id
 
 
-# Forms that put the newsletter question to the visitor: a tick-box on the
-# contact and landowner forms, the newsletter form itself. The CPD and Fold
-# forms never ask, so their leads say nothing either way - "Opted Out" for a
-# question that was never put would be false.
+# Forms that always put the newsletter question to the visitor before the
+# consent basis was recorded (rows from before 26 Nov 2026 have no basis):
+# the contact and landowner forms' Yes / No radios, the newsletter form
+# itself. The old CPD and Fold forms never asked, so their leads say nothing
+# either way - "Opted Out" for a question that was never put would be false.
 _FORMS_ASKING_ABOUT_NEWSLETTER = frozenset({"contact", "landowner", "newsletter"})
 
 
@@ -123,9 +177,15 @@ def _lead_custom_fields(lead: Lead, settings: Settings) -> dict[str, str | int]:
     }
     # The "Newsletter Sign Up" option field, as the old embeds wrote it: the
     # option id (an integer, which is how Pipedrive stores and returns it).
-    if settings.pipedrive_newsletter_field and lead.form in _FORMS_ASKING_ABOUT_NEWSLETTER:
-        choice = "opted_in" if lead.newsletter_opt_in else "opted_out"
-        option_id = settings.pipedrive_newsletter_option_map.get(choice)
+    basis = lead.newsletter_consent_basis
+    asked = basis is not None or lead.form in _FORMS_ASKING_ABOUT_NEWSLETTER
+    if settings.pipedrive_newsletter_field and asked:
+        options = settings.pipedrive_newsletter_option_map
+        if basis == "soft_opt_in" and "soft_opt_in" in options:
+            choice = "soft_opt_in"
+        else:
+            choice = "opted_in" if lead.newsletter_opt_in else "opted_out"
+        option_id = options.get(choice)
         if option_id is not None:
             fields[settings.pipedrive_newsletter_field] = option_id
     # "How they heard": a multiple-option field, which v1 leads take (and
@@ -244,10 +304,34 @@ async def _sync_to_pipedrive(lead: Lead, settings: Settings) -> None:
                 ),
                 owner_id=owner_id, channel=None, lead=lead, what="person",
             )
-        elif lead.phone or marketing_status:
-            await client.update_person(
-                person_id, phone=lead.phone, marketing_status=marketing_status
-            )
+        else:
+            # An existing contact. An express opt-in (a sign-up form, a box
+            # ticked) subscribes them as before. A soft opt-in only lifts a
+            # person who has never answered: someone who unsubscribed, bounced
+            # or is mid double opt-in keeps that status (PECR: they refused;
+            # Pipedrive also allows each status change only once). The
+            # consent record travels with the subscription; a declined
+            # answer never overwrites an earlier record on the person.
+            status = marketing_status
+            consent = _consent_custom_fields(lead, settings) if lead.newsletter_opt_in else {}
+            if status and lead.newsletter_consent_basis == "soft_opt_in":
+                try:
+                    current = await client.get_person_marketing_status(person_id)
+                except PipedriveError as exc:
+                    # Not knowing is not consent: leave the subscription alone
+                    # rather than fail the whole sync (there is no retry sweep,
+                    # so a failed sync is a lead Sales never see). The row
+                    # keeps a trace so the subscription can be set by hand.
+                    logger.warning("Could not read the marketing status of person %s for lead %s: %s. Not subscribing.", person_id, lead.id, exc)
+                    note = f"soft opt-in not applied: could not read marketing status ({exc})"
+                    lead.sync_error = (f"{lead.sync_error}; {note}" if lead.sync_error else note)[:2000]
+                    current = "unknown"
+                if current not in (None, "no_consent"):
+                    status, consent = None, {}
+            if lead.phone or status or consent:
+                await client.update_person(
+                    person_id, phone=lead.phone, marketing_status=status, custom_fields=consent or None
+                )
         lead.pipedrive_person_id = person_id
 
     lead_id = lead.pipedrive_lead_id

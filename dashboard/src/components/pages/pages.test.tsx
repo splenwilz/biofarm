@@ -16,6 +16,7 @@ import { KpiRulePage } from "@/components/pages/KpiRulePage";
 import { ReportPage } from "@/components/pages/ReportPage";
 import { TrafficPage } from "@/components/pages/TrafficPage";
 import { NewsletterPage } from "@/components/pages/NewsletterPage";
+import { CpdPage } from "@/components/pages/CpdPage";
 import { SearchPage } from "@/components/pages/SearchPage";
 import { conversionPct, conversionText, OverviewPage } from "@/components/pages/OverviewPage";
 import { QualifiedPage } from "@/components/pages/QualifiedPage";
@@ -989,5 +990,28 @@ describe("view-only access", () => {
     fireEvent.change(field, { target: { value: "15" } });
     fireEvent.blur(field);
     expect(screen.getByRole("table", { name: /target changes/i })).toHaveTextContent(/Admin/);
+  });
+});
+
+describe("CpdPage", () => {
+  beforeEach(() => resetNavigation("/cpd"));
+
+  it("shows CPD bookings by month from Pipedrive, apart from enquiries", () => {
+    wrap(<CpdPage />);
+    expect(screen.getByRole("heading", { level: 1, name: /cpd bookings/i })).toBeInTheDocument();
+    expect(screen.getByText(/not counted as enquiries/i)).toBeInTheDocument();
+    expect(screen.getByTestId("kpi-cpd-month")).toHaveTextContent(/^Bookings in Oct 2026\d+[−+±]\d+ vs Sep 2026$/);
+    expect(screen.getByTestId("kpi-cpd-window")).toHaveTextContent(/^Bookings in the window\d+(first booking [A-Z][a-z]{2} 2026|none yet)$/);
+    expect(screen.getByRole("figure", { name: /^cpd bookings by month$/i })).toBeInTheDocument();
+    expect(screen.getByText(/never counted twice here/i)).toBeInTheDocument();
+  });
+
+  it("shows zeros on a feed from before the line existed", () => {
+    render(
+      <DashboardProvider role="admin" data={{ ...data, cpdBookings: undefined }} config={kpiConfig}>
+        <CpdPage />
+      </DashboardProvider>,
+    );
+    expect(screen.getByTestId("kpi-cpd-window")).toHaveTextContent(/^Bookings in the window0none yet$/);
   });
 });
