@@ -39,6 +39,8 @@
   .bf-foldf .bf-nl input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex:0 0 18px;margin:0;padding:0;border:1px solid var(--ink);border-radius:4px;background:#fff;cursor:pointer;}
   .bf-foldf .bf-nl input:checked{background:var(--ink) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1' fill='none' stroke='%23fff' stroke-width='1.8'/%3E%3C/svg%3E") center no-repeat;}
   .bf-foldf .bf-nl input:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+  .bf-foldf .bf-nl .bf-privacy{font-size:13px;color:var(--muted);line-height:1.6;margin:4px 0 0;}
+  .bf-foldf .bf-nl .bf-privacy a{color:var(--ink);}
   .bf-foldf .bf-status{margin-top:14px;font-size:15px;min-height:1.4em;}
   .bf-foldf .bf-status.err{color:#4A1414;}
   .bf-foldf .bf-done{padding:12px 0;}
@@ -84,6 +86,7 @@
         <div class="bf-nl">
           <p>Keep up to date with the latest in BNG, with industry insights, practical guidance and stories from our habitat banks, delivered straight to your inbox. You can unsubscribe at any time.</p>
           <label><input type="checkbox" name="newsletter_declined" value="yes">I&rsquo;d prefer not to receive these updates.</label>
+          <p class="bf-privacy">See our <a href="/privacy-policy">Privacy Policy</a>.</p>
         </div>
         <button type="submit" class="bf-btn" id="bfFoldSubmit">Join the Fold</button>
         <p class="fine">We&rsquo;ll come back to you to talk through your habitat bank and whether the Fold is the right fit.</p>
